@@ -1,0 +1,41 @@
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: #181818;
+    color: #c9d6de;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif
+}
+
+h1 {
+    color: rebeccapurple;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    border: 1px solid rebeccapurple;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-inline: auto;
+}
+
+form label {
+    margin: 0.5rem 0;
+}
+
+form button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rebeccapurple;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
