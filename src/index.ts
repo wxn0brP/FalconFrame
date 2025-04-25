@@ -63,11 +63,12 @@ class FalconFrame {
         });
     }
 
-    listen(port: number, callback?: () => void): void {
+    listen(port: number, callback?: () => void) {
         const server = http.createServer((req, res) => {
             handleRequest(req as FFRequest, res as FFResponse, this);
         });
         server.listen(port, callback);
+        return server;
     }
 
     getApp() {
