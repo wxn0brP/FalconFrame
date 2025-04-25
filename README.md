@@ -26,7 +26,7 @@ yarn add github:wxn0brP/FalconFrame#dist
 ## 🚦 Usage Example
 
 ```ts
-import FalconFrame from "@wxn0brp/FalconFrame";
+import FalconFrame from "@wxn0brp/falcon-frame";
 const app = new FalconFrame();
 
 const USERS = {
@@ -50,7 +50,7 @@ const requireAuth = (req, res, next) => {
 // Static files
 app.static("/", "public");
 
-app.post("/login", (req, res, next) => {
+app.post("/login", (req, res) => {
     const { valid, validErrors } = req.valid({
         username: "required|string",
         password: "required|string",
@@ -69,9 +69,26 @@ app.post("/login", (req, res, next) => {
     res.status(401).json({ status: "fail", message: "Invalid credentials" });
 });
 
+app.post("/register", (req, res, next) => {
+    const { valid, validErrors } = req.valid({
+        username: "required|string|min:3|max:20",
+        password: "required|string|min:8",
+    });
+
+    if (!valid) {
+        return res.status(400).json({ status: "error", errors: validErrors });
+    }
+
+    next();
+}, (req, res) => {
+    const { username, password } = req.body;
+    USERS[username] = password;
+    return { status: "success", message: "User registered successfully" };
+});
+
 // Protected route
 app.get("/dashboard", requireAuth, (req, res) => {
-    res.json({
+    return {
         message: `👑 Welcome to the dashboard, ${req.cookies.session}`,
     });
 });
