@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import querystring from "querystring";
 import { FFResponse } from "./res";
-import { Body, Cookies, FFRequest, Middleware } from "./types";
+import { Body, Cookies, FFRequest, RouteHandler } from "./types";
 
 export function parseCookies(cookieHeader: string): Cookies {
     const cookies: Cookies = {};
@@ -52,7 +52,7 @@ export function getContentType(filePath: string): string {
     }
 }
 
-export function handleStaticFiles(apiPath: string, dirPath: string): Middleware {
+export function handleStaticFiles(apiPath: string, dirPath: string): RouteHandler {
     return (req: FFRequest, res: FFResponse, next: () => void) => {
         if (!req.path.startsWith(apiPath)) return next();
         const filePath = path.join(dirPath, req.path.slice(apiPath.length));

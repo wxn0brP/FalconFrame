@@ -3,11 +3,11 @@ import http from "http";
 import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
-import { FFRequest, Middleware, RequestHandler, Routes } from "./types";
+import { FFRequest, MiddlewareEntry, RouteHandler, Routes } from "./types";
 
 class FalconFrame {
     public routes: Routes = {};
-    public middlewares: Middleware[] = [];
+    public middlewares: MiddlewareEntry[] = [];
     public logger: Logger;
 
     constructor(loggerOpts?: LoggerOptions) {
@@ -20,32 +20,41 @@ class FalconFrame {
         });
     }
 
-    use(middleware: Middleware): void {
-        this.middlewares.push(middleware);
+    use(path: string | RouteHandler = "/", middleware?: RouteHandler): void {
+        if (typeof path === "function") {
+            middleware = path;
+            path = "/";
+        }
+        this.middlewares.push({ path, middleware });
     }
 
-    addRoute(method: string, path: string, handler: RequestHandler): void {
+    addRoute(method: string, path: string, ...handlers: RouteHandler[]): void {
+        const handler = handlers.pop();
+        handlers.forEach(middleware => this.use(path, middleware));
         this.routes[method.toLowerCase()]?.push({ path, handler });
     }
 
-    get(path: string, handler: RequestHandler): void {
-        this.addRoute("get", path, handler);
+    get(path: string, ...handlers: RouteHandler[]): void {
+        this.addRoute("get", path, ...handlers);
     }
 
-    post(path: string, handler: RequestHandler): void {
-        this.addRoute("post", path, handler);
+    post(path: string, ...handlers: RouteHandler[]): void {
+        this.addRoute("post", path, ...handlers);
     }
 
-    put(path: string, handler: RequestHandler): void {
-        this.addRoute("put", path, handler);
+    put(path: string, ...handlers: RouteHandler[]): void {
+        this.addRoute("put", path, ...handlers);
     }
 
-    delete(path: string, handler: RequestHandler): void {
-        this.addRoute("delete", path, handler);
+    delete(path: string, ...handlers: RouteHandler[]): void {
+        this.addRoute("delete", path, ...handlers);
     }
 
     static(apiPath: string, dirPath: string): void {
-        this.middlewares.push(handleStaticFiles(apiPath, dirPath));
+        this.middlewares.push({
+            path: apiPath,
+            middleware: handleStaticFiles(apiPath, dirPath)
+        });
     }
 
     listen(port: number, callback?: () => void): void {

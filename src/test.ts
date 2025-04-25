@@ -1,6 +1,8 @@
 import FalconFrame from ".";
 
-const app = new FalconFrame();
+const app = new FalconFrame({
+    logLevel: "DEBUG",
+});
 
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`);
@@ -14,7 +16,6 @@ app.get("/hello", (req, res) => {
     res.json({
         message: `Hello, ${name}?`,
         query: req.query,
-        cookies: req.cookies,
     });
 });
 
@@ -22,24 +23,32 @@ app.get("/hello/*", (req, res) => {
     res.json({
         message: `Hello, ${req.params.name}!`,
         query: req.query,
-        cookies: req.cookies,
     });
 });
 
-app.post("/submit", async (req, res) => {
+app.get("/greet/:name", (req, res, next) => {
+    console.log(req.params);
+    next();
+}, (req, res) => {
+    res.json({
+        message: `Hello, ${req.params.name}!`,
+    });
+})
+
+app.post("/submit", (req, res, next) => {
     const { validErrors, valid } = req.valid({
         login: "required|string",
         password: "required|string|min:8",
     });
 
     if (!valid) {
-        res.status(400);
-        return {
+        res.status(400).json({
             status: "error",
             errors: validErrors,
-        }
-    }
-
+        });
+    } else next()
+}, async (req, res) => {
+    console.log("run")
     res.redirect("/hello?name=" + req.body.login);
     return {
         status: "success",
@@ -51,8 +60,6 @@ app.get("*", (req, res) => {
     res.status(404);
     res.json({
         message: "Not found",
-        query: req.query,
-        cookies: req.cookies,
     });
 });
 

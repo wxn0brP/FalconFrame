@@ -1,8 +1,7 @@
 import { FFResponse } from "./res";
 import http from "http";
 
-export type RequestHandler = (req: FFRequest, res: FFResponse) => void | any;
-export type Middleware = (req: FFRequest, res: FFResponse, next: () => void) => void;
+export type RouteHandler = (req: FFRequest, res: FFResponse, next?: () => void) => void | any;
 
 export interface Params {
     [key: string]: string;
@@ -31,11 +30,16 @@ export class FFRequest extends http.IncomingMessage {
 
 export interface Route {
     path: string;
-    handler: RequestHandler;
+    handler: RouteHandler;
 }
 
 export interface Routes {
     [method: string]: Route[];
+}
+
+export interface MiddlewareEntry {
+    path: string;
+    middleware: RouteHandler;
 }
 
 export interface CookieOptions {
