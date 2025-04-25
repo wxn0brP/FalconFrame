@@ -2,6 +2,7 @@ import { FFResponse } from "./res";
 import http from "http";
 
 export type RouteHandler = (req: FFRequest, res: FFResponse, next?: () => void) => void | any;
+export type Method = "get" | "post" | "put" | "delete" | "all";
 
 export interface Params {
     [key: string]: string;
@@ -28,18 +29,11 @@ export class FFRequest extends http.IncomingMessage {
     valid!: (schema: ValidationSchema) => ValidationResult;
 }
 
-export interface Route {
+export interface Middleware {
     path: string;
-    handler: RouteHandler;
-}
-
-export interface Routes {
-    [method: string]: Route[];
-}
-
-export interface MiddlewareEntry {
-    path: string;
+    method: Method;
     middleware: RouteHandler;
+    use?: true;
 }
 
 export interface CookieOptions {

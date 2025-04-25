@@ -1,7 +1,7 @@
 import FalconFrame from ".";
 
 const app = new FalconFrame({
-    logLevel: "DEBUG",
+    logLevel: "INFO",
 });
 
 app.use((req, res, next) => {
@@ -56,7 +56,7 @@ app.post("/submit", (req, res, next) => {
     }
 });
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
     res.status(404);
     res.json({
         message: "Not found",

@@ -3,11 +3,10 @@ import http from "http";
 import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
-import { FFRequest, MiddlewareEntry, RouteHandler, Routes } from "./types";
+import { FFRequest, Method, Middleware, RouteHandler } from "./types";
 
 class FalconFrame {
-    public routes: Routes = {};
-    public middlewares: MiddlewareEntry[] = [];
+    public middlewares: Middleware[] = [];
     public logger: Logger;
 
     constructor(loggerOpts?: LoggerOptions) {
@@ -15,23 +14,20 @@ class FalconFrame {
             loggerName: "falcon-frame",
             ...loggerOpts
         });
-        ["get", "post", "put", "delete"].forEach(method => {
-            this.routes[method] = [];
-        });
     }
 
-    use(path: string | RouteHandler = "/", middleware?: RouteHandler): void {
+    addRoute(method: Method, path: string, ...handlers: RouteHandler[]): void {
+        const handler = handlers.pop();
+        handlers.forEach(middleware => this.use(path, middleware));
+        this.middlewares.push({ path, middleware: handler, method });
+    }
+
+    use(path: string | RouteHandler = "/", middleware?: RouteHandler, method: Method = "all"): void {
         if (typeof path === "function") {
             middleware = path;
             path = "/";
         }
-        this.middlewares.push({ path, middleware });
-    }
-
-    addRoute(method: string, path: string, ...handlers: RouteHandler[]): void {
-        const handler = handlers.pop();
-        handlers.forEach(middleware => this.use(path, middleware));
-        this.routes[method.toLowerCase()]?.push({ path, handler });
+        this.middlewares.push({ path, middleware, method, use: true });
     }
 
     get(path: string, ...handlers: RouteHandler[]): void {
@@ -50,9 +46,19 @@ class FalconFrame {
         this.addRoute("delete", path, ...handlers);
     }
 
+    all(path: string, ...handlers: RouteHandler[]): void {
+        this.addRoute("all", path, ...handlers);
+    }
+
     static(apiPath: string, dirPath: string): void {
         this.middlewares.push({
+            path: (apiPath+"/*").replace("//","/"),
+            method: "get",
+            middleware: handleStaticFiles(apiPath, dirPath)
+        });
+        this.middlewares.push({
             path: apiPath,
+            method: "get",
             middleware: handleStaticFiles(apiPath, dirPath)
         });
     }
