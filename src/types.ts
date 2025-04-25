@@ -26,6 +26,7 @@ export class FFRequest extends http.IncomingMessage {
     params!: Params;
     cookies!: Cookies;
     body!: Body;
+    valid!: (schema: ValidationSchema) => ValidationResult;
 }
 
 export interface Route {
@@ -43,4 +44,15 @@ export interface CookieOptions {
     httpOnly?: boolean;
     secure?: boolean;
     sameSite?: "Strict" | "Lax" | "None";
+}
+
+export interface ValidationSchema {
+    [key: string]: string;
+}
+
+export interface ValidationResult {
+    valid: boolean;
+    validErrors: {
+        [key: string]: string[];
+    };
 }

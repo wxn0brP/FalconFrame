@@ -27,6 +27,19 @@ app.get("/hello/*", (req, res) => {
 });
 
 app.post("/submit", async (req, res) => {
+    const { validErrors, valid } = req.valid({
+        login: "required|string",
+        password: "required|string|min:8",
+    });
+
+    if (!valid) {
+        res.status(400);
+        return {
+            status: "error",
+            errors: validErrors,
+        }
+    }
+
     res.redirect("/hello?name=" + req.body.login);
     return {
         status: "success",

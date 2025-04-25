@@ -3,6 +3,7 @@ import FalconFrame from ".";
 import { parseBody, parseCookies } from "./helpers";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
+import { validate } from "./valid";
 
 export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
@@ -17,6 +18,7 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
     req.path = parsedUrl.pathname || "/";
     req.query = Object.fromEntries(parsedUrl.searchParams);
     req.cookies = parseCookies(req.headers.cookie || "");
+    req.valid = (schema: any) => validate(schema, req.body);
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
