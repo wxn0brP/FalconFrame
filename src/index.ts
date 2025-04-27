@@ -5,7 +5,7 @@ import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { FFRequest, Method, Middleware, RouteHandler } from "./types";
 
-class FalconFrame {
+export class FalconFrame {
     public middlewares: Middleware[] = [];
     public logger: Logger;
 
