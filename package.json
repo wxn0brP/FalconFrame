@@ -22,11 +22,13 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "default": "./dist/index.js"
+            "default": "./dist/index.js",
+            "import": "./dist/index.js"
         },
         "./*": {
             "types": "./dist/*.d.ts",
-            "default": "./dist/*.js"
+            "default": "./dist/*.js",
+            "import": "./dist/*.js"
         }
     }
 }
