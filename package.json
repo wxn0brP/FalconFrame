@@ -18,6 +18,9 @@
     "dependencies": {
         "@wxn0brp/wts-logger": "github:wxn0brP/ts-shared#dist-logger"
     },
+    "files": [
+        "dist"
+    ],
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",

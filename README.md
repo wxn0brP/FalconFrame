@@ -20,7 +20,7 @@
 ## 📦 Installation
 
 ```bash
-yarn add github:wxn0brP/FalconFrame#dist
+yarn add @wxn0brp/falcon-frame
 ```
 
 ## 🚦 Usage Example

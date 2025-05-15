@@ -9,6 +9,10 @@ on:
 
   workflow_dispatch:
 
+concurrency:
+  group: build-main
+  cancel-in-progress: true
+
 jobs:
   build:
     uses: wxn0brP/workflow-dist/.github/workflows/build-ts.yml@main
