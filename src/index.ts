@@ -79,3 +79,9 @@ export class FalconFrame {
 }
 
 export default FalconFrame;
+
+export {
+    FFResponse,
+    FFRequest,
+    RouteHandler,
+}
