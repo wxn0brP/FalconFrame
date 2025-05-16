@@ -1,4 +1,4 @@
-import { Logger, LoggerOptions } from "@wxn0brp/wts-logger";
+import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
 import http from "http";
 import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";

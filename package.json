@@ -16,7 +16,7 @@
         "typescript": "^5.7.3"
     },
     "dependencies": {
-        "@wxn0brp/wts-logger": "github:wxn0brP/ts-shared#dist-logger"
+        "@wxn0brp/lucerna-log": "^0.1.1"
     },
     "files": [
         "dist"
