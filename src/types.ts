@@ -13,7 +13,7 @@ export interface Cookies {
 }
 
 export interface Query {
-    [key: string]: string | string[];
+    [key: string]: string;
 }
 
 export interface Body {
