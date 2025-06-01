@@ -2,6 +2,7 @@ import http from "http";
 import { CookieOptions } from "./types";
 import { getContentType } from "./helpers";
 import { createReadStream } from "fs";
+import { renderHTML } from "./render";
 
 export class FFResponse extends http.ServerResponse {
     _ended = false;
@@ -38,6 +39,12 @@ export class FFResponse extends http.ServerResponse {
     sendFile(filePath: string): this {
         this.setHeader("Content-Type", getContentType(filePath));
         createReadStream(filePath).pipe(this);
+        return this;
+    }
+
+    render(templatePath: string, data: any): this {
+        this.setHeader("Content-Type", "text/html");
+        this.end(renderHTML(templatePath, data));
         return this;
     }
 }

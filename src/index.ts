@@ -4,6 +4,7 @@ import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { FFRequest, Method, Middleware, RouteHandler } from "./types";
+import { renderHTML } from "./render";
 
 export class FalconFrame {
     public middlewares: Middleware[] = [];
@@ -84,4 +85,5 @@ export {
     FFResponse,
     FFRequest,
     RouteHandler,
+    renderHTML,
 }
