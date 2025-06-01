@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/wxn0brP/FalconFrame/compare/v0.0.4...v0.0.5) (2025-06-01)
+
+
+### Features
+
+* add simple template render ([1a54833](https://github.com/wxn0brP/FalconFrame/commit/1a54833fe5e08b7814105f7b6a88db87aa37eeb5))
+
+
+### Bug Fixes
+
+* type ([c22fe7c](https://github.com/wxn0brP/FalconFrame/commit/c22fe7c3a0a4f1d3dbb1e9041eb857691600f96c))
+
 ### [0.0.4](https://github.com/wxn0brP/FalconFrame/compare/v0.0.3...v0.0.4) (2025-05-16)
 
 
