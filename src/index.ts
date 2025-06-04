@@ -5,6 +5,7 @@ import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { FFRequest, Method, Middleware, RouteHandler } from "./types";
 import { renderHTML } from "./render";
+import { PluginSystem } from "./plugins";
 
 export class FalconFrame {
     public middlewares: Middleware[] = [];
@@ -86,4 +87,5 @@ export {
     FFRequest,
     RouteHandler,
     renderHTML,
+    PluginSystem,
 }

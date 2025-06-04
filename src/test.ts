@@ -1,13 +1,33 @@
-import FalconFrame from ".";
+import FalconFrame, { PluginSystem } from ".";
 
 const app = new FalconFrame({
     logLevel: "INFO",
 });
 
+const pluginSystem = new PluginSystem();
+
+pluginSystem.register({
+    id: "logger",
+    process: (req, res, next) => {
+        console.log(`Request to ${req.url} with body ${JSON.stringify(req.body)}`);
+        next();
+    }
+});
+
+pluginSystem.register({
+    id: "logger2",
+    process: (req, res, next) => {
+        req.body.test = "test";
+        next();
+    }
+}, { before: "logger" });
+
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`);
     next();
 });
+
+app.use(pluginSystem.getRouteHandler());
 
 app.static("/", "public");
 
