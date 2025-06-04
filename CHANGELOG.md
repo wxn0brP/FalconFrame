@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/wxn0brP/FalconFrame/compare/v0.0.5...v0.0.6) (2025-06-04)
+
+
+### Features
+
+* add central plugin/middleware system ([4dea405](https://github.com/wxn0brP/FalconFrame/commit/4dea4053ef8bfbd8294c2706134fde6fd9628320))
+
 ### [0.0.5](https://github.com/wxn0brP/FalconFrame/compare/v0.0.4...v0.0.5) (2025-06-01)
 
 
