@@ -1,11 +1,17 @@
 import { RouteHandler } from "./types";
 
-type PluginId = string;
+export type PluginId = string;
 
-interface Plugin {
+export interface Plugin {
     id: PluginId;
     process: RouteHandler;
     priority?: number;
+}
+
+export interface PluginOptions {
+    before?: PluginId | PluginId[];
+    after?: PluginId | PluginId[];
+    optional?: boolean;
 }
 
 export class PluginSystem {
@@ -19,7 +25,7 @@ export class PluginSystem {
      */
     register(
         plugin: Plugin,
-        options?: { before?: PluginId; after?: PluginId }
+        options?: PluginOptions
     ): void {
         if (this.plugins.some(p => p.id === plugin.id)) {
             throw new Error(`Plugin with id '${plugin.id}' already registered`);
@@ -39,24 +45,37 @@ export class PluginSystem {
      */
     private updateExecutionOrder(
         pluginId: PluginId,
-        options?: { before?: PluginId; after?: PluginId }
+        options?: PluginOptions
     ): void {
-        if (!this.executionOrder.includes(pluginId)) {
-            if (options?.before) {
-                const index = this.executionOrder.indexOf(options.before);
-                if (index === -1) {
-                    throw new Error(`Plugin '${options.before}' not found`);
-                }
-                this.executionOrder.splice(index, 0, pluginId);
-            } else if (options?.after) {
-                const index = this.executionOrder.indexOf(options.after);
-                if (index === -1) {
-                    throw new Error(`Plugin '${options.after}' not found`);
-                }
-                this.executionOrder.splice(index + 1, 0, pluginId);
+        if (this.executionOrder.includes(pluginId)) return;
+
+        const resolveTarget = (target: PluginId | PluginId[] | undefined): PluginId | null => {
+            if (!target) return null;
+            const list = Array.isArray(target) ? target : [target];
+            return list.find(id => this.executionOrder.includes(id)) || null;
+        };
+
+        const beforeTarget = resolveTarget(options?.before);
+        const afterTarget = resolveTarget(options?.after);
+
+        if (beforeTarget) {
+            const index = this.executionOrder.indexOf(beforeTarget);
+            this.executionOrder.splice(index, 0, pluginId);
+        } else if (afterTarget) {
+            const index = this.executionOrder.indexOf(afterTarget);
+            this.executionOrder.splice(index + 1, 0, pluginId);
+        } else if (options?.before || options?.after) {
+            if (options.optional) {
+                this.executionOrder.push(pluginId); // fallback: add to the end
             } else {
-                this.executionOrder.push(pluginId);
+                throw new Error(
+                    `Plugin dependency not found for '${pluginId}': ` +
+                    `before=${JSON.stringify(options?.before)}, ` +
+                    `after=${JSON.stringify(options?.after)}`
+                );
             }
+        } else {
+            this.executionOrder.push(pluginId);
         }
     }
 
