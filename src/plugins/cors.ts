@@ -1,8 +1,20 @@
 import { Plugin } from "../plugins";
+import { FFResponse } from "../res";
 
 interface Opts {
     accessControlAllowMethods?: boolean;
     accessControlAllowHeaders?: boolean;
+}
+
+function setHeader(res: FFResponse, opts: Opts) {
+    if (opts.accessControlAllowMethods) res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PUT,DELETE,OPTIONS"
+    );
+    if (opts.accessControlAllowHeaders) res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
 }
 
 export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plugin {
@@ -14,18 +26,17 @@ export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plu
     return {
         id: "cors",
         process: (req, res, next) => {
+            if (allowedOrigins.includes("*")) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                setHeader(res, opts);
+                return next();
+            }
+
             const origin = req.headers.origin;
 
             if (origin && allowedOrigins.includes(origin)) {
                 res.setHeader("Access-Control-Allow-Origin", origin);
-                if (opts.accessControlAllowMethods) res.setHeader(
-                    "Access-Control-Allow-Methods",
-                    "GET,POST,PUT,DELETE,OPTIONS"
-                );
-                if (opts.accessControlAllowHeaders) res.setHeader(
-                    "Access-Control-Allow-Headers",
-                    "Content-Type, Authorization"
-                );
+                setHeader(res, opts);
             }
 
             if (req.method === "OPTIONS") {
