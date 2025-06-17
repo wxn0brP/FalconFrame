@@ -15,9 +15,9 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
 
     const { logger, middlewares } = FF;
     try {
-        const path = (req.url || "").split("?")[0];
+        const [path, params] = (req.url || "").split("?");
         const normalizedPath = path.replace(/\/{2,}/g, "/");
-        const parsedUrl = new URL(normalizedPath, "http://localhost");
+        const parsedUrl = new URL(normalizedPath + (params ? `?${params}` : ""), "http://localhost");
         req.path = parsedUrl.pathname || "/";
         req.query = Object.fromEntries(parsedUrl.searchParams);
     } catch (e) {
