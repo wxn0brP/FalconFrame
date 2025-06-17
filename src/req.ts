@@ -14,9 +14,18 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
     }
 
     const { logger, middlewares } = FF;
-    const parsedUrl = new URL(req.url || "", "http://localhost");
-    req.path = parsedUrl.pathname || "/";
-    req.query = Object.fromEntries(parsedUrl.searchParams);
+    try {
+        const path = (req.url || "").split("?")[0];
+        const normalizedPath = path.replace(/\/{2,}/g, "/");
+        const parsedUrl = new URL(normalizedPath, "http://localhost");
+        req.path = parsedUrl.pathname || "/";
+        req.query = Object.fromEntries(parsedUrl.searchParams);
+    } catch (e) {
+        logger.error(`Error parsing URL (${req.url}): ${e}`);
+        res.status(400).end("400: Bad request");
+        return; 
+    }
+    
     req.cookies = parseCookies(req.headers.cookie || "");
     req.params = {};
     req.valid = (schema: any) => validate(schema, req.body);
