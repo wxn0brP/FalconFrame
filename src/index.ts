@@ -3,7 +3,7 @@ import http from "http";
 import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
-import { FFRequest, Method, Middleware, RouteHandler } from "./types";
+import { AfterHandleRequest, FFRequest, Method, Middleware, RouteHandler } from "./types";
 import { renderHTML } from "./render";
 import { PluginSystem } from "./plugins";
 
@@ -65,16 +65,18 @@ export class FalconFrame {
         });
     }
 
-    listen(port: number, callback?: () => void) {
-        const server = http.createServer((req, res) => {
-            handleRequest(req as FFRequest, res as FFResponse, this);
-        });
+    listen(port: number, callback?: () => void, afterHandleRequest?: AfterHandleRequest) {
+        const server = http.createServer(this.getApp(afterHandleRequest));
         server.listen(port, callback);
         return server;
     }
 
-    getApp() {
+    getApp(afterHandleRequest?: AfterHandleRequest) {
         return (req: any, res: any) => {
+            if (afterHandleRequest) {
+                const result = afterHandleRequest(req, res);
+                if (result) return result;
+            }
             handleRequest(req as FFRequest, res as FFResponse, this);
         }
     }

@@ -54,3 +54,5 @@ export interface ValidationResult {
         [key: string]: string[];
     };
 }
+
+export type AfterHandleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => any; 
