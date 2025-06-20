@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.13](https://github.com/wxn0brP/FalconFrame/compare/v0.0.12...v0.0.13) (2025-06-20)
+
+
+### Bug Fixes
+
+* **plugin:** cors OPTIONS method ([a479887](https://github.com/wxn0brP/FalconFrame/commit/a479887ef604b94125a14a6f2b4d0dd687469c98))
+
 ### [0.0.12](https://github.com/wxn0brP/FalconFrame/compare/v0.0.11...v0.0.12) (2025-06-18)
 
 
