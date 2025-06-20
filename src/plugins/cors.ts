@@ -29,6 +29,10 @@ export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plu
             if (allowedOrigins.includes("*")) {
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 setHeader(res, opts);
+                if (req.method === "OPTIONS") {
+                    res.statusCode = 204;
+                    return res.end();
+                }
                 return next();
             }
 
@@ -37,11 +41,10 @@ export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plu
             if (origin && allowedOrigins.includes(origin)) {
                 res.setHeader("Access-Control-Allow-Origin", origin);
                 setHeader(res, opts);
-            }
-
-            if (req.method === "OPTIONS") {
-                res.statusCode = 204;
-                return res.end();
+                if (req.method === "OPTIONS") {
+                    res.statusCode = 204;
+                    return res.end();
+                }
             }
 
             next();
