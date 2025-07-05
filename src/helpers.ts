@@ -27,7 +27,7 @@ export function parseBody(contentType: string, body: string): Body {
     return {};
 }
 
-export function getContentType(filePath: string): string {
+function _getContentType(filePath: string): string {
     const ext = path.extname(filePath).toLowerCase();
     switch (ext) {
         case ".html":
@@ -47,18 +47,30 @@ export function getContentType(filePath: string): string {
             return "image/gif";
         case ".svg":
             return "image/svg+xml";
+        case ".ico":
+            return "image/x-icon";
+        case ".txt":
+            return "text/plain";
+        case ".pdf":
+            return "application/pdf";
         default:
             return "application/octet-stream";
     }
 }
 
-export function handleStaticFiles(apiPath: string, dirPath: string): RouteHandler {
+export function getContentType(filePath: string, utf8 = false): string {
+    let contentType = _getContentType(filePath);
+    if (utf8) contentType += "; charset=utf-8";
+    return contentType; 
+}
+
+export function handleStaticFiles(apiPath: string, dirPath: string, utf8 = true): RouteHandler {
     return (req: FFRequest, res: FFResponse, next: () => void) => {
         if (!req.path.startsWith(apiPath)) return next();
         const filePath = path.join(dirPath, req.path.slice(apiPath.length));
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            res.setHeader("Content-Type", getContentType(filePath));
+            res.ct(getContentType(filePath, utf8));
             fs.createReadStream(filePath).pipe(res);
             return true;
         }
@@ -67,7 +79,7 @@ export function handleStaticFiles(apiPath: string, dirPath: string): RouteHandle
             if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
                 const indexPath = path.join(filePath, "index.html");
                 if (fs.existsSync(indexPath) && fs.statSync(indexPath).isFile()) {
-                    res.setHeader("Content-Type", getContentType(indexPath));
+                    res.ct(getContentType(indexPath, utf8));
                     fs.createReadStream(indexPath).pipe(res);
                     return true;
                 }

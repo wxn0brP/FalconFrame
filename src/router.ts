@@ -52,16 +52,16 @@ export class Router {
         this.addRoute("all", path, ...handlers);
     }
 
-    static(apiPath: string, dirPath: string): void {
+    static(apiPath: string, dirPath: string, utf8 = true): void {
         this.middlewares.push({
             path: (apiPath + "/*").replace("//", "/"),
             method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath)
+            middleware: handleStaticFiles(apiPath, dirPath, utf8)
         });
         this.middlewares.push({
             path: apiPath,
             method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath)
+            middleware: handleStaticFiles(apiPath, dirPath, utf8)
         });
     }
 }

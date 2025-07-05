@@ -7,6 +7,20 @@ import { renderHTML } from "./render";
 export class FFResponse extends http.ServerResponse {
     _ended = false;
 
+    /**
+     * bind end for compatibility
+    */
+    send(data: string): void {
+        this.end(data);
+    }
+
+    /**
+     * Set content type
+     */
+    ct(contentType: string = "text/plain"): void {
+        this.setHeader("Content-Type", contentType);
+    }
+
     json(data: any): void {
         this.setHeader("Content-Type", "application/json");
         this.end(JSON.stringify(data));
@@ -36,8 +50,9 @@ export class FFResponse extends http.ServerResponse {
         return this;
     }
 
-    sendFile(filePath: string): this {
-        this.setHeader("Content-Type", getContentType(filePath));
+    sendFile(filePath: string, contentType?: string): this {
+        if (contentType === "utf8") contentType = getContentType(filePath);
+        this.ct(contentType || getContentType(filePath));
         createReadStream(filePath).pipe(this);
         return this;
     }

@@ -40,4 +40,6 @@ export default FalconFrame;
 export {
     FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
 };
-export * as Plugins from "./plugins";
+export * as Plugins from "./plugins/index";
+export * as PluginsEngine from "./plugins.js";
+export * as Helpers from "./helpers";
