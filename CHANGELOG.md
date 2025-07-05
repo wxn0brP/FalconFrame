@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.15](https://github.com/wxn0brP/FalconFrame/compare/v0.0.14...v0.0.15) (2025-07-05)
+
+
+### Features
+
+* routers ([f9d6500](https://github.com/wxn0brP/FalconFrame/commit/f9d65005ecd5018dfe2cc1a9f9d94f0dfe6c7294))
+* static files ux ([c80df87](https://github.com/wxn0brP/FalconFrame/commit/c80df87a915beeb69f0fd345454c6ba864daf327))
+* ux ([aec1a56](https://github.com/wxn0brP/FalconFrame/commit/aec1a56eeed4fda06486736ba3b709c0c2dd6f44))
+
+
+### Bug Fixes
+
+* routers ([f4f1db2](https://github.com/wxn0brP/FalconFrame/commit/f4f1db21363fc3a9e563b00a6a134b0bf7dc5546))
+
 ### [0.0.14](https://github.com/wxn0brP/FalconFrame/compare/v0.0.13...v0.0.14) (2025-06-22)
 
 ### [0.0.13](https://github.com/wxn0brP/FalconFrame/compare/v0.0.12...v0.0.13) (2025-06-20)
