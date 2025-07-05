@@ -19,7 +19,6 @@ jobs:
     with:
       scriptsHandling: "remove-all"
       publishToNpm: true
-      preBuildCustomCommands: "rm src/test.ts"
     
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
