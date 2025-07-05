@@ -27,7 +27,16 @@ yarn add @wxn0brp/falcon-frame
 
 ```ts
 import FalconFrame from "@wxn0brp/falcon-frame";
+import { createCORSPlugin } from "@wxn0brp/falcon-frame/plugins/cors";
 const app = new FalconFrame();
+
+const pluginSystem = new PluginSystem();
+
+// Initialize CORS plugin
+pluginSystem.register(createCORSPlugin(["http://localhost:3000", "https://example.com"]));
+
+// Register plugins
+app.use(pluginSystem.getRouteHandler());
 
 const USERS = {
     admin: "hunter2",
