@@ -142,6 +142,8 @@ function getMiddlewares(middlewares: Middleware[], matchUrl: string, basePath = 
 
         const matches =
             matchUrl === fullPath ||
+            fullPath.includes(":") ||
+            fullPath.includes("*") ||
             matchUrl.startsWith(fullPath + "/");
 
         if (!matches) continue;
