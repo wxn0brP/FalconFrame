@@ -52,7 +52,11 @@ export class Router {
         this.addRoute("all", path, ...handlers);
     }
 
-    static(apiPath: string, dirPath: string, utf8 = true): void {
+    static(apiPath: string, dirPath?: string, utf8 = true): void {
+        if (!dirPath) {
+            dirPath = apiPath;
+            apiPath = "/";
+        }
         this.middlewares.push({
             path: (apiPath + "/*").replace("//", "/"),
             method: "get",
