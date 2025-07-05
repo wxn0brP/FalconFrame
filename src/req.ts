@@ -13,7 +13,7 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         return originalEnd.call(res, ...any);
     }
 
-    const { logger, middlewares } = FF;
+    const { logger } = FF;
     try {
         const [path, params] = (req.url || "").split("?");
         const normalizedPath = path.replace(/\/{2,}/g, "/");
@@ -31,6 +31,8 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
     req.valid = (schema: any) => validate(schema, req.body);
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
+
+    const middlewares = getMiddlewares(FF.middlewares, (req.url + "/").replace(/\/+/g, "/"));
 
     let body = "";
     req.on("data", chunk => (body += chunk.toString()));
@@ -129,4 +131,28 @@ function matchMiddleware(url: string, middlewares: Middleware[]): Middleware[] {
     }
 
     return matchedMiddlewares;
+}
+
+function getMiddlewares(middlewares: Middleware[], matchUrl: string, basePath = ""): Middleware[] {
+    const result: Middleware[] = [];
+
+    for (const middleware of middlewares) {
+        const midPath = (middleware.path || "").replace(/\/+$/, "");
+        const fullPath = (basePath + "/" + midPath).replace(/\/+/g, "/");
+
+        const matches =
+            matchUrl === fullPath ||
+            matchUrl.startsWith(fullPath + "/");
+
+        if (!matches) continue;
+
+        if (middleware.router) {
+            const nested = getMiddlewares(middleware.router, matchUrl, fullPath);
+            result.push(...nested);
+        } else {
+            result.push({ ...middleware, path: fullPath });
+        }
+    }
+
+    return result;
 }

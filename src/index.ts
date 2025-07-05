@@ -1,67 +1,20 @@
 import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
 import http from "http";
-import { handleStaticFiles } from "./helpers";
+import { PluginSystem } from "./plugins";
+import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
-import { BeforeHandleRequest, FFRequest, Method, Middleware, RouteHandler } from "./types";
-import { renderHTML } from "./render";
-import { PluginSystem } from "./plugins";
+import { Router } from "./router";
+import { BeforeHandleRequest, FFRequest, RouteHandler } from "./types";
 
-export class FalconFrame {
-    public middlewares: Middleware[] = [];
+export class FalconFrame extends Router {
     public logger: Logger;
 
     constructor(loggerOpts?: LoggerOptions) {
+        super();
         this.logger = new Logger({
             loggerName: "falcon-frame",
             ...loggerOpts
-        });
-    }
-
-    addRoute(method: Method, path: string, ...handlers: RouteHandler[]): void {
-        const handler = handlers.pop();
-        handlers.forEach(middleware => this.use(path, middleware));
-        this.middlewares.push({ path, middleware: handler, method });
-    }
-
-    use(path: string | RouteHandler = "/", middleware?: RouteHandler, method: Method = "all"): void {
-        if (typeof path === "function") {
-            middleware = path;
-            path = "/";
-        }
-        this.middlewares.push({ path, middleware, method, use: true });
-    }
-
-    get(path: string, ...handlers: RouteHandler[]): void {
-        this.addRoute("get", path, ...handlers);
-    }
-
-    post(path: string, ...handlers: RouteHandler[]): void {
-        this.addRoute("post", path, ...handlers);
-    }
-
-    put(path: string, ...handlers: RouteHandler[]): void {
-        this.addRoute("put", path, ...handlers);
-    }
-
-    delete(path: string, ...handlers: RouteHandler[]): void {
-        this.addRoute("delete", path, ...handlers);
-    }
-
-    all(path: string, ...handlers: RouteHandler[]): void {
-        this.addRoute("all", path, ...handlers);
-    }
-
-    static(apiPath: string, dirPath: string): void {
-        this.middlewares.push({
-            path: (apiPath+"/*").replace("//","/"),
-            method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath)
-        });
-        this.middlewares.push({
-            path: apiPath,
-            method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath)
         });
     }
 
@@ -85,9 +38,6 @@ export class FalconFrame {
 export default FalconFrame;
 
 export {
-    FFResponse,
-    FFRequest,
-    RouteHandler,
-    renderHTML,
-    PluginSystem,
-}
+    FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
+};
+export * as Plugins from "./plugins";
