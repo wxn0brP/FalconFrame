@@ -13,8 +13,7 @@
     },
     "scripts": {
         "build": "tsc && tsc-alias",
-        "test": "node dist/test.js",
-        "bun": "bun run test.ts"
+        "test": "node dist/test.js"
     },
     "devDependencies": {
         "@types/node": "^22.12.0",
