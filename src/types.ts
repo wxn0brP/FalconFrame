@@ -55,4 +55,4 @@ export interface ValidationResult {
     };
 }
 
-export type AfterHandleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => any; 
+export type BeforeHandleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => any; 

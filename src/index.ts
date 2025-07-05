@@ -3,7 +3,7 @@ import http from "http";
 import { handleStaticFiles } from "./helpers";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
-import { AfterHandleRequest as BeforeHandleRequest, FFRequest, Method, Middleware, RouteHandler } from "./types";
+import { BeforeHandleRequest, FFRequest, Method, RouteHandler } from "./types";
 import { renderHTML } from "./render";
 import { PluginSystem } from "./plugins";
 
