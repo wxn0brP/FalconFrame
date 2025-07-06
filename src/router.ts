@@ -57,15 +57,6 @@ export class Router {
             dirPath = apiPath;
             apiPath = "/";
         }
-        this.middlewares.push({
-            path: (apiPath + "/*").replace("//", "/"),
-            method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath, utf8)
-        });
-        this.middlewares.push({
-            path: apiPath,
-            method: "get",
-            middleware: handleStaticFiles(apiPath, dirPath, utf8)
-        });
+        this.use(apiPath, handleStaticFiles(dirPath, utf8));
     }
 }

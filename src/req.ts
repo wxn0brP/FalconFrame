@@ -69,6 +69,7 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
                     }
                 }
             }
+            req.middleware = middleware;
             const result = await middleware.middleware(req, res, next);
             if (result && !res._ended) {
                 if (typeof result === "string") {

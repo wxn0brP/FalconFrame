@@ -64,10 +64,11 @@ export function getContentType(filePath: string, utf8 = false): string {
     return contentType; 
 }
 
-export function handleStaticFiles(apiPath: string, dirPath: string, utf8 = true): RouteHandler {
+export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
     return (req: FFRequest, res: FFResponse, next: () => void) => {
-        if (!req.path.startsWith(apiPath)) return next();
-        const filePath = path.join(dirPath, req.path.slice(apiPath.length));
+        if (req.method.toLowerCase() !== "get") return next();
+        const apiPath = req.middleware.path;
+        const filePath = path.join(dirPath, req.path.replace(apiPath, ""));
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
             res.ct(getContentType(filePath, utf8));
@@ -75,14 +76,15 @@ export function handleStaticFiles(apiPath: string, dirPath: string, utf8 = true)
             return true;
         }
 
-        if (req.path.endsWith("/")) {
-            if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
-                const indexPath = path.join(filePath, "index.html");
-                if (fs.existsSync(indexPath) && fs.statSync(indexPath).isFile()) {
-                    res.ct(getContentType(indexPath, utf8));
-                    fs.createReadStream(indexPath).pipe(res);
-                    return true;
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+            const indexPath = path.join(filePath, "index.html");
+            if (fs.existsSync(indexPath) && fs.statSync(indexPath).isFile()) {
+                if (!req.path.endsWith("/")) {
+                    res.redirect(req.path + "/");
                 }
+                res.ct(getContentType(indexPath, utf8));
+                fs.createReadStream(indexPath).pipe(res);
+                return true;
             }
         }
 

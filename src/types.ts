@@ -27,6 +27,7 @@ export class FFRequest extends http.IncomingMessage {
     cookies!: Cookies;
     body!: Body;
     valid!: (schema: ValidationSchema) => ValidationResult;
+    middleware!: Middleware;
 }
 
 export interface Middleware {
