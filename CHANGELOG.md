@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.17](https://github.com/wxn0brP/FalconFrame/compare/v0.0.16...v0.0.17) (2025-07-08)
+
+
+### Bug Fixes
+
+* getMiddlewares ([289f3dd](https://github.com/wxn0brP/FalconFrame/commit/289f3dd0ad7f0825e0f77d109a57ddd8d0c77c6c))
+
 ### [0.0.16](https://github.com/wxn0brP/FalconFrame/compare/v0.0.15...v0.0.16) (2025-07-06)
 
 
