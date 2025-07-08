@@ -32,7 +32,8 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
-    const middlewares = getMiddlewares(FF.middlewares, (req.url + "/").replace(/\/+/g, "/"));
+    const middlewaresPath = req.url.split("?")[0] + "/";
+    const middlewares = getMiddlewares(FF.middlewares, middlewaresPath.replace(/\/+/g, "/"));
 
     let body = "";
     req.on("data", chunk => (body += chunk.toString()));
