@@ -4,13 +4,13 @@ import { Method, Middleware, RouteHandler } from "./types";
 export class Router {
     public middlewares: Middleware[] = [];
 
-    addRoute(method: Method, path: string, ...handlers: RouteHandler[]): void {
+    addRoute(method: Method, path: string, ...handlers: RouteHandler[]) {
         const handler = handlers.pop();
         handlers.forEach(middleware => this.use(path, middleware));
-        this.middlewares.push({ path, middleware: handler, method });
+        return this.middlewares.push({ path, middleware: handler, method });
     }
 
-    use(path: string | RouteHandler | Router = "/", middlewareFn?: RouteHandler | Router, method: Method = "all"): void {
+    use(path: string | RouteHandler | Router = "/", middlewareFn?: RouteHandler | Router, method: Method = "all") {
         if (typeof path === "function" || path instanceof Router) {
             middlewareFn = path;
             path = "/";
@@ -30,33 +30,46 @@ export class Router {
         }
 
         this.middlewares.push(middleware);
+        return this;
     }
 
-    get(path: string, ...handlers: RouteHandler[]): void {
+    get(path: string, ...handlers: RouteHandler[]) {
         this.addRoute("get", path, ...handlers);
+        return this;
     }
 
-    post(path: string, ...handlers: RouteHandler[]): void {
+    post(path: string, ...handlers: RouteHandler[]) {
         this.addRoute("post", path, ...handlers);
+        return this;
     }
 
-    put(path: string, ...handlers: RouteHandler[]): void {
+    put(path: string, ...handlers: RouteHandler[]) {
         this.addRoute("put", path, ...handlers);
+        return this;
     }
 
-    delete(path: string, ...handlers: RouteHandler[]): void {
+    delete(path: string, ...handlers: RouteHandler[]) {
         this.addRoute("delete", path, ...handlers);
+        return this;
     }
 
-    all(path: string, ...handlers: RouteHandler[]): void {
+    all(path: string, ...handlers: RouteHandler[]) {
         this.addRoute("all", path, ...handlers);
+        return this;
     }
 
-    static(apiPath: string, dirPath?: string, utf8 = true): void {
+    static(apiPath: string, dirPath?: string, utf8 = true) {
         if (!dirPath) {
             dirPath = apiPath;
             apiPath = "/";
         }
         this.use(apiPath, handleStaticFiles(dirPath, utf8));
+        return this;
+    }
+
+    sse(path: string, ...handlers: RouteHandler[]) {
+        const index = this.addRoute("get", path, ...handlers);
+        this.middlewares[index - 1].sse = true;
+        return this;
     }
 }

@@ -23,17 +23,62 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
     } catch (e) {
         logger.error(`Error parsing URL (${req.url}): ${e}`);
         res.status(400).end("400: Bad request");
-        return; 
+        return;
     }
-    
+
     req.cookies = parseCookies(req.headers.cookie || "");
     req.params = {};
     req.valid = (schema: any) => validate(schema, req.body);
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
-    const middlewaresPath = req.url.split("?")[0] + "/";
+    const middlewaresPath = req.path + "/";
     const middlewares = getMiddlewares(FF.middlewares, middlewaresPath.replace(/\/+/g, "/"));
+
+    const matchedTypeMiddlewares = middlewares.filter(middleware => middleware.method === req.method.toLowerCase() || middleware.method === "all");
+    const matchedMiddlewares = matchMiddleware(req.path, matchedTypeMiddlewares);
+    logger.debug("Matched middlewares: " + matchedMiddlewares.map(middleware => middleware.path).join(", "));
+
+    if (matchedMiddlewares.length === 0) {
+        res.status(404).end("404: File had second thoughts");
+        return;
+    }
+
+    let middlewareIndex = 0;
+    async function next() {
+        if (middlewareIndex >= matchedMiddlewares.length) {
+            return res.status(404).end("404: File had second thoughts");
+        }
+
+        const middleware = matchedMiddlewares[middlewareIndex++];
+        logger.debug(`Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`);
+
+        if (middleware.path.includes(":")) {
+            const middlewareParts = middleware.path.split("/");
+            const reqPathParts = req.path.split("/");
+            req.params = {};
+            for (let i = 0; i < middlewareParts.length; i++) {
+                if (middlewareParts[i].startsWith(":")) {
+                    const paramName = middlewareParts[i].slice(1);
+                    req.params[paramName] = reqPathParts[i];
+                }
+            }
+        }
+        req.middleware = middleware;
+        const result = await middleware.middleware(req, res, next);
+        if (result && !res._ended) {
+            if (typeof result === "string") {
+                return res.end(result);
+            } else if (typeof result === "object") {
+                return res.json(result);
+            }
+        }
+    }
+
+    if (req.method === "GET" && middlewares[middlewares.length - 1]?.sse) {
+        next();
+        return;
+    }
 
     let body = "";
     req.on("data", chunk => (body += chunk.toString()));
@@ -42,44 +87,6 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         req.body = parseBody(contentType, body);
 
         logger.debug(`Request body: ${JSON.stringify(req.body)}`);
-
-        const matchedTypeMiddlewares = middlewares.filter(middleware => middleware.method === req.method.toLocaleLowerCase() || middleware.method === "all");
-        const matchedMiddlewares = matchMiddleware(req.path, matchedTypeMiddlewares);
-
-        if (matchedMiddlewares.length === 0) {
-            return res.status(404).end("404: File had second thoughts.");
-        }
-
-        logger.debug("Matched middlewares: " + matchedMiddlewares.map(middleware => middleware.path).join(", "));
-
-        let middlewareIndex = 0;
-        const next = async () => {
-            if (middlewareIndex >= matchedMiddlewares.length) {
-                return res.status(404).end("404: File had second thoughts");
-            }
-            const middleware = matchedMiddlewares[middlewareIndex++];
-            logger.debug(`Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`);
-            if (middleware.path.includes(":")) {
-                const middlewareParts = middleware.path.split("/");
-                const reqPathParts = req.path.split("/");
-                req.params = {};
-                for (let i = 0; i < middlewareParts.length; i++) {
-                    if (middlewareParts[i].startsWith(":")) {
-                        const paramName = middlewareParts[i].slice(1);
-                        req.params[paramName] = reqPathParts[i];
-                    }
-                }
-            }
-            req.middleware = middleware;
-            const result = await middleware.middleware(req, res, next);
-            if (result && !res._ended) {
-                if (typeof result === "string") {
-                    return res.end(result);
-                } else if (typeof result === "object") {
-                    return res.json(result);
-                }
-            }
-        }
 
         next();
     });

@@ -36,6 +36,7 @@ export interface Middleware {
     middleware: RouteHandler;
     use?: true;
     router?: Middleware[];
+    sse?: true;
 }
 
 export interface CookieOptions {
