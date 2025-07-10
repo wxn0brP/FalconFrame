@@ -81,6 +81,7 @@ export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
             if (fs.existsSync(indexPath) && fs.statSync(indexPath).isFile()) {
                 if (!req.path.endsWith("/")) {
                     res.redirect(req.path + "/");
+                    return true;
                 }
                 res.ct(getContentType(indexPath, utf8));
                 fs.createReadStream(indexPath).pipe(res);

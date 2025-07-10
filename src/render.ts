@@ -6,6 +6,7 @@ interface RenderData {
 }
 
 export function renderHTML(templatePath: string, data: RenderData): string {
+    if (!fs.existsSync(templatePath)) return "Template not found";
     let template = fs.readFileSync(templatePath, "utf8");
 
     // Inserting data, e.g. {{name}}
