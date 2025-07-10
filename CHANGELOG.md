@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.18](https://github.com/wxn0brP/FalconFrame/compare/v0.0.17...v0.0.18) (2025-07-10)
+
+
+### Features
+
+* refactor, error handling, docs ([b3b49d5](https://github.com/wxn0brP/FalconFrame/commit/b3b49d56d6d3435ff62177ae4e0228b9153a718d))
+* sse support ([e45c71b](https://github.com/wxn0brP/FalconFrame/commit/e45c71bfedca2c104579d4035724e8e114f12f04))
+
 ### [0.0.17](https://github.com/wxn0brP/FalconFrame/compare/v0.0.16...v0.0.17) (2025-07-08)
 
 
