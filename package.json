@@ -1,6 +1,6 @@
 {
     "name": "@wxn0brp/falcon-frame",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "author": "wxn0brP",
