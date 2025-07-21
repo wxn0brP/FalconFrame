@@ -18,9 +18,16 @@ export class FalconFrame extends Router {
         });
     }
 
-    listen(port: number, callback?: () => void, beforeHandleRequest?: BeforeHandleRequest) {
+    listen(port: number, callback?: (() => void) | boolean, beforeHandleRequest?: BeforeHandleRequest) {
         const server = http.createServer(this.getApp(beforeHandleRequest));
-        server.listen(port, callback);
+        if (typeof callback === "boolean") {
+            if (callback)
+                callback = () => {
+                    console.log(`[FF] Server running on http://localhost:${port}`);
+                };
+            else callback = () => { };
+        }
+        server.listen(port, callback || (() => {}));
         return server;
     }
 
