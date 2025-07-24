@@ -19,7 +19,7 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         const [path, params] = (req.url || "").split("?");
         const normalizedPath = path.replace(/\/{2,}/g, "/");
         const parsedUrl = new URL(normalizedPath + (params ? `?${params}` : ""), "http://localhost");
-        req.path = parsedUrl.pathname || "/";
+        req.path = decodeURIComponent(parsedUrl.pathname) || "/";
         req.query = Object.fromEntries(parsedUrl.searchParams);
     } catch (e) {
         logger.error(`Error parsing URL (${req.url}): ${e}`);
