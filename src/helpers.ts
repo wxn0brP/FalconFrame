@@ -89,6 +89,13 @@ export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
             }
         }
 
+        const htmlPath = filePath + ".html";
+        if (fs.existsSync(htmlPath) && fs.statSync(htmlPath).isFile()) {
+            res.ct(getContentType(htmlPath, utf8));
+            fs.createReadStream(htmlPath).pipe(res);
+            return true;
+        }
+
         next();
     }
 }
