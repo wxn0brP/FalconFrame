@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.21](https://github.com/wxn0brP/FalconFrame/compare/v0.0.20...v0.0.21) (2025-08-03)
+
+
+### Features
+
+* handleStaticFiles try .html ([c4990f4](https://github.com/wxn0brP/FalconFrame/commit/c4990f40da32c0ea3aedf0aca8dd4fc9d86cbf50))
+
 ### [0.0.20](https://github.com/wxn0brP/FalconFrame/compare/v0.0.19...v0.0.20) (2025-07-24)
 
 
