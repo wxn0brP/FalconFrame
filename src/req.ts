@@ -1,10 +1,11 @@
 import { URL } from "url";
 import FalconFrame from ".";
-import { parseBody, parseCookies } from "./helpers";
+import { parseCookies } from "./helpers";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
 import { validate } from "./valid";
 import { getMiddlewares, matchMiddleware } from "./middleware";
+import { parseBody } from "./body";
 
 export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
@@ -84,10 +85,9 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
 
     let body = "";
     req.on("data", chunk => (body += chunk.toString()));
-    req.on("end", () => {
-        const contentType = req.headers["content-type"] || "";
-        req.body = parseBody(contentType, body);
-
+    req.on("end", async () => {
+        const parsedBody = await parseBody(req, body, FF);
+        Object.assign(req, parsedBody);
         logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
         next();

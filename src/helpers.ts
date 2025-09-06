@@ -1,8 +1,7 @@
 import fs from "fs";
 import path from "path";
-import querystring from "querystring";
 import { FFResponse } from "./res";
-import { Body, Cookies, FFRequest, RouteHandler } from "./types";
+import { Cookies, FFRequest, RouteHandler } from "./types";
 
 export function parseCookies(cookieHeader: string): Cookies {
     const cookies: Cookies = {};
@@ -12,19 +11,6 @@ export function parseCookies(cookieHeader: string): Cookies {
         cookies[name.trim()] = value;
     });
     return cookies;
-}
-
-export function parseBody(contentType: string, body: string): Body {
-    if (contentType.includes("application/json")) {
-        try {
-            return JSON.parse(body);
-        } catch {
-            return {};
-        }
-    } else if (contentType.includes("application/x-www-form-urlencoded")) {
-        return querystring.parse(body);
-    }
-    return {};
 }
 
 function _getContentType(filePath: string): string {
@@ -61,7 +47,7 @@ function _getContentType(filePath: string): string {
 export function getContentType(filePath: string, utf8 = false): string {
     let contentType = _getContentType(filePath);
     if (utf8) contentType += "; charset=utf-8";
-    return contentType; 
+    return contentType;
 }
 
 export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {

@@ -1,3 +1,4 @@
+import FalconFrame from ".";
 import { FFResponse } from "./res";
 import http from "http";
 
@@ -19,6 +20,13 @@ export interface Query {
 export interface Body {
     [key: string]: any;
 }
+
+export interface ParseBody {
+    body?: Body;
+    files?: Record<string, Buffer>;
+}
+
+export type ParseBodyFunction = (body: string, req: FFRequest, FF: FalconFrame) => Promise<ParseBody>;
 
 export class FFRequest extends http.IncomingMessage {
     path!: string;

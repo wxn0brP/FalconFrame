@@ -5,10 +5,11 @@ import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { Router } from "./router";
-import { BeforeHandleRequest, FFRequest, RouteHandler } from "./types";
+import { BeforeHandleRequest, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
 
 export class FalconFrame extends Router {
     public logger: Logger;
+    public customParsers: Record<string, ParseBodyFunction> = {};
 
     constructor(loggerOpts?: LoggerOptions) {
         super();
@@ -27,7 +28,7 @@ export class FalconFrame extends Router {
                 };
             else callback = () => { };
         }
-        server.listen(port, callback || (() => {}));
+        server.listen(port, callback || (() => { }));
         return server;
     }
 
