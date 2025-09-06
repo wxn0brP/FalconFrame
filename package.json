@@ -12,8 +12,7 @@
         "url": "https://github.com/wxn0brP/FalconFrame.git"
     },
     "scripts": {
-        "build": "tsc && tsc-alias",
-        "test": "node dist/test.js"
+        "build": "tsc && tsc-alias"
     },
     "devDependencies": {
         "@types/node": "^22.12.0",

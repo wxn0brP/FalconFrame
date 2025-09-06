@@ -1,5 +1,5 @@
 {
-    "cmd": "yarn build && yarn test",
+    "cmd": "tsc --noEmit && bun run src/test.ts",
     "watch": [
         "src"
     ],
