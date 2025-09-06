@@ -5,7 +5,7 @@ import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { Router } from "./router";
-import { BeforeHandleRequest, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
+import type { BeforeHandleRequest, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
 
 export class FalconFrame extends Router {
     public logger: Logger;
@@ -46,7 +46,7 @@ export class FalconFrame extends Router {
 export default FalconFrame;
 
 export {
-    FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
+    FFRequest, FFResponse, PluginSystem, renderHTML, Router, RouteHandler
 };
 export * as Plugins from "./plugins/index";
 export * as PluginsEngine from "./plugins.js";

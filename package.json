@@ -15,12 +15,12 @@
         "build": "tsc && tsc-alias"
     },
     "devDependencies": {
-        "@types/node": "^22.12.0",
-        "tsc-alias": "^1.8.10",
-        "typescript": "^5.7.3"
+        "@types/node": "*",
+        "tsc-alias": "*",
+        "typescript": "*"
     },
     "dependencies": {
-        "@wxn0brp/lucerna-log": "^0.1.1"
+        "@wxn0brp/lucerna-log": "^0.2.0"
     },
     "files": [
         "dist"
