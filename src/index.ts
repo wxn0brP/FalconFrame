@@ -7,9 +7,10 @@ import { FFResponse } from "./res";
 import { Router } from "./router";
 import type { BeforeHandleRequest, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
 
-export class FalconFrame extends Router {
+export class FalconFrame<Vars extends Record<string, any>> extends Router {
     public logger: Logger;
     public customParsers: Record<string, ParseBodyFunction> = {};
+    public vars: Vars = {} as Vars;
 
     constructor(loggerOpts?: LoggerOptions) {
         super();
@@ -40,6 +41,16 @@ export class FalconFrame extends Router {
             }
             await handleRequest(req as FFRequest, res as FFResponse, this);
         }
+    }
+
+    setVar(key: keyof Vars, value: typeof this.vars[keyof Vars]) {
+        // @ts-ignore
+        this.vars[key] = value;
+    }
+
+    getVar(key: string): typeof this.vars[keyof Vars] {
+        // @ts-ignore
+        return this.vars[key];
     }
 }
 
