@@ -7,7 +7,7 @@ import { FFResponse } from "./res";
 import { Router } from "./router";
 import type { BeforeHandleRequest, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
 
-export class FalconFrame<Vars extends Record<string, any>> extends Router {
+export class FalconFrame<Vars extends Record<string, any> = any> extends Router {
     public logger: Logger;
     public customParsers: Record<string, ParseBodyFunction> = {};
     public vars: Vars = {} as Vars;
