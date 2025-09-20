@@ -9,6 +9,7 @@ import { parseBody } from "./body";
 
 export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
+    res.FF = FF;
     const originalEnd = res.end;
     res.end = function (...any: any[]) {
         res._ended = true;
