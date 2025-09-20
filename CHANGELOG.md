@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/wxn0brP/FalconFrame/compare/v0.0.21...v0.1.0) (2025-09-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* body limit & break FF opts api
+
+### Features
+
+* body limit & break FF opts api ([c97b832](https://github.com/wxn0brP/FalconFrame/commit/c97b832332d0692e205cbe3bf10c40fafe93f28e))
+* custom body parse ([b0b2d6f](https://github.com/wxn0brP/FalconFrame/commit/b0b2d6faae1ac69a24322f3fd1e86880b5fc70ce))
+* render path ([7f8b305](https://github.com/wxn0brP/FalconFrame/commit/7f8b30520cfa0f2e2f70910b17e05e77b0634828))
+* vars ([714f241](https://github.com/wxn0brP/FalconFrame/commit/714f24117584b390cbd9173e8093e56394bce710))
+
+
+### Bug Fixes
+
+* render path ([b8ac022](https://github.com/wxn0brP/FalconFrame/commit/b8ac022728ce340969a7deb360bc59f8d4995918))
+* vars ([bac9f96](https://github.com/wxn0brP/FalconFrame/commit/bac9f9694ae7e16c47c02262ba671399c4faa044))
+
 ### [0.0.21](https://github.com/wxn0brP/FalconFrame/compare/v0.0.20...v0.0.21) (2025-08-03)
 
 
