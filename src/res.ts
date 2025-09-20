@@ -4,6 +4,7 @@ import { getContentType } from "./helpers";
 import { createReadStream } from "fs";
 import { renderHTML } from "./render";
 import FalconFrame from ".";
+import { resolve } from "path";
 
 export class FFResponse extends http.ServerResponse {
     _ended = false;
@@ -114,7 +115,7 @@ export class FFResponse extends http.ServerResponse {
     render(templatePath: string, data: any = {}) {
         this.setHeader("Content-Type", "text/html");
         if (this.FF.vars["views"] && !templatePath.endsWith(".html")) {
-            templatePath = this.FF.vars["views"] + templatePath + ".html";
+            templatePath = resolve(this.FF.vars["views"] + "/" + templatePath + ".html");
         }
         this.end(renderHTML(templatePath, data));
         return this;
