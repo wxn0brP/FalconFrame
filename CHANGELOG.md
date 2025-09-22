@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/wxn0brP/FalconFrame/compare/v0.1.0...v0.2.0) (2025-09-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* update render
+* update plugin api
+
+### Features
+
+* don't parse body if method is GET, HEAD, OPTIONS ([f9e16a3](https://github.com/wxn0brP/FalconFrame/commit/f9e16a3ecbbb12510819d4630fce95c86badf378))
+* ETag support ([17e0e72](https://github.com/wxn0brP/FalconFrame/commit/17e0e72ffe2736a3c963f628b33c054d59e111e1))
+* update cors ([8f25e63](https://github.com/wxn0brP/FalconFrame/commit/8f25e63bab825e65f5331f191d6f5a2b4e2790e4))
+* update plugin api ([55ea1e3](https://github.com/wxn0brP/FalconFrame/commit/55ea1e368684fb7d840d08a2c187c49923a2c5e4))
+* update render ([fac91d1](https://github.com/wxn0brP/FalconFrame/commit/fac91d1fde1267d391c13dd5d12de5b484b732d6))
+
+
+### Bug Fixes
+
+* typo in import ([bcc026f](https://github.com/wxn0brP/FalconFrame/commit/bcc026f5587e05b27ccdebd40ede37ed230b8694))
+
 ## [0.1.0](https://github.com/wxn0brP/FalconFrame/compare/v0.0.21...v0.1.0) (2025-09-20)
 
 
