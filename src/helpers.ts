@@ -43,12 +43,34 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
     opts = {
         utf8: true,
         render: true,
+        etag: true,
         ...opts,
     };
 
     if (!fs.existsSync(dirPath)) {
         throw new Error(`Directory ${dirPath} does not exist`);
     }
+
+    const serveFile = (req: FFRequest, res: FFResponse, filePath: string, stats: fs.Stats) => {
+        if (opts.etag) {
+            const etag = `W/"${stats.size}-${stats.mtime.getTime()}"`;
+            if (req.headers["if-none-match"] === etag) {
+                res.status(304).end();
+                return true;
+            }
+            res.setHeader("ETag", etag);
+        }
+
+        if (opts.render && filePath.endsWith(".html")) {
+            res.ct("text/html");
+            res.render(filePath);
+            return true;
+        }
+
+        res.ct(getContentType(filePath, opts.utf8));
+        fs.createReadStream(filePath).pipe(res);
+        return true;
+    };
 
     return (req: FFRequest, res: FFResponse, next: () => void) => {
         if (req.method.toLowerCase() !== "get") return next();
@@ -58,14 +80,7 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
         try {
             const stats = fs.statSync(filePath);
             if (stats.isFile()) {
-                if (opts.render && filePath.endsWith(".html")) {
-                    res.ct("text/html");
-                    res.render(filePath);
-                    return true;
-                }
-                res.ct(getContentType(filePath, opts.utf8));
-                fs.createReadStream(filePath).pipe(res);
-                return true;
+                return serveFile(req, res, filePath, stats);
             }
 
             if (stats.isDirectory()) {
@@ -77,9 +92,7 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
                             res.redirect(req.path + "/");
                             return true;
                         }
-                        res.ct("text/html");
-                        res.render(indexPath);
-                        return true;
+                        return serveFile(req, res, indexPath, indexStats);
                     }
                 } catch (e) {
                     /* index.html not found, do nothing */
@@ -93,6 +106,14 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
             const htmlPath = filePath + ".html";
             const htmlStats = fs.statSync(htmlPath);
             if (htmlStats.isFile()) {
+                if (opts.etag) {
+                    const etag = `W/"${htmlStats.size}-${htmlStats.mtime.getTime()}"`;
+                    if (req.headers["if-none-match"] === etag) {
+                        res.status(304).end();
+                        return true;
+                    }
+                    res.setHeader("ETag", etag);
+                }
                 res.ct(getContentType(htmlPath, opts.utf8));
                 fs.createReadStream(htmlPath).pipe(res);
                 return true;

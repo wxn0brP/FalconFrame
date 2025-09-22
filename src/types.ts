@@ -82,4 +82,5 @@ export type BeforeHandleRequest = (
 export interface StaticServeOptions {
 	utf8?: boolean;
 	render?: boolean;
+	etag?: boolean;
 }
