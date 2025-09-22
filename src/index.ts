@@ -1,6 +1,7 @@
 import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
 import http from "http";
 import { PluginSystem } from "./plugins";
+import { createCORSPlugin } from "./plugins/cors";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
@@ -62,13 +63,26 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         // @ts-ignore
         return this.vars[key];
     }
+
+    /**
+     * Sets the allowed origins for CORS.
+     * This method is a shortcut that simplifies CORS configuration
+     * without needing to manually create and register a plugin.
+     * @param origin - An array of allowed origins.
+     * @example
+     * app.setOrigin(["http://example.com", "https://example.com"]);
+    */
+    setOrigin(origin: string[]) {
+        this.use(createCORSPlugin(origin).process);
+    }
 }
 
 export default FalconFrame;
 
-export {
-    FFRequest, FFResponse, PluginSystem, renderHTML, Router, RouteHandler
-};
-export * as Plugins from "./plugins/index";
-export * as PluginsEngine from "./plugins.js";
 export * as Helpers from "./helpers";
+export * as PluginsEngine from "./plugins.js";
+export * as Plugins from "./plugins/index";
+export {
+    FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
+};
+

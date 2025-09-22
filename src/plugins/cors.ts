@@ -4,6 +4,7 @@ import { FFResponse } from "../res";
 interface Opts {
     accessControlAllowMethods?: boolean;
     accessControlAllowHeaders?: boolean;
+    headers?: Record<string, string>;
 }
 
 function setHeader(res: FFResponse, opts: Opts) {
@@ -26,6 +27,12 @@ export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plu
     return {
         id: "cors",
         process: (req, res, next) => {
+            if (opts.headers) {
+                for (const [key, value] of Object.entries(opts.headers)) {
+                    res.setHeader(key, value);
+                }
+            }
+
             if (allowedOrigins.includes("*")) {
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 setHeader(res, opts);

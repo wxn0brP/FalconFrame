@@ -31,10 +31,7 @@ export class PluginSystem {
             throw new Error(`Plugin with id '${plugin.id}' already registered`);
         }
 
-        // Add plugin to the list
         this.plugins.push(plugin);
-
-        // Update the execution order
         this.updateExecutionOrder(plugin.id, options);
     }
 
