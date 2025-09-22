@@ -1,0 +1,37 @@
+{
+  "name": "@wxn0brp/falcon-frame",
+  "version": "0.2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "wxn0brP",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/wxn0brP/FalconFrame",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wxn0brP/FalconFrame.git"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "tsc-alias": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@wxn0brp/lucerna-log": "^0.2.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js",
+      "import": "./dist/*.js"
+    }
+  }
+}
