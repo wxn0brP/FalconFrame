@@ -7,20 +7,27 @@ import { validate } from "./valid";
 import { getMiddlewares, matchMiddleware } from "./middleware";
 import { parseBody } from "./body";
 
-export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame): void {
+export function handleRequest(
+    req: FFRequest,
+    res: FFResponse,
+    FF: FalconFrame,
+): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
     res.FF = FF;
     const originalEnd = res.end;
     res.end = function (...any: any[]) {
         res._ended = true;
         return originalEnd.call(res, ...any);
-    }
+    };
 
     const { logger } = FF;
     try {
         const [path, params] = (req.url || "").split("?");
         const normalizedPath = path.replace(/\/{2,}/g, "/");
-        const parsedUrl = new URL(normalizedPath + (params ? `?${params}` : ""), "http://localhost");
+        const parsedUrl = new URL(
+            normalizedPath + (params ? `?${params}` : ""),
+            "http://localhost",
+        );
         req.path = decodeURIComponent(parsedUrl.pathname) || "/";
         req.query = Object.fromEntries(parsedUrl.searchParams);
     } catch (e) {
@@ -36,11 +43,24 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
     const middlewaresPath = req.path + "/";
-    const middlewares = getMiddlewares(FF.middlewares, middlewaresPath.replace(/\/+/g, "/"));
+    const middlewares = getMiddlewares(
+        FF.middlewares,
+        middlewaresPath.replace(/\/+/g, "/"),
+    );
 
-    const matchedTypeMiddlewares = middlewares.filter(middleware => middleware.method === req.method.toLowerCase() || middleware.method === "all");
-    const matchedMiddlewares = matchMiddleware(req.path, matchedTypeMiddlewares);
-    logger.debug("Matched middlewares: " + matchedMiddlewares.map(middleware => middleware.path).join(", "));
+    const matchedTypeMiddlewares = middlewares.filter(
+        (middleware) =>
+            middleware.method === req.method.toLowerCase() ||
+            middleware.method === "all",
+    );
+    const matchedMiddlewares = matchMiddleware(
+        req.path,
+        matchedTypeMiddlewares,
+    );
+    logger.debug(
+        "Matched middlewares: " +
+        matchedMiddlewares.map((middleware) => middleware.path).join(", "),
+    );
 
     if (matchedMiddlewares.length === 0) {
         res.status(404).end("404: File had second thoughts");
@@ -54,7 +74,9 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         }
 
         const middleware = matchedMiddlewares[middlewareIndex++];
-        logger.debug(`Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`);
+        logger.debug(
+            `Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`,
+        );
 
         if (middleware.path.includes(":")) {
             const middlewareParts = middleware.path.split("/");
@@ -79,13 +101,18 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         }
     }
 
-    if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+    if (
+        req.method === "GET" ||
+        req.method === "HEAD" ||
+        req.method === "OPTIONS"
+    ) {
+        req.body = {};
         next();
         return;
     }
 
     let body = "";
-    req.on("data", chunk => (body += chunk.toString()));
+    req.on("data", (chunk) => (body += chunk.toString()));
     req.on("end", async () => {
         const parsedBody = await parseBody(req, body, FF);
         Object.assign(req, parsedBody);

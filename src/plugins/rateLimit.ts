@@ -7,7 +7,7 @@ type RateLimitRecord = {
 
 export function createRateLimiterPlugin(
     maxRequests: number,
-    windowMs: number
+    windowMs: number,
 ): Plugin {
     const rateLimitMap = new Map<string, RateLimitRecord>();
 

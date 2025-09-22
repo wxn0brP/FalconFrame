@@ -8,17 +8,22 @@ interface Opts {
 }
 
 function setHeader(res: FFResponse, opts: Opts) {
-    if (opts.accessControlAllowMethods) res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,PUT,DELETE,OPTIONS"
-    );
-    if (opts.accessControlAllowHeaders) res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization"
-    );
+    if (opts.accessControlAllowMethods)
+        res.setHeader(
+            "Access-Control-Allow-Methods",
+            "GET,POST,PUT,DELETE,OPTIONS",
+        );
+    if (opts.accessControlAllowHeaders)
+        res.setHeader(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Authorization",
+        );
 }
 
-export function createCORSPlugin(allowedOrigins: string[], opts: Opts = {}): Plugin {
+export function createCORSPlugin(
+    allowedOrigins: string[],
+    opts: Opts = {},
+): Plugin {
     opts = {
         accessControlAllowMethods: true,
         accessControlAllowHeaders: true,

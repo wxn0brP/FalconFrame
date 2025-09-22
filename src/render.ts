@@ -5,21 +5,42 @@ interface RenderData {
     [key: string]: string;
 }
 
-export function renderHTML(templatePath: string, data: RenderData): string {
-    if (!fs.existsSync(templatePath)) return "Template not found";
-    let template = fs.readFileSync(templatePath, "utf8");
+export function renderHTML(
+    templatePath: string,
+    data: RenderData,
+    renderedPaths: string[] = [],
+): string {
+    try {
+        const realPath = path.resolve(templatePath);
+        if (renderedPaths.includes(realPath)) {
+            return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
+        }
 
-    // Inserting data, e.g. {{name}}
-    template = template.replace(/{{(.*?)}}/g, (_, key) => data[key.trim()] || "");
+        let template = fs.readFileSync(templatePath, "utf8");
 
-    // Loading partials, e.g. <!-- include header -->
-    template = template.replace(/<!--\s*include\s*(.*?)\s*-->/g, (_, partialName) => {
-        const partialPath = path.join(path.dirname(templatePath), partialName + ".html");
-        if (fs.existsSync(partialPath)) 
-            return renderHTML(partialPath, data)
-        else
-            return `<!-- Partial "${partialName}" (${partialPath.replace(process.cwd() + "/", "")}) not found -->`;
-    });
+        // Inserting data, e.g. {{name}}
+        template = template.replace(
+            /{{(.*?)}}/g,
+            (_, key) => data[key.trim()] || "",
+        );
 
-    return template;
+        // Loading partials, e.g. <!-- include header -->
+        template = template.replace(
+            /<!--\s*include\s*(.*?)\s*-->/g,
+            (_, partialName) => {
+                const partialPath = path.join(
+                    path.dirname(templatePath),
+                    partialName + ".html",
+                );
+                return renderHTML(partialPath, data, [
+                    ...renderedPaths,
+                    realPath,
+                ]);
+            },
+        );
+
+        return template;
+    } catch (error) {
+        return `<!-- Template not found: ${templatePath} -->`;
+    }
 }
