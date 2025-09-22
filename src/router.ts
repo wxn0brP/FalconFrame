@@ -1,5 +1,5 @@
 import { handleStaticFiles } from "./helpers";
-import { Method, Middleware, RouteHandler } from "./types";
+import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 
 export class Router {
 	public middlewares: Middleware[] = [];
@@ -62,12 +62,12 @@ export class Router {
 		return this;
 	}
 
-	static(apiPath: string, dirPath?: string, utf8 = true) {
+	static(apiPath: string, dirPath?: string, opts: StaticServeOptions = {}) {
 		if (!dirPath) {
 			dirPath = apiPath;
 			apiPath = "/";
 		}
-		this.use(apiPath, handleStaticFiles(dirPath, utf8));
+		this.use(apiPath, handleStaticFiles(dirPath, opts));
 		return this;
 	}
 

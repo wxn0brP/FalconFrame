@@ -1,10 +1,9 @@
-import http from "http";
-import { CookieOptions } from "./types";
-import { getContentType } from "./helpers";
 import { createReadStream } from "fs";
-import { renderHTML } from "./render";
+import http from "http";
+import path from "path";
 import FalconFrame from ".";
-import { resolve } from "path";
+import { getContentType } from "./helpers";
+import { CookieOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
 	_ended = false;
@@ -106,20 +105,52 @@ export class FFResponse extends http.ServerResponse {
 	}
 
 	/**
-	 * Renders an HTML template with the provided data and sends it as the response.
-	 * Sets the "Content-Type" header to "text/html".
-	 * @param templatePath The path to the HTML template file.
+	 * Renders a view with the given data and sends it as the response.
+	 * It uses the registered template engine.
+	 * @param view The name of the view file to render.
 	 * @param data An object containing data to be injected into the template.
 	 * @returns The response object.
 	 */
-	render(templatePath: string, data: any = {}) {
-		this.setHeader("Content-Type", "text/html");
-		if (this.FF.vars["views"] && !templatePath.endsWith(".html")) {
-			templatePath = resolve(
-				this.FF.vars["views"] + "/" + templatePath + ".html",
-			);
+	render(view: string, data: any = {}) {
+		const ff = this.FF;
+		const viewEngine = ff.getVar("view engine") as string;
+		const viewsDir = ff.getVar("views") as string || ".";
+
+		let finalExt = path.extname(view);
+		let filePath = view;
+
+		if (!finalExt) {
+			const defaultExt = viewEngine ? (viewEngine.startsWith(".") ? viewEngine : "." + viewEngine) : ".html";
+			finalExt = defaultExt;
+			filePath += finalExt;
 		}
-		this.end(renderHTML(templatePath, data));
+
+		const engine = ff.engines[finalExt];
+
+		if (!engine) {
+			const errMessage = `No engine registered for extension ${finalExt}`;
+			ff.logger.error(errMessage);
+			this.status(500).end("Server Error: " + errMessage);
+			return this;
+		}
+
+		const fullPath = path.resolve(viewsDir, filePath);
+
+		try {
+			engine(fullPath, data, (err, str) => {
+				if (err) {
+					ff.logger.error(`Error rendering view: ${err}`);
+					this.status(500).end("Server Error: Failed to render view.");
+				} else {
+					this.setHeader("Content-Type", "text/html");
+					this.end(str);
+				}
+			});
+		} catch (err) {
+			ff.logger.error(`Unhandled error in template engine: ${err}`);
+			this.status(500).end("Server Error: Unhandled exception in template engine.");
+		}
+
 		return this;
 	}
 

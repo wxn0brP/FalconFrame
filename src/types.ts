@@ -78,3 +78,8 @@ export type BeforeHandleRequest = (
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
 ) => any;
+
+export interface StaticServeOptions {
+	utf8?: boolean;
+	render?: boolean;
+}

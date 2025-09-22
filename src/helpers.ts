@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { FFResponse } from "./res";
-import { Cookies, FFRequest, RouteHandler } from "./types";
+import { Cookies, FFRequest, RouteHandler, StaticServeOptions } from "./types";
 
 export function parseCookies(cookieHeader: string): Cookies {
     const cookies: Cookies = {};
@@ -39,7 +39,17 @@ export function getContentType(filePath: string, utf8 = false): string {
     return contentType;
 }
 
-export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
+export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): RouteHandler {
+    opts = {
+        utf8: true,
+        render: true,
+        ...opts,
+    };
+
+    if (!fs.existsSync(dirPath)) {
+        throw new Error(`Directory ${dirPath} does not exist`);
+    }
+
     return (req: FFRequest, res: FFResponse, next: () => void) => {
         if (req.method.toLowerCase() !== "get") return next();
         const apiPath = req.middleware.path;
@@ -48,7 +58,12 @@ export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
         try {
             const stats = fs.statSync(filePath);
             if (stats.isFile()) {
-                res.ct(getContentType(filePath, utf8));
+                if (opts.render && filePath.endsWith(".html")) {
+                    res.ct("text/html");
+                    res.render(filePath);
+                    return true;
+                }
+                res.ct(getContentType(filePath, opts.utf8));
                 fs.createReadStream(filePath).pipe(res);
                 return true;
             }
@@ -62,8 +77,8 @@ export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
                             res.redirect(req.path + "/");
                             return true;
                         }
-                        res.ct(getContentType(indexPath, utf8));
-                        fs.createReadStream(indexPath).pipe(res);
+                        res.ct("text/html");
+                        res.render(indexPath);
                         return true;
                     }
                 } catch (e) {
@@ -78,7 +93,7 @@ export function handleStaticFiles(dirPath: string, utf8 = true): RouteHandler {
             const htmlPath = filePath + ".html";
             const htmlStats = fs.statSync(htmlPath);
             if (htmlStats.isFile()) {
-                res.ct(getContentType(htmlPath, utf8));
+                res.ct(getContentType(htmlPath, opts.utf8));
                 fs.createReadStream(htmlPath).pipe(res);
                 return true;
             }
