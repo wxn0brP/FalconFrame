@@ -79,7 +79,7 @@ export function handleRequest(req: FFRequest, res: FFResponse, FF: FalconFrame):
         }
     }
 
-    if (req.method === "GET" && middlewares[middlewares.length - 1]?.sse) {
+    if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
         next();
         return;
     }
