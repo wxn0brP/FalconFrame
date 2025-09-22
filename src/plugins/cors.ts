@@ -1,4 +1,4 @@
-import { Plugin } from "../plugins";
+import { Plugin } from "../plugin";
 import { FFResponse } from "../res";
 
 interface Opts {

@@ -1,6 +1,6 @@
 import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
 import http from "http";
-import { PluginSystem } from "./plugins";
+import { PluginSystem } from "./plugin";
 import { createCORSPlugin } from "./plugins/cors";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
@@ -80,8 +80,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 export default FalconFrame;
 
 export * as Helpers from "./helpers";
-export * as PluginsEngine from "./plugins.js";
-export * as Plugins from "./plugins/index";
+export * as PluginsEngine from "./plugin";
 export {
     FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
 };

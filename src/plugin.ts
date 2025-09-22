@@ -5,7 +5,8 @@ export type PluginId = string;
 export interface Plugin {
     id: PluginId;
     process: RouteHandler;
-    priority?: number;
+    before?: PluginId | PluginId[];
+    after?: PluginId | PluginId[];
 }
 
 export interface PluginOptions {
@@ -32,7 +33,7 @@ export class PluginSystem {
         }
 
         this.plugins.push(plugin);
-        this.updateExecutionOrder(plugin.id, options);
+        this.updateExecutionOrder(plugin, options);
     }
 
     /**
@@ -41,9 +42,10 @@ export class PluginSystem {
      * @param options - Options for positioning
      */
     private updateExecutionOrder(
-        pluginId: PluginId,
+        plugin: Plugin,
         options?: PluginOptions
     ): void {
+        const pluginId = plugin.id;
         if (this.executionOrder.includes(pluginId)) return;
 
         const resolveTarget = (target: PluginId | PluginId[] | undefined): PluginId | null => {
@@ -52,8 +54,8 @@ export class PluginSystem {
             return list.find(id => this.executionOrder.includes(id)) || null;
         };
 
-        const beforeTarget = resolveTarget(options?.before);
-        const afterTarget = resolveTarget(options?.after);
+        const beforeTarget = resolveTarget(options?.before || plugin.before);
+        const afterTarget = resolveTarget(options?.after || plugin.after);
 
         if (beforeTarget) {
             const index = this.executionOrder.indexOf(beforeTarget);
