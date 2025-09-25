@@ -43,7 +43,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         });
     }
 
-    listen(port: number, callback?: (() => void) | boolean, beforeHandleRequest?: BeforeHandleRequest) {
+    listen(port: number | string, callback?: (() => void) | boolean, beforeHandleRequest?: BeforeHandleRequest) {
         const server = http.createServer(this.getApp(beforeHandleRequest));
         if (typeof callback === "boolean") {
             if (callback)
