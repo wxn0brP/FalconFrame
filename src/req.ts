@@ -124,7 +124,7 @@ export function handleRequest(
     type = type.split(";")[0].toLowerCase();
     const parser = getParser(FF, type);
 
-    const parserMeta = FF.customParsersMeta?.[type] || {};
+    const parserMeta = FF.customParsersMeta?.[type] || { useBody: true };
     if (parser && !parserMeta.useBody) {
         parser("", req, FF).then(body => {
             req.body = body || {};

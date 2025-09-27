@@ -25,9 +25,10 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 
     constructor(opts: Partial<Opts> = {}) {
         super();
+        const loggerOpts = opts?.loggerOpts || {};
         this.logger = new Logger({
             loggerName: "falcon-frame",
-            ...[opts?.loggerOpts || {}],
+            ...loggerOpts,
         });
         this.opts = {
             bodyLimit: "10m",
