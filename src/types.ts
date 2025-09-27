@@ -53,6 +53,7 @@ export interface Middleware {
 	use?: true;
 	router?: Middleware[];
 	sse?: true;
+	customParser?: true;
 }
 
 export interface CookieOptions {

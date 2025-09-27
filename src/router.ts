@@ -81,4 +81,10 @@ export class Router {
 		this.middlewares[index - 1].sse = true;
 		return this;
 	}
+
+	customParser(path: string, handler: RouteHandler, method: Method = "post") {
+		const index = this.addRoute(method, path, handler);
+		this.middlewares[index - 1].customParser = true;
+		return this;
+	}
 }

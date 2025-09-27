@@ -101,6 +101,15 @@ export function handleRequest(
         }
     }
 
+    const hasCustomParserEndpoint = matchedMiddlewares.some(
+        middleware => middleware.customParser,
+    );
+    if (hasCustomParserEndpoint) {
+        req.body = {};
+        next();
+        return;
+    }
+
     if (
         req.method === "GET" ||
         req.method === "HEAD" ||
