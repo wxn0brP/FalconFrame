@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/wxn0brP/FalconFrame/compare/v0.2.0...v0.2.1) (2025-09-27)
+
+
+### Features
+
+* app.listen(port: number | string) ([314f12b](https://github.com/wxn0brP/FalconFrame/commit/314f12b2d794cfc62e48ffb6452af7f5415a4593))
+* PluginSystem in router.use ([ad9469d](https://github.com/wxn0brP/FalconFrame/commit/ad9469d2d8b217490d6bdaf4f907e87c783fb4d3))
+
+
+### Bug Fixes
+
+* serve static file ([5bc6800](https://github.com/wxn0brP/FalconFrame/commit/5bc6800b45fc8231a5f6e95d1db43251649ff507))
+
 ## [0.2.0](https://github.com/wxn0brP/FalconFrame/compare/v0.1.0...v0.2.0) (2025-09-22)
 
 
