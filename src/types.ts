@@ -83,4 +83,5 @@ export interface StaticServeOptions {
 	utf8?: boolean;
 	render?: boolean;
 	etag?: boolean;
+	errorIfDirNotFound?: boolean;
 }

@@ -44,10 +44,11 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
         utf8: true,
         render: true,
         etag: true,
+        errorIfDirNotFound: true,
         ...opts,
     };
 
-    if (!fs.existsSync(dirPath)) {
+    if (opts.errorIfDirNotFound && !fs.existsSync(dirPath)) {
         throw new Error(`Directory ${dirPath} does not exist`);
     }
 
@@ -105,19 +106,8 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
         try {
             const htmlPath = filePath + ".html";
             const htmlStats = fs.statSync(htmlPath);
-            if (htmlStats.isFile()) {
-                if (opts.etag) {
-                    const etag = `W/"${htmlStats.size}-${htmlStats.mtime.getTime()}"`;
-                    if (req.headers["if-none-match"] === etag) {
-                        res.status(304).end();
-                        return true;
-                    }
-                    res.setHeader("ETag", etag);
-                }
-                res.ct(getContentType(htmlPath, opts.utf8));
-                fs.createReadStream(htmlPath).pipe(res);
-                return true;
-            }
+            if (htmlStats.isFile())
+                return serveFile(req, res, htmlPath, htmlStats);
         } catch (e) {
             /* .html file not found, fall through to next() */
         }
