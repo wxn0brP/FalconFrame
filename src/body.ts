@@ -13,6 +13,7 @@ export async function parseBody(
 	req: FFRequest,
 	body: string,
 	FF: FalconFrame,
+	type: string
 ): Promise<ParseBody> {
 	const limit = parseLimit(FF.opts.bodyLimit);
 
@@ -22,7 +23,7 @@ export async function parseBody(
 			return {};
 		}
 
-		const func = getParser(FF, req.headers["content-type"] || "");
+		const func = getParser(FF, type);
 		if (!func) return {};
 
 		const data = await func(body, req, FF);

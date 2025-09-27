@@ -111,20 +111,23 @@ export function handleRequest(
         return;
     }
 
-    const type = req.headers["content-type"] || "";
+    let type = req.headers["content-type"] || "";
+    type = type.split(";")[0].toLowerCase();
     const parser = getParser(FF, type);
 
     const parserMeta = FF.customParsersMeta?.[type] || {};
     if (parser && !parserMeta.useBody) {
-        req.body = {};
-        next();
+        parser("", req, FF).then(body => {
+            req.body = body || {};
+            next();
+        });
         return;
     }
 
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
     req.on("end", async () => {
-        const parsedBody = await parseBody(req, body, FF);
+        const parsedBody = await parseBody(req, body, FF, type);
         Object.assign(req, parsedBody);
         logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
