@@ -85,3 +85,8 @@ export interface StaticServeOptions {
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
 }
+
+export interface CustomParsersOpts {
+	/** Default: true */
+	useBody?: boolean;
+}

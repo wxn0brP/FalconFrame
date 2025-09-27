@@ -5,7 +5,7 @@ import { FFResponse } from "./res";
 import { FFRequest } from "./types";
 import { validate } from "./valid";
 import { getMiddlewares, matchMiddleware } from "./middleware";
-import { parseBody } from "./body";
+import { getParser, parseBody } from "./body";
 
 export function handleRequest(
     req: FFRequest,
@@ -106,6 +106,16 @@ export function handleRequest(
         req.method === "HEAD" ||
         req.method === "OPTIONS"
     ) {
+        req.body = {};
+        next();
+        return;
+    }
+
+    const type = req.headers["content-type"] || "";
+    const parser = getParser(FF, type);
+
+    const parserMeta = FF.customParsersMeta?.[type] || {};
+    if (parser && !parserMeta.useBody) {
         req.body = {};
         next();
         return;

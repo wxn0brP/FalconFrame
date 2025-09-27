@@ -14,7 +14,6 @@ export async function parseBody(
 	body: string,
 	FF: FalconFrame,
 ): Promise<ParseBody> {
-	const funcs = Object.assign({}, parseBodyFunctions, FF.customParsers || {});
 	const limit = parseLimit(FF.opts.bodyLimit);
 
 	try {
@@ -23,8 +22,7 @@ export async function parseBody(
 			return {};
 		}
 
-		const type = req.headers["content-type"] || "";
-		const func = funcs[type];
+		const func = getParser(FF, req.headers["content-type"] || "");
 		if (!func) return {};
 
 		const data = await func(body, req, FF);
@@ -36,6 +34,10 @@ export async function parseBody(
 		await FF.logger.warn(`Error parsing body: ${e}`);
 		return {};
 	}
+}
+
+export function getParser(FF: FalconFrame, type: string): ParseBodyFunction | undefined {
+	return FF.customParsers?.[type] || parseBodyFunctions[type] || undefined;
 }
 
 function parseLimit(limit: string | number): number {
