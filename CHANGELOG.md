@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/wxn0brP/FalconFrame/compare/v0.2.1...v0.3.0) (2025-09-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* update body parsers
+
+### Features
+
+* custom parser opts ([b03f5b1](https://github.com/wxn0brP/FalconFrame/commit/b03f5b1e6eda1f0b9cc1c9dbd20ec8c8ef4fce06))
+* endpoint custom parser ([54d1043](https://github.com/wxn0brP/FalconFrame/commit/54d1043de276a55896b42f5da26fbe1f7c679fc8))
+* opts - disable default body parsers ([943f419](https://github.com/wxn0brP/FalconFrame/commit/943f419731cab4496d21b15435e500cd38d471c7))
+* update body parsers ([88b08e6](https://github.com/wxn0brP/FalconFrame/commit/88b08e601fd0a928b91425004404bc0680a7816e))
+
+
+### Bug Fixes
+
+* custom parser opts ([858dc4b](https://github.com/wxn0brP/FalconFrame/commit/858dc4b9dce5055fa0dbeca251a7c446c36a36f9))
+* logger opts & req ([df8e67a](https://github.com/wxn0brP/FalconFrame/commit/df8e67a383c1a23936715f6c6284e7b2203adfec))
+
 ### [0.2.1](https://github.com/wxn0brP/FalconFrame/compare/v0.2.0...v0.2.1) (2025-09-27)
 
 
