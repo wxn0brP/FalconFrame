@@ -14,6 +14,8 @@ export type EngineCallback = (path: string, options: any, callback: (e: any, ren
 export interface Opts {
     loggerOpts?: LoggerOptions;
     bodyLimit?: string;
+    disableJsonParser?: boolean;
+    disableUrlencodedParser?: boolean;
 }
 
 export class FalconFrame<Vars extends Record<string, any> = any> extends Router {
@@ -35,8 +37,8 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
             ...opts,
         };
 
-        this.addBodyParser(json(this, { limit: this.opts.bodyLimit }));
-        this.addBodyParser(urlencoded(this, { limit: this.opts.bodyLimit }));
+        if (!this.opts.disableJsonParser) this.addBodyParser(json(this, { limit: this.opts.bodyLimit }));
+        if (!this.opts.disableUrlencodedParser) this.addBodyParser(urlencoded(this, { limit: this.opts.bodyLimit }));
 
         this.engine(".html", (path, options, callback) => {
             try {
