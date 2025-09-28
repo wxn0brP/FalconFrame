@@ -104,6 +104,7 @@ export function handleRequest(
         middleware => middleware.customParser,
     );
     if (hasCustomParserEndpoint) {
+        logger.debug("Executing custom parser endpoint");
         req.body = {};
         next();
         return;
@@ -114,6 +115,7 @@ export function handleRequest(
         req.method === "HEAD" ||
         req.method === "OPTIONS"
     ) {
+        logger.debug("Method does not require body. Executing middlewares");
         req.body = {};
         next();
         return;
