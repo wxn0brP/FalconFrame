@@ -6,7 +6,8 @@ import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { Router } from "./router";
-import type { BeforeHandleRequest, CustomParsersOpts, FFRequest, ParseBodyFunction, RouteHandler } from "./types";
+import type { BeforeHandleRequest, FFRequest, RouteHandler } from "./types";
+import { json, urlencoded } from "./body";
 
 export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;
 
@@ -17,8 +18,7 @@ export interface Opts {
 
 export class FalconFrame<Vars extends Record<string, any> = any> extends Router {
     public logger: Logger;
-    public customParsers: Record<string, ParseBodyFunction> = {};
-    public customParsersMeta: Record<string, CustomParsersOpts> = {};
+    public bodyParsers: RouteHandler[] = [];
     public vars: Vars = {} as Vars;
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
@@ -35,6 +35,9 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
             ...opts,
         };
 
+        this.addBodyParser(json(this, { limit: this.opts.bodyLimit }));
+        this.addBodyParser(urlencoded(this, { limit: this.opts.bodyLimit }));
+
         this.engine(".html", (path, options, callback) => {
             try {
                 const content = renderHTML(path, options);
@@ -43,6 +46,11 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
                 callback(e);
             }
         });
+    }
+
+    addBodyParser(parser: RouteHandler) {
+        this.bodyParsers.push(parser);
+        return this;
     }
 
     listen(port: number | string, callback?: (() => void) | boolean, beforeHandleRequest?: BeforeHandleRequest) {

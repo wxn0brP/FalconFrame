@@ -5,7 +5,6 @@ import { FFResponse } from "./res";
 import { FFRequest } from "./types";
 import { validate } from "./valid";
 import { getMiddlewares, matchMiddleware } from "./middleware";
-import { getParser, parseBody } from "./body";
 
 export function handleRequest(
     req: FFRequest,
@@ -120,26 +119,17 @@ export function handleRequest(
         return;
     }
 
-    let type = req.headers["content-type"] || "";
-    type = type.split(";")[0].toLowerCase();
-    const parser = getParser(FF, type);
-
-    const parserMeta = FF.customParsersMeta?.[type] || { useBody: true };
-    if (parser && !parserMeta.useBody) {
-        parser("", req, FF).then(body => {
-            req.body = body || {};
-            next();
-        });
-        return;
+    req.body = {};
+    let bodyParserIndex = 0;
+    function nextBodyParser() {
+        if (bodyParserIndex >= FF.bodyParsers.length) {
+            logger.debug("No more body parsers. Executing middlewares");
+            return next();
+        }
+        logger.debug(`Executing body parser ${bodyParserIndex} of ${FF.bodyParsers.length}`);
+        const bodyParser = FF.bodyParsers[bodyParserIndex++];
+        bodyParser(req, res, nextBodyParser);
     }
 
-    let body = "";
-    req.on("data", (chunk) => (body += chunk.toString()));
-    req.on("end", async () => {
-        const parsedBody = await parseBody(req, body, FF, type);
-        Object.assign(req, parsedBody);
-        logger.debug(`Request body: ${JSON.stringify(req.body)}`);
-
-        next();
-    });
+    nextBodyParser();
 }

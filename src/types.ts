@@ -7,6 +7,7 @@ export type RouteHandler = (
 	res: FFResponse,
 	next?: () => void,
 ) => void | any;
+
 export type Method = "get" | "post" | "put" | "delete" | "all";
 
 export interface Params {
@@ -25,16 +26,15 @@ export interface Body {
 	[key: string]: any;
 }
 
-export interface ParseBody {
-	body?: Body;
-	files?: Record<string, Buffer>;
-}
-
 export type ParseBodyFunction = (
 	body: string,
 	req: FFRequest,
 	FF: FalconFrame,
-) => Promise<ParseBody>;
+) => Promise<Record<string, any>>;
+
+export interface StandardBodyParserOptions {
+	limit?: string | number;
+}
 
 export class FFRequest extends http.IncomingMessage {
 	path!: string;
@@ -85,9 +85,4 @@ export interface StaticServeOptions {
 	render?: boolean;
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
-}
-
-export interface CustomParsersOpts {
-	/** Default: true */
-	useBody?: boolean;
 }
