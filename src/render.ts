@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import FalconFrame from ".";
 
 interface RenderData {
     [key: string]: string;
@@ -9,6 +10,7 @@ export function renderHTML(
     templatePath: string,
     data: RenderData,
     renderedPaths: string[] = [],
+    FF?: FalconFrame
 ): string {
     try {
         const realPath = path.resolve(templatePath);
@@ -38,6 +40,22 @@ export function renderHTML(
                 ]);
             },
         );
+
+        // Layout
+        if (FF && FF.vars["layout"]) {
+            const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
+            const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
+            const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
+
+            if (hasHtmlStructure && !forceLayout) return template;
+            if (!hasHtmlStructure && forceNoLayout) return template;
+
+            return renderHTML(
+                FF.vars["layout"],
+                { ...data, body: template },
+                [...renderedPaths, realPath],
+            );
+        }
 
         return template;
     } catch (error) {
