@@ -15,6 +15,15 @@ export interface PluginOptions {
 	optional?: boolean;
 }
 
+/**
+ * @deprecated
+ * The `PluginSystem` class is deprecated and should not be used in new projects.
+ *
+ * ⚠️ Notes:
+ * - It may be refactored in the future, but any refactor will introduce breaking changes.
+ * - If your system currently relies on it and it works, you may continue using it.
+ * - If it does not work in your setup, it is recommended to skip it or wait for an update.
+ */
 export class PluginSystem {
 	private plugins: Plugin[] = [];
 	private executionOrder: PluginId[] = [];
