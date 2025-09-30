@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/wxn0brP/FalconFrame/compare/v0.3.0...v0.4.0) (2025-09-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* sse update
+
+### Features
+
+* add body parser logs ([b69ad76](https://github.com/wxn0brP/FalconFrame/commit/b69ad7663390e625f676b9da3970875a0b62ebd0))
+* layout ([9eb8b49](https://github.com/wxn0brP/FalconFrame/commit/9eb8b49dad2153d56844fcdaa327540f263ab191))
+* sse update ([c7ac498](https://github.com/wxn0brP/FalconFrame/commit/c7ac49873c7041c77978ead73a7a00143a40eb68))
+
 ## [0.3.0](https://github.com/wxn0brP/FalconFrame/compare/v0.2.1...v0.3.0) (2025-09-28)
 
 
