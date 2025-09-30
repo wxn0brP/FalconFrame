@@ -1,6 +1,8 @@
+import { randomUUID } from "crypto";
 import { handleStaticFiles } from "./helpers";
 import { PluginSystem } from "./plugin";
 import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
+import { SSEManager } from "./sse";
 
 export type MiddlewareFn = RouteHandler | Router | PluginSystem;
 
@@ -77,9 +79,14 @@ export class Router {
 	}
 
 	sse(path: string, ...handlers: RouteHandler[]) {
-		const index = this.addRoute("get", path, ...handlers);
-		this.middlewares[index - 1].sse = true;
-		return this;
+		const lastHandler = handlers.pop() || (() => { });
+
+		const manager = new SSEManager();
+		handlers.push(manager.getMiddleware(lastHandler));
+
+		this.addRoute("get", path, ...handlers);
+
+		return manager;
 	}
 
 	customParser(path: string, handler: RouteHandler, method: Method = "post") {

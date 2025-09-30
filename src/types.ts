@@ -44,6 +44,7 @@ export class FFRequest extends http.IncomingMessage {
 	body!: Body;
 	valid!: (schema: ValidationSchema) => ValidationResult;
 	middleware!: Middleware;
+	sseId?: string;
 }
 
 export interface Middleware {
@@ -52,7 +53,6 @@ export interface Middleware {
 	middleware: RouteHandler;
 	use?: true;
 	router?: Middleware[];
-	sse?: true;
 	customParser?: true;
 }
 
