@@ -100,12 +100,12 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
      * Sets the allowed origins for CORS.
      * This method is a shortcut that simplifies CORS configuration
      * without needing to manually create and register a plugin.
-     * @param origin - An array of allowed origins.
+     * @param [origin] - An array of allowed origins. (default: ["*"])
      * @example
      * app.setOrigin(["http://example.com", "https://example.com"]);
     */
-    setOrigin(origin: string[]) {
-        this.use(createCORSPlugin(origin).process);
+    setOrigin(origin: string[] | string = "*") {
+        this.use(createCORSPlugin(Array.isArray(origin) ? origin : [origin]).process);
     }
 }
 
