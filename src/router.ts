@@ -1,8 +1,7 @@
-import { randomUUID } from "crypto";
 import { handleStaticFiles } from "./helpers";
 import { PluginSystem } from "./plugin";
-import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 import { SSEManager } from "./sse";
+import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 
 export type MiddlewareFn = RouteHandler | Router | PluginSystem;
 
@@ -93,5 +92,11 @@ export class Router {
 		const index = this.addRoute(method, path, handler);
 		this.middlewares[index - 1].customParser = true;
 		return this;
+	}
+
+	router(path: string) {
+		const router = new Router();
+		this.use(path, router);
+		return router;
 	}
 }
