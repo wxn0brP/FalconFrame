@@ -107,6 +107,15 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     setOrigin(origin: string[] | string = "*") {
         this.use(createCORSPlugin(Array.isArray(origin) ? origin : [origin]).process);
     }
+
+    /**
+     * Listens to the specified port, or the environment variable PORT if available.
+     * @param port - The port number to listen to.
+     * @returns The server object returned by the listen method.
+     */
+    l(port: number) {
+        return this.listen(+process.env.PORT || port, true);
+    }
 }
 
 export default FalconFrame;
