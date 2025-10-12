@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/wxn0brP/FalconFrame/compare/v0.4.0...v0.4.1) (2025-10-12)
+
+
+### Features
+
+* app.setOrigin ux ([751d7ff](https://github.com/wxn0brP/FalconFrame/commit/751d7ff1167602c4911bc89ee94a37c80c9282b6))
+* router.router(path) ([90743ac](https://github.com/wxn0brP/FalconFrame/commit/90743ace2127e3c1f78b3fe94b37f5995b7187ae))
+
 ## [0.4.0](https://github.com/wxn0brP/FalconFrame/compare/v0.3.0...v0.4.0) (2025-09-30)
 
 
