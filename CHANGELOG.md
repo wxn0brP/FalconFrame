@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/wxn0brP/FalconFrame/compare/v0.4.1...v0.5.0) (2025-10-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove old plugin system
+
+### Features
+
+* app.l(port) ([58e8ce8](https://github.com/wxn0brP/FalconFrame/commit/58e8ce84893955fc5529cb8698fca18806ca46f5))
+* remove old plugin system ([00728e6](https://github.com/wxn0brP/FalconFrame/commit/00728e6d0c9f10c1c6c7e93e8568f4c100a0779f))
+
 ### [0.4.1](https://github.com/wxn0brP/FalconFrame/compare/v0.4.0...v0.4.1) (2025-10-12)
 
 
