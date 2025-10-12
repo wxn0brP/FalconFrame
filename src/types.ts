@@ -86,3 +86,5 @@ export interface StaticServeOptions {
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
 }
+
+export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;

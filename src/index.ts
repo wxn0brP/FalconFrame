@@ -1,15 +1,12 @@
 import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
 import http from "http";
-import { PluginSystem } from "./plugin";
-import { createCORSPlugin } from "./plugins/cors";
+import { json, urlencoded } from "./body";
+import { createCORS } from "./cors";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { Router } from "./router";
-import type { BeforeHandleRequest, FFRequest, RouteHandler } from "./types";
-import { json, urlencoded } from "./body";
-
-export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;
+import type { BeforeHandleRequest, EngineCallback, FFRequest, RouteHandler } from "./types";
 
 export interface Opts {
     loggerOpts?: LoggerOptions;
@@ -105,7 +102,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
      * app.setOrigin(["http://example.com", "https://example.com"]);
     */
     setOrigin(origin: string[] | string = "*") {
-        this.use(createCORSPlugin(Array.isArray(origin) ? origin : [origin]).process);
+        this.use(createCORS(Array.isArray(origin) ? origin : [origin]));
     }
 
     /**
@@ -121,7 +118,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 export default FalconFrame;
 
 export * as Helpers from "./helpers";
-export * as PluginsEngine from "./plugin";
 export {
-    FFRequest, FFResponse, PluginSystem, renderHTML, RouteHandler, Router
+    FFRequest, FFResponse, renderHTML, RouteHandler, Router
 };
+

@@ -1,9 +1,8 @@
 import { handleStaticFiles } from "./helpers";
-import { PluginSystem } from "./plugin";
 import { SSEManager } from "./sse";
 import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 
-export type MiddlewareFn = RouteHandler | Router | PluginSystem;
+export type MiddlewareFn = RouteHandler | Router | { getRouteHandler(): RouteHandler };
 
 export class Router {
 	public middlewares: Middleware[] = [];
@@ -19,7 +18,7 @@ export class Router {
 		middlewareFn?: MiddlewareFn,
 		method: Method = "all",
 	) {
-		if (typeof path === "function" || path instanceof Router || path instanceof PluginSystem) {
+		if (typeof path !== "string") {
 			middlewareFn = path;
 			path = "/";
 		}
@@ -33,7 +32,7 @@ export class Router {
 
 		if (middlewareFn instanceof Router) {
 			middleware.router = middlewareFn.middlewares;
-		} else if (middlewareFn instanceof PluginSystem) {
+		} else if ("getRouteHandler" in middlewareFn) {
 			middleware.middleware = middlewareFn.getRouteHandler();
 		} else {
 			middleware.middleware = middlewareFn;
