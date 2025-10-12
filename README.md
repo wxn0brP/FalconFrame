@@ -4,8 +4,6 @@
 
 **FalconFrame** is a minimalist web framework inspired by the middleware-first style, with routing similar to Express, but written in pure TypeScript. It supports static files, data validation, and cookie management, all without external dependencies apart from a logger.
 
----
-
 ## ✨ Features
 
 - 🚀 Zero-dependency routing engine
@@ -14,8 +12,6 @@
 - 📦 Request validation via inline schemas
 - 🍪 Cookie management
 - 🔍 Debuggable logger
-
----
 
 ## 📦 Installation
 
@@ -27,16 +23,9 @@ yarn add @wxn0brp/falcon-frame
 
 ```ts
 import FalconFrame from "@wxn0brp/falcon-frame";
-import { createCORSPlugin } from "@wxn0brp/falcon-frame/plugins/cors";
 const app = new FalconFrame();
 
-const pluginSystem = new PluginSystem();
-
-// Initialize CORS plugin
-pluginSystem.register(createCORSPlugin(["http://localhost:3000", "https://example.com"]));
-
-// Register plugins
-app.use(pluginSystem.getRouteHandler());
+app.setOrigin("*");
 
 const USERS = {
     admin: "hunter2",
@@ -112,9 +101,8 @@ app.all("*", (req, res) => {
     res.status(404).json({ error: "Not found" });
 });
 
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
-});
+// Start the server (env.PORT || 3000)
+app.l(3000);
 ```
 
 ## 📜 License
