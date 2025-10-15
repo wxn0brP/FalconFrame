@@ -3,7 +3,7 @@ import http from "http";
 import path from "path";
 import FalconFrame from ".";
 import { getContentType } from "./helpers";
-import { CookieOptions } from "./types";
+import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
 	_ended = false;
@@ -111,24 +111,31 @@ export class FFResponse extends http.ServerResponse {
 	 * @param data An object containing data to be injected into the template.
 	 * @returns The response object.
 	 */
-	render(view: string, data: any = {}) {
+	render(view: string, data: any = {}, opts: RenderOptions = {}) {
 		const ff = this.FF;
-		const viewEngine = ff.getVar("view engine") as string;
-		const viewsDir = ff.getVar("views") as string || ".";
 
-		let finalExt = path.extname(view);
+		const viewsDir =
+			opts.baseDir ??
+			(opts.notUseViews ? "." : (ff.getVar("views") as string || "."));
+
+		let engineName = path.extname(view);
 		let filePath = view;
 
-		if (!finalExt) {
-			const defaultExt = viewEngine ? (viewEngine.startsWith(".") ? viewEngine : "." + viewEngine) : ".html";
-			finalExt = defaultExt;
-			filePath += finalExt;
+		const ensureLeadingDot = (str: string) => (str.startsWith(".") ? str : "." + str);
+
+		if (opts.engine) {
+			engineName = ensureLeadingDot(opts.engine);
+		} else if (!engineName) {
+			const defaultEngine = ff.getVar("view engine") as string;
+
+			engineName = defaultEngine ? ensureLeadingDot(defaultEngine) : ".html";
+			if (!opts.notAppendExt) filePath += engineName;
 		}
 
-		const engine = ff.engines[finalExt];
+		const engine = ff.engines[engineName];
 
 		if (!engine) {
-			const errMessage = `No engine registered for extension ${finalExt}`;
+			const errMessage = `No engine registered for extension ${engineName}`;
 			ff.logger.error(errMessage);
 			this.status(500).end("Server Error: " + errMessage);
 			return this;
@@ -142,7 +149,7 @@ export class FFResponse extends http.ServerResponse {
 					ff.logger.error(`Error rendering view: ${err}`);
 					this.status(500).end("Server Error: Failed to render view.");
 				} else {
-					this.setHeader("Content-Type", "text/html");
+					this.ct(opts.contentType || "text/html");
 					this.end(str);
 				}
 			});

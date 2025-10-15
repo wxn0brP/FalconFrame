@@ -88,3 +88,11 @@ export interface StaticServeOptions {
 }
 
 export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;
+
+export interface RenderOptions {
+	notUseViews?: boolean;
+	contentType?: string;
+	baseDir?: string;
+	engine?: string;
+	notAppendExt?: boolean;
+}
