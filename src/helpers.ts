@@ -53,6 +53,19 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
     }
 
     const serveFile = (req: FFRequest, res: FFResponse, filePath: string, stats: fs.Stats) => {
+        if (opts.render) {
+            const defaultRenderer = res.FF.getVar("view engine") as string;
+
+            const renderStatement =
+                (defaultRenderer && filePath.endsWith(ensureLeadingDot(defaultRenderer))) ||
+                (!opts.notRenderHtml && filePath.endsWith(".html"));
+
+            if (renderStatement) {
+                res.render(filePath, {}, { notUseViews: true });
+                return true;
+            }
+        }
+
         if (opts.etag) {
             const etag = `W/"${stats.size}-${stats.mtime.getTime()}"`;
             if (req.headers["if-none-match"] === etag) {
@@ -60,12 +73,6 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
                 return true;
             }
             res.setHeader("ETag", etag);
-        }
-
-        if (opts.render && filePath.endsWith(".html")) {
-            res.ct("text/html");
-            res.render(filePath);
-            return true;
         }
 
         res.ct(getContentType(filePath, opts.utf8));
@@ -115,3 +122,5 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
         next();
     };
 }
+
+export const ensureLeadingDot = (str: string) => (str.startsWith(".") ? str : "." + str);

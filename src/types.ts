@@ -85,6 +85,7 @@ export interface StaticServeOptions {
 	render?: boolean;
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
+	notRenderHtml?: boolean;
 }
 
 export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;

@@ -2,7 +2,7 @@ import { createReadStream } from "fs";
 import http from "http";
 import path from "path";
 import FalconFrame from ".";
-import { getContentType } from "./helpers";
+import { ensureLeadingDot, getContentType } from "./helpers";
 import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
@@ -120,8 +120,6 @@ export class FFResponse extends http.ServerResponse {
 
 		let engineName = path.extname(view);
 		let filePath = view;
-
-		const ensureLeadingDot = (str: string) => (str.startsWith(".") ? str : "." + str);
 
 		if (opts.engine) {
 			engineName = ensureLeadingDot(opts.engine);
