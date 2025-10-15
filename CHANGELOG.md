@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/wxn0brP/FalconFrame/compare/v0.5.0...v0.5.1) (2025-10-15)
+
+
+### Features
+
+* improve render in static files handler ([fc272be](https://github.com/wxn0brP/FalconFrame/commit/fc272beb047b09d95eecf65b09a2e5566aa43f81))
+* render options ([1b443d9](https://github.com/wxn0brP/FalconFrame/commit/1b443d99624e6bb9638f9a01d73dfe974aabd6a1))
+
 ## [0.5.0](https://github.com/wxn0brP/FalconFrame/compare/v0.4.1...v0.5.0) (2025-10-12)
 
 
