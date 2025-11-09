@@ -150,7 +150,7 @@ export class FFResponse extends http.ServerResponse {
 					this.ct(opts.contentType || "text/html");
 					this.end(str);
 				}
-			});
+			}, opts.notShareFF ? undefined : this.FF);
 		} catch (err) {
 			ff.logger.error(`Unhandled error in template engine: ${err}`);
 			this.status(500).end("Server Error: Unhandled exception in template engine.");

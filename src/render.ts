@@ -43,7 +43,7 @@ export function renderHTML(
                 return renderHTML(partialPath, data, [
                     ...renderedPaths,
                     realPath,
-                ]);
+                ], FF);
             },
         );
 
@@ -60,6 +60,7 @@ export function renderHTML(
                 FF.vars["layout"],
                 { ...data, body: template },
                 [...renderedPaths, realPath],
+                FF
             );
         }
 

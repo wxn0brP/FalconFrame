@@ -88,7 +88,7 @@ export interface StaticServeOptions {
 	notRenderHtml?: boolean;
 }
 
-export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void) => void;
+export type EngineCallback = (path: string, options: any, callback: (e: any, rendered?: string) => void, FF?: FalconFrame) => void;
 
 export interface RenderOptions {
 	notUseViews?: boolean;
@@ -96,4 +96,5 @@ export interface RenderOptions {
 	baseDir?: string;
 	engine?: string;
 	notAppendExt?: boolean;
+	notShareFF?: boolean;
 }

@@ -37,9 +37,9 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         if (!this.opts.disableJsonParser) this.addBodyParser(json(this, { limit: this.opts.bodyLimit }));
         if (!this.opts.disableUrlencodedParser) this.addBodyParser(urlencoded(this, { limit: this.opts.bodyLimit }));
 
-        this.engine(".html", (path, options, callback) => {
+        this.engine(".html", (path, options, callback, FF) => {
             try {
-                const content = renderHTML(path, options);
+                const content = renderHTML(path, options, [], FF);
                 callback(null, content);
             } catch (e) {
                 callback(e);
@@ -76,9 +76,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     }
 
     engine(ext: string, callback: EngineCallback) {
-        if (ext[0] !== ".") {
-            ext = "." + ext;
-        }
+        if (ext[0] !== ".") ext = "." + ext;
         this.engines[ext] = callback;
         return this;
     }
