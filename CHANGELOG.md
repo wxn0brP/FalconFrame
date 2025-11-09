@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://github.com/wxn0brP/FalconFrame/compare/v0.5.2...v0.5.3) (2025-11-09)
+
+
+### Features
+
+* allow res.render to access FalconFrame instance ([0c1ed58](https://github.com/wxn0brP/FalconFrame/commit/0c1ed58d0bbbdda91a7df204ba29c245a78f8896))
+
 ### [0.5.2](https://github.com/wxn0brP/FalconFrame/compare/v0.5.1...v0.5.2) (2025-11-09)
 
 
