@@ -14,8 +14,14 @@ export function renderHTML(
 ): string {
     try {
         const realPath = path.resolve(templatePath);
-        if (renderedPaths.includes(realPath)) {
+        if (renderedPaths.includes(realPath))
             return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
+
+        if (FF && FF.vars["render data"]) {
+            data = {
+                ...FF.vars["render data"],
+                ...data,
+            };
         }
 
         let template = fs.readFileSync(templatePath, "utf8");
