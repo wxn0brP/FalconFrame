@@ -54,14 +54,31 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 
     listen(port: number | string, callback?: (() => void) | boolean, beforeHandleRequest?: BeforeHandleRequest) {
         const server = http.createServer(this.getApp(beforeHandleRequest));
+
+        let parsedPort = 0;
+        let host = "";
+
+        if (typeof port === "string") {
+            if (port.includes(":")) {
+                const [h, po] = port.split(":");
+                host = h;
+                parsedPort = +po;
+            } else
+                parsedPort = +port;
+        } else if (typeof port === "number") {
+            parsedPort = port;
+        }
+
         if (typeof callback === "boolean") {
             if (callback)
                 callback = () => {
-                    console.log(`[FF] Server running on http://localhost:${port}`);
+                    console.log(`[FF] Server running on http://${host || "localhost"}:${parsedPort}`);
                 };
             else callback = () => { };
         }
-        server.listen(port, callback || (() => { }));
+        const cb = callback || (() => { });
+
+        server.listen(parsedPort, host || "0.0.0.0", cb);
         return server;
     }
 
