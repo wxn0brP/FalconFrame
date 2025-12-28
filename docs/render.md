@@ -34,3 +34,106 @@ Layouts are applied when a `FalconFrame` instance is provided with a `layout` va
 
 - Returns an HTML comment `<!-- Template not found: path -->` when files cannot be read
 - Prevents circular dependencies by tracking rendered template paths
+
+## Examples
+
+### Data Interpolation Example
+
+**File: `template.html`**
+```html
+<h1>Hello, {{ name }}!</h1>
+<p>Welcome to our site.</p>
+```
+
+**Data:**
+```javascript
+const data = { name: "Alex" };
+```
+
+**Result:**
+```html
+<h1>Hello, Alex!</h1>
+<p>Welcome to our site.</p>
+```
+
+---
+
+### Partial Inclusion Example
+
+**File: `views/profile.html`**
+```html
+<div class="profile">
+  <!-- include partials/header -->
+  <p>User profile content.</p>
+</div>
+```
+
+**File: `views/partials/header.html`**
+```html
+<header>
+  <h1>Welcome, {{ username }}</h1>
+</header>
+```
+
+**Data:**
+```javascript
+const data = { username: "JaneDoe" };
+```
+
+**Result:**
+```html
+<div class="profile">
+  <header>
+    <h1>Welcome, JaneDoe</h1>
+  </header>
+  <p>User profile content.</p>
+</div>
+```
+
+---
+
+### Layout Handling Example
+
+**File: `layouts/main.html` (Layout)**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+</head>
+<body>
+  <main>
+    {{ body }}
+  </main>
+</body>
+</html>
+```
+
+**File: `pages/about.html` (Template)**
+```html
+<h2>About Us</h2>
+<p>This is the about page content.</p>
+```
+
+**Data:**
+```javascript
+const data = { title: "My Awesome Site", body: fs.readFileSync("pages/about.html", "utf8") };
+```
+
+**Result:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Awesome Site</title>
+</head>
+<body>
+  <main>
+    <h2>About Us</h2>
+    <p>This is the about page content.</p>
+  </main>
+</body>
+</html>
+```
