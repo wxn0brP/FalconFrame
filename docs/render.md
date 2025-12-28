@@ -94,6 +94,10 @@ const data = { username: "JaneDoe" };
 
 ### Layout Handling Example
 
+```javascript
+app.setVar("layout", "layouts/main.html");
+```
+
 **File: `layouts/main.html` (Layout)**
 ```html
 <!DOCTYPE html>
@@ -118,7 +122,7 @@ const data = { username: "JaneDoe" };
 
 **Data:**
 ```javascript
-const data = { title: "My Awesome Site", body: fs.readFileSync("pages/about.html", "utf8") };
+const data = { title: "My Awesome Site" };
 ```
 
 **Result:**
