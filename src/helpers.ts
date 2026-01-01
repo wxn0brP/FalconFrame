@@ -43,6 +43,7 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
     opts = {
         utf8: true,
         render: true,
+        renderData: {},
         etag: true,
         errorIfDirNotFound: true,
         ...opts,
@@ -61,7 +62,8 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
                 (!opts.notRenderHtml && filePath.endsWith(".html"));
 
             if (renderStatement) {
-                res.render(filePath, {}, { notUseViews: true });
+                const relativePath = filePath.replace(dirPath + "/", "").replace(".html", "");
+                res.render(filePath, opts.renderData?.[relativePath] || {}, { notUseViews: true });
                 return true;
             }
         }

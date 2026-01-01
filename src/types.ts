@@ -83,6 +83,7 @@ export type BeforeHandleRequest = (
 export interface StaticServeOptions {
 	utf8?: boolean;
 	render?: boolean;
+	renderData?: Record<string, Record<string, any>>;
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
 	notRenderHtml?: boolean;
