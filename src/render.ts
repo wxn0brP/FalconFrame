@@ -47,6 +47,19 @@ export function renderHTML(
             },
         );
 
+        // Loading files, e.g. /* include style.css */
+        template = template.replace(
+            /\/\*\s*include\s*(.*?)\s*\*\//g,
+            (_, fileName) => {
+                fileName = fileName.trim();
+                try {
+                    return fs.readFileSync(fileName, "utf8");
+                } catch (error) {
+                    return `/* File not found: ${fileName} */`;
+                }
+            }
+        );
+
         // Layout
         if (FF && FF.vars["layout"]) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);

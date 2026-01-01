@@ -21,6 +21,14 @@ Partials are loaded using HTML comment syntax `<!-- include partialname -->`. Th
 - Tracks rendered paths to prevent circular dependencies
 - Returns a comment when circular dependencies are detected
 
+### Raw File Inclusion
+
+Raw files (like CSS or JavaScript) are loaded using C-style comment syntax `/* include filename */`. The engine:
+- Reads the content of the file specified by `filename`. The path should be relative to the project's root directory.
+- Inserts the content directly into the template.
+- Does not process the included file content for data interpolation, partial inclusion, or layout handling.
+- Returns a comment when the file is not found.
+
 ### Layout Handling
 
 Layouts are applied when a `FalconFrame` instance is provided with a `layout` variable. The engine:
@@ -32,7 +40,8 @@ Layouts are applied when a `FalconFrame` instance is provided with a `layout` va
 
 ### Error Handling
 
-- Returns an HTML comment `<!-- Template not found: path -->` when files cannot be read
+- Returns a C-style comment `/* File not found: path */` when a file requested by `/* include */` cannot be read.
+- Returns an HTML comment `<!-- Template not found: path -->` when a template/partial file cannot be read.
 - Prevents circular dependencies by tracking rendered template paths
 
 ## Examples
@@ -138,6 +147,66 @@ const data = { title: "My Awesome Site" };
     <h2>About Us</h2>
     <p>This is the about page content.</p>
   </main>
+</body>
+</html>
+```
+
+---
+
+### Raw File Inclusion Example
+
+**File: `views/page.html`**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Page</title>
+  <style>
+    /* include views/assets/style.css */
+  </style>
+</head>
+<body>
+  <h1>Welcome!</h1>
+  <script>
+    /* include views/assets/script.js */
+  </script>
+</body>
+</html>
+```
+
+**File: `views/assets/style.css`**
+```css
+body {
+  font-family: sans-serif;
+  color: #333;
+}
+```
+
+**File: `views/assets/script.js`**
+```javascript
+console.log("Page loaded successfully!");
+```
+
+**Result:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Page</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome!</h1>
+  <script>
+    console.log("Page loaded successfully!");
+  </script>
 </body>
 </html>
 ```
