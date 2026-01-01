@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7](https://github.com/wxn0brP/FalconFrame/compare/v0.5.6...v0.5.7) (2026-01-01)
+
+
+### Features
+
+* rebuild compression ([a82741b](https://github.com/wxn0brP/FalconFrame/commit/a82741b743537d9e374b81c92da57661d4cd88a0))
+* static file server - dynamic data ([369ef0c](https://github.com/wxn0brP/FalconFrame/commit/369ef0c54b334960b9ca3c710e3670d91805dad1))
+
 ### [0.5.6](https://github.com/wxn0brP/FalconFrame/compare/v0.5.5...v0.5.6) (2026-01-01)
 
 
