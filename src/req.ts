@@ -1,11 +1,10 @@
 import { URL } from "url";
 import FalconFrame from ".";
 import { parseCookies } from "./helpers";
+import { getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
 import { validate } from "./valid";
-import { getMiddlewares, matchMiddleware } from "./middleware";
-import { compressionMiddleware } from "./compress";
 
 export function handleRequest(
     req: FFRequest,
@@ -66,8 +65,6 @@ export function handleRequest(
         res.status(404).end("404: File had second thoughts");
         return;
     }
-
-    if (!FF.getVar("disable compression")) compressionMiddleware(req, res);
 
     let middlewareIndex = 0;
     async function next() {

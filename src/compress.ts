@@ -3,7 +3,7 @@ import { FFResponse } from "./res";
 import { Transform } from "stream";
 import { FFRequest } from "./types";
 
-export function compressionMiddleware(req: FFRequest, res: FFResponse) {
+export function compression(req: FFRequest, res: FFResponse) {
     const encoding = req.headers["accept-encoding"];
 
     if (!encoding || typeof encoding !== "string" || res.headersSent) {
@@ -56,5 +56,12 @@ export function compressionMiddleware(req: FFRequest, res: FFResponse) {
         }
         compressionStream.end();
         return res;
+    };
+}
+
+export function compressionMiddleware() {
+    return (req: FFRequest, res: FFResponse, next: () => void) => {
+        compression(req, res);
+        next();
     };
 }
