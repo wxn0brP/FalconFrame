@@ -1,5 +1,5 @@
 {
-    "cmd": "tsc --noEmit && bun run src/test.ts",
+    "cmd": "tsc && tsc-alias && bun run src/test.ts",
     "watch": [
         "src"
     ],
