@@ -22,7 +22,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
     public _404: RouteHandler = (req, res) => {
-        res.status(404).end("404: File had second thoughts");
+        res.end("404: File had second thoughts");
     }
 
     constructor(opts: Partial<Opts> = {}) {
