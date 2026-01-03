@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.8](https://github.com/wxn0brP/FalconFrame/compare/v0.5.7...v0.5.8) (2026-01-03)
+
+
+### Features
+
+* `setVar` alias `set` ([1283fac](https://github.com/wxn0brP/FalconFrame/commit/1283fac7ea67f8a7ae65b911fda4f3b261e0de0f))
+* custom 404 ([c23f6e5](https://github.com/wxn0brP/FalconFrame/commit/c23f6e57aaa0bae5dfb672065330539a39ace969))
+
 ### [0.5.7](https://github.com/wxn0brP/FalconFrame/compare/v0.5.6...v0.5.7) (2026-01-01)
 
 
