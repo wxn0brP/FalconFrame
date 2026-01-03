@@ -21,6 +21,9 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     public vars: Vars = {} as Vars;
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
+    public _404: RouteHandler = (req, res) => {
+        res.status(404).end("404: File had second thoughts");
+    }
 
     constructor(opts: Partial<Opts> = {}) {
         super();
@@ -132,6 +135,10 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
      */
     l(port: number) {
         return this.listen(+process.env.PORT || port, true);
+    }
+
+    set404(handler: RouteHandler) {
+        this._404 = handler;
     }
 }
 

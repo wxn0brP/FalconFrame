@@ -62,14 +62,17 @@ export function handleRequest(
     );
 
     if (matchedMiddlewares.length === 0) {
-        res.status(404).end("404: File had second thoughts");
+        res.status(404);
+        FF._404(req, res);
         return;
     }
 
     let middlewareIndex = 0;
     async function next() {
         if (middlewareIndex >= matchedMiddlewares.length) {
-            return res.status(404).end("404: File had second thoughts");
+            res.status(404);
+            FF._404(req, res);
+            return;
         }
 
         const middleware = matchedMiddlewares[middlewareIndex++];

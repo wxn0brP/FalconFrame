@@ -97,7 +97,7 @@ app.post("/logout", (req, res) => {
 });
 
 // if no route matches
-app.all("*", (req, res) => {
+app.set404((req, res) => {
     res.status(404).json({ error: "Not found" });
 });
 
