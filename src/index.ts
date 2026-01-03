@@ -103,6 +103,11 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         this.vars[key] = value;
     }
 
+    set(key: keyof Vars, value: typeof this.vars[keyof Vars]) {
+        // @ts-ignore
+        this.vars[key] = value;
+    }
+
     getVar(key: string): typeof this.vars[keyof Vars] {
         // @ts-ignore
         return this.vars[key];
