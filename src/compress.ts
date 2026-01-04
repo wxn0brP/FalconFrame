@@ -1,7 +1,7 @@
 import { createGzip, createDeflate } from "zlib";
 import { FFResponse } from "./res";
 import { Transform } from "stream";
-import { FFRequest } from "./types";
+import { FFRequest, RouteHandler } from "./types";
 
 export function compression(req: FFRequest, res: FFResponse) {
     const encoding = req.headers["accept-encoding"];
@@ -37,31 +37,59 @@ export function compression(req: FFRequest, res: FFResponse) {
         originalEnd.call(res);
     });
 
+    compressionStream.on("error", (err) => {
+        if (!res.headersSent) {
+            res.statusCode = 500;
+            originalEnd.call(res);
+        } else {
+            res.destroy(err);
+        }
+    });
+
+    res.on("close", () => {
+        compressionStream.destroy();
+    });
+
     // @ts-ignore
-    res.write = (chunk: any, encoding?: BufferEncoding) => {
+    res.write = (...args: any[]) => {
+        const [chunk, encoding, cb] = args;
+        const callback = typeof encoding === "function" ? encoding : cb;
+        const enc = typeof encoding === "function" ? undefined : encoding;
+
         if (!res.headersSent) {
             res.writeHead(res.statusCode);
         }
-        return compressionStream.write(chunk, encoding);
+        return compressionStream.write(chunk, enc, callback);
     };
 
     // @ts-ignore
-    res.end = (chunk?: any, encoding?: BufferEncoding) => {
-        if (res.writableEnded) {
-            return res;
+    res.end = (...args: any[]) => {
+        if (res.writableEnded) return res;
+
+        const [chunk, encoding, cb] = args;
+        let finalChunk = chunk;
+        let finalCb = cb;
+        let finalEncoding = encoding;
+
+        if (typeof chunk === "function") {
+            finalCb = chunk;
+            finalChunk = undefined;
+        } else if (typeof encoding === "function") {
+            finalCb = encoding;
+            finalEncoding = undefined;
         }
-        if (chunk) {
-            // @ts-ignore
-            res.write(chunk, encoding);
+
+        if (finalCb) res.once("finish", finalCb);
+
+        if (finalChunk) {
+            res.write(finalChunk, finalEncoding);
         }
         compressionStream.end();
         return res;
     };
 }
 
-export function compressionMiddleware() {
-    return (req: FFRequest, res: FFResponse, next: () => void) => {
-        compression(req, res);
-        next();
-    };
+export const compressionMiddleware: RouteHandler = (req: FFRequest, res: FFResponse, next: () => void) => {
+    compression(req, res);
+    next();
 }
