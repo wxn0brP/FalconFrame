@@ -22,7 +22,7 @@ yarn add @wxn0brp/falcon-frame
 ## 🚦 Usage Example
 
 ```ts
-import FalconFrame from "@wxn0brp/falcon-frame";
+import FalconFrame, { validateBody } from "@wxn0brp/falcon-frame";
 const app = new FalconFrame();
 
 app.setOrigin("*");
@@ -67,22 +67,18 @@ app.post("/login", (req, res) => {
     res.status(401).json({ status: "fail", message: "Invalid credentials" });
 });
 
-app.post("/register", (req, res, next) => {
-    const { valid, validErrors } = req.valid({
+app.post(
+    "/register", 
+    validateBody({
         username: "required|string|min:3|max:20",
         password: "required|string|min:8",
-    });
-
-    if (!valid) {
-        return res.status(400).json({ status: "error", errors: validErrors });
+    }),
+    (req, res) => {
+        const { username, password } = req.body;
+        USERS[username] = password;
+        return { status: "success", message: "User registered successfully" };
     }
-
-    next();
-}, (req, res) => {
-    const { username, password } = req.body;
-    USERS[username] = password;
-    return { status: "success", message: "User registered successfully" };
-});
+);
 
 // Protected route
 app.get("/dashboard", requireAuth, (req, res) => {

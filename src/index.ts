@@ -11,7 +11,8 @@ import type {
     EngineCallback,
     ErrorHandler,
     FFRequest,
-    RouteHandler
+    RouteHandler,
+    ValidationErrorFormatter
 } from "./types";
 
 export interface Opts {
@@ -28,6 +29,13 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
 
+    public _400_formatter: ValidationErrorFormatter = (err) => {
+        return {
+            err: true,
+            msg: "Bad request",
+            errors: err,
+        }
+    }
     public _404: RouteHandler = (req, res) => {
         res.end("404: File had second thoughts");
     }
@@ -147,6 +155,10 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         return this.listen(+process.env.PORT || port, true);
     }
 
+    set400Formatter(formatter: ValidationErrorFormatter) {
+        this._400_formatter = formatter;
+    }
+
     set404(handler: RouteHandler) {
         this._404 = handler;
     }
@@ -159,6 +171,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 export default FalconFrame;
 
 export * as Helpers from "./helpers";
+export { validateBody } from "./valid";
 export {
     FFRequest, FFResponse, renderHTML, RouteHandler, Router
 };

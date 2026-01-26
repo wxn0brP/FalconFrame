@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationSchema } from "./types";
+import { RouteHandler, ValidationErrorFormatter, ValidationResult, ValidationSchema } from "./types";
 
 export function validate(
 	schema: ValidationSchema,
@@ -72,4 +72,16 @@ export function validate(
 	}
 
 	return { valid: isValid, validErrors: errors };
+}
+
+export function validateBody(schema: ValidationSchema): RouteHandler {
+	return (req, res, next) => {
+		const validationResult = req.valid(schema);
+		if (validationResult.valid) {
+			return next ? next() : undefined;
+		}
+
+		const errorResponse = res.FF._400_formatter(validationResult.validErrors);
+		res.status(400).json(errorResponse);
+	};
 }

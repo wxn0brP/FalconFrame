@@ -81,6 +81,8 @@ export interface ValidationResult {
 	};
 }
 
+export type ValidationErrorFormatter = (errors: ValidationResult["validErrors"]) => Record<string, any>;
+
 export type BeforeHandleRequest = (
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
