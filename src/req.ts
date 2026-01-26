@@ -92,13 +92,21 @@ export function handleRequest(
             }
         }
         req.middleware = middleware;
-        const result = await middleware.middleware(req, res, next);
-        if (result && !res._ended) {
-            if (typeof result === "string") {
-                return res.end(result);
-            } else if (typeof result === "object") {
-                if (result instanceof FFResponse) return res.end();
-                return res.json(result);
+        try {
+            const result = await middleware.middleware(req, res, next);
+            if (result && !res._ended) {
+                if (typeof result === "string") {
+                    return res.end(result);
+                } else if (typeof result === "object") {
+                    if (result instanceof FFResponse) return res.end();
+                    return res.json(result);
+                }
+            }
+        } catch (err: any) {
+            logger.error(`Unhandled error in middleware for path [${middleware.path}]:`, err.stack || err);
+            if (!res.headersSent && !res.writableEnded) {
+                res.status(500);
+                FF._500(err, req, res);
             }
         }
     }

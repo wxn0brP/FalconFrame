@@ -8,6 +8,12 @@ export type RouteHandler = (
 	next?: () => void,
 ) => void | any;
 
+export type ErrorHandler = (
+	err: Error,
+	req: FFRequest,
+	res: FFResponse
+) => void | any;
+
 export type Method = "get" | "post" | "put" | "delete" | "all";
 
 export interface Params {

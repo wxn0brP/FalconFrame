@@ -6,7 +6,13 @@ import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
 import { Router } from "./router";
-import type { BeforeHandleRequest, EngineCallback, FFRequest, RouteHandler } from "./types";
+import type {
+    BeforeHandleRequest,
+    EngineCallback,
+    ErrorHandler,
+    FFRequest,
+    RouteHandler
+} from "./types";
 
 export interface Opts {
     loggerOpts?: LoggerOptions;
@@ -21,8 +27,12 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     public vars: Vars = {} as Vars;
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
+
     public _404: RouteHandler = (req, res) => {
         res.end("404: File had second thoughts");
+    }
+    public _500: ErrorHandler = (err, req, res) => {
+        res.end("500: The code had an existential crisis");
     }
 
     constructor(opts: Partial<Opts> = {}) {
@@ -139,6 +149,10 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 
     set404(handler: RouteHandler) {
         this._404 = handler;
+    }
+
+    set500(handler: ErrorHandler) {
+        this._500 = handler;
     }
 }
 
