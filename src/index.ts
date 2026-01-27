@@ -39,6 +39,9 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
     public _404: RouteHandler = (req, res) => {
         res.end("404: File had second thoughts");
     }
+    public _413: RouteHandler = (req, res) => {
+        res.end("413: Cat is too fat");
+    }
     public _500: ErrorHandler = (err, req, res) => {
         res.end("500: The code had an existential crisis");
     }
@@ -161,6 +164,10 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
 
     set404(handler: RouteHandler) {
         this._404 = handler;
+    }
+
+    set413(handler: RouteHandler) {
+        this._413 = handler;
     }
 
     set500(handler: ErrorHandler) {

@@ -29,16 +29,18 @@ export function getContentType(req: FFRequest): string | undefined {
     return req.headers["content-type"]?.split(";")[0].toLowerCase();
 }
 
-export function getRawBody(req: FFRequest, limit: number): Promise<string> {
+export function getRawBody(req: FFRequest, res: FFResponse, limit: number): Promise<string> {
     return new Promise((resolve, reject) => {
         let body = "";
         req.on("data", (chunk) => {
             body += chunk.toString();
             if (limit && body.length > limit) {
                 const error = new Error("Payload Too Large");
-                // @ts-ignore
-                error.statusCode = 413;
+                res.status(413);
+                res.FF._413(req, res);
                 req.destroy();
+                // @ts-ignore
+                error.cancel = true;
                 return reject(error);
             }
         });
@@ -62,11 +64,12 @@ export function getStandardBodyParser(type: string, parser: ParseBodyFunction, F
         }
 
         try {
-            const body = await getRawBody(req, limit);
+            const body = await getRawBody(req, res, limit);
             req.body = await parser(body, req, FF);
+            next();
         } catch (err: any) {
+            if (err.cancel) return;
             req.body = {};
-        } finally {
             next();
         }
     }
