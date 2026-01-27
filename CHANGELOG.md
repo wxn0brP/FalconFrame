@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/wxn0brP/FalconFrame/compare/v0.5.9...v0.6.0) (2026-01-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* 413
+
+### Features
+
+* 400 ([f5368e1](https://github.com/wxn0brP/FalconFrame/commit/f5368e1550ba4d579eccec383fe0800c48bb94c7))
+* 413 ([97f60ee](https://github.com/wxn0brP/FalconFrame/commit/97f60eefef6d055fe1311b637495edba068662df))
+* 500 The code had an existential crisis ([6f9207f](https://github.com/wxn0brP/FalconFrame/commit/6f9207fb8a08640be79f7cd2012a5da004fd5da2))
+
 ### [0.5.9](https://github.com/wxn0brP/FalconFrame/compare/v0.5.8...v0.5.9) (2026-01-04)
 
 
