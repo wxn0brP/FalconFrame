@@ -2,13 +2,9 @@ import fs from "fs";
 import path from "path";
 import FalconFrame from ".";
 
-interface RenderData {
-    [key: string]: string;
-}
-
 export function renderHTML(
     templatePath: string,
-    data: RenderData,
+    data: Record<string, any> = {},
     renderedPaths: string[] = [],
     FF?: FalconFrame
 ): string {
@@ -17,9 +13,10 @@ export function renderHTML(
         if (renderedPaths.includes(realPath))
             return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
 
-        if (FF && FF.getVar("render data")) {
+        const FFData = FF && FF.getVar("render data");
+        if (FFData) {
             data = {
-                ...FF.getVar("render data"),
+                ...FFData,
                 ...data,
             };
         }
@@ -61,7 +58,8 @@ export function renderHTML(
         );
 
         // Layout
-        if (FF && FF.getVar("layout")) {
+        const FFLayout = FF && FF.getVar("layout");
+        if (FFLayout) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
             const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
             const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
@@ -70,7 +68,7 @@ export function renderHTML(
             if (!hasHtmlStructure && forceNoLayout) return template;
 
             return renderHTML(
-                FF.getVar("layout"),
+                FFLayout,
                 { ...data, body: template },
                 [...renderedPaths, realPath],
                 FF
