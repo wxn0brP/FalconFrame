@@ -17,9 +17,9 @@ export function renderHTML(
         if (renderedPaths.includes(realPath))
             return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
 
-        if (FF && FF.vars["render data"]) {
+        if (FF && FF.getVar("render data")) {
             data = {
-                ...FF.vars["render data"],
+                ...FF.getVar("render data"),
                 ...data,
             };
         }
@@ -61,7 +61,7 @@ export function renderHTML(
         );
 
         // Layout
-        if (FF && FF.vars["layout"]) {
+        if (FF && FF.getVar("layout")) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
             const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
             const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
@@ -70,7 +70,7 @@ export function renderHTML(
             if (!hasHtmlStructure && forceNoLayout) return template;
 
             return renderHTML(
-                FF.vars["layout"],
+                FF.getVar("layout"),
                 { ...data, body: template },
                 [...renderedPaths, realPath],
                 FF

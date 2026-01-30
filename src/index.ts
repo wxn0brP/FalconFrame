@@ -22,10 +22,19 @@ export interface Opts {
     disableUrlencodedParser?: boolean;
 }
 
-export class FalconFrame<Vars extends Record<string, any> = any> extends Router {
+export type FFVars = {
+    "render data": Record<string, any>;
+    "view engine": string;
+    "views": string;
+    "layout": string;
+};
+
+export type CombinedVars<ExtraVars> = ExtraVars & FFVars;
+
+export class FalconFrame<Vars extends Record<string, any> = Record<string, any>> extends Router {
     public logger: Logger;
     public bodyParsers: RouteHandler[] = [];
-    public vars: Vars = {} as Vars;
+    public vars: CombinedVars<Vars> = {} as any;
     public opts: Opts = {};
     public engines: Record<string, EngineCallback> = {};
 
@@ -58,8 +67,11 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
             ...opts,
         };
 
-        if (!this.opts.disableJsonParser) this.addBodyParser(json(this, { limit: this.opts.bodyLimit }));
-        if (!this.opts.disableUrlencodedParser) this.addBodyParser(urlencoded(this, { limit: this.opts.bodyLimit }));
+        if (!this.opts.disableJsonParser)
+            this.addBodyParser(json(this as any, { limit: this.opts.bodyLimit }));
+
+        if (!this.opts.disableUrlencodedParser)
+            this.addBodyParser(urlencoded(this as any, { limit: this.opts.bodyLimit }));
 
         this.engine(".html", (path, options, callback, FF) => {
             try {
@@ -112,7 +124,7 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
                 const result = await beforeHandleRequest(req, res);
                 if (result || (res as FFResponse)._ended) return;
             }
-            await handleRequest(req as FFRequest, res as FFResponse, this);
+            handleRequest(req as FFRequest, res as FFResponse, this as any);
         }
     }
 
@@ -122,17 +134,17 @@ export class FalconFrame<Vars extends Record<string, any> = any> extends Router 
         return this;
     }
 
-    setVar(key: keyof Vars, value: typeof this.vars[keyof Vars]) {
+    setVar(key: keyof CombinedVars<Vars>, value: typeof this.vars[keyof CombinedVars<Vars>]) {
         // @ts-ignore
         this.vars[key] = value;
     }
 
-    set(key: keyof Vars, value: typeof this.vars[keyof Vars]) {
+    set(key: keyof CombinedVars<Vars>, value: typeof this.vars[keyof CombinedVars<Vars>]) {
         // @ts-ignore
         this.vars[key] = value;
     }
 
-    getVar(key: string): typeof this.vars[keyof Vars] {
+    getVar(key: keyof CombinedVars<Vars>): typeof this.vars[keyof CombinedVars<Vars>] {
         // @ts-ignore
         return this.vars[key];
     }
