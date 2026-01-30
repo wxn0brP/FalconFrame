@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://github.com/wxn0brP/FalconFrame/compare/v0.6.0...v0.6.1) (2026-01-30)
+
+
+### Features
+
+* improve vars ([c611eda](https://github.com/wxn0brP/FalconFrame/commit/c611edae57d9d38d0199ee420faa4f1a8b53a2bc))
+
 ## [0.6.0](https://github.com/wxn0brP/FalconFrame/compare/v0.5.9...v0.6.0) (2026-01-27)
 
 
