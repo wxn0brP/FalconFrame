@@ -1,3 +1,4 @@
+import { LoggerOptions } from "@wxn0brp/lucerna-log";
 import FalconFrame from ".";
 import { FFResponse } from "./res";
 import http from "http";
@@ -107,3 +108,19 @@ export interface RenderOptions {
 	notAppendExt?: boolean;
 	notShareFF?: boolean;
 }
+
+export interface FFOpts {
+	loggerOpts?: LoggerOptions;
+	bodyLimit?: string;
+	disableJsonParser?: boolean;
+	disableUrlencodedParser?: boolean;
+}
+
+export type FFVars = {
+	"render data": Record<string, any>;
+	"view engine": string;
+	"views": string;
+	"layout": string;
+};
+
+export type CombinedVars<ExtraVars> = ExtraVars & FFVars;

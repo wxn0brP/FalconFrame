@@ -1,4 +1,4 @@
-import { Logger, LoggerOptions } from "@wxn0brp/lucerna-log";
+import { Logger } from "@wxn0brp/lucerna-log";
 import http from "http";
 import { json, urlencoded } from "./body";
 import { createCORS } from "./cors";
@@ -8,34 +8,20 @@ import { FFResponse } from "./res";
 import { Router } from "./router";
 import type {
     BeforeHandleRequest,
+    CombinedVars,
     EngineCallback,
     ErrorHandler,
+    FFOpts,
     FFRequest,
     RouteHandler,
     ValidationErrorFormatter
 } from "./types";
 
-export interface Opts {
-    loggerOpts?: LoggerOptions;
-    bodyLimit?: string;
-    disableJsonParser?: boolean;
-    disableUrlencodedParser?: boolean;
-}
-
-export type FFVars = {
-    "render data": Record<string, any>;
-    "view engine": string;
-    "views": string;
-    "layout": string;
-};
-
-export type CombinedVars<ExtraVars> = ExtraVars & FFVars;
-
 export class FalconFrame<Vars extends Record<string, any> = Record<string, any>> extends Router {
     public logger: Logger;
     public bodyParsers: RouteHandler[] = [];
     public vars: CombinedVars<Vars> = {} as any;
-    public opts: Opts = {};
+    public opts: FFOpts = {};
     public engines: Record<string, EngineCallback> = {};
 
     public _400_formatter: ValidationErrorFormatter = (err) => {
@@ -55,7 +41,7 @@ export class FalconFrame<Vars extends Record<string, any> = Record<string, any>>
         res.end("500: The code had an existential crisis");
     }
 
-    constructor(opts: Partial<Opts> = {}) {
+    constructor(opts: Partial<FFOpts> = {}) {
         super();
         const loggerOpts = opts?.loggerOpts || {};
         this.logger = new Logger({
@@ -190,6 +176,7 @@ export class FalconFrame<Vars extends Record<string, any> = Record<string, any>>
 export default FalconFrame;
 
 export * as Helpers from "./helpers";
+export { FFOpts as Opts } from "./types";
 export { validateBody } from "./valid";
 export {
     FFRequest, FFResponse, renderHTML, RouteHandler, Router
