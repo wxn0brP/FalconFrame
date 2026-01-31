@@ -6,11 +6,23 @@
     "author": "wxn0brP",
     "license": "MIT",
     "type": "module",
+    "description": "Lightweight modular TypeScript web framework",
     "homepage": "https://github.com/wxn0brP/FalconFrame",
     "repository": {
         "type": "git",
         "url": "https://github.com/wxn0brP/FalconFrame.git"
     },
+    "keywords": [
+        "http",
+        "web",
+        "framework",
+        "typescript",
+        "modular",
+        "lightweight",
+        "middleware",
+        "middleware-first",
+        "middleware-chain"
+    ],
     "scripts": {
         "build": "tsc && tsc-alias"
     },
