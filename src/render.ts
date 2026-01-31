@@ -13,15 +13,26 @@ export function renderHTML(
         if (renderedPaths.includes(realPath))
             return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
 
-        const FFData = FF && FF.getVar("render data");
-        if (FFData) {
-            data = {
-                ...FFData,
-                ...data,
-            };
+        let template = fs.readFileSync(templatePath, "utf8");
+
+        // Loading internal data, e.g. <!-- data { "title": "My title" } -->
+        const templateDataMatch = template.match(/<!--\s*data\s*(\{.*?\})\s*-->/s);
+        let templateData: Record<string, any> = {};
+        if (templateDataMatch) {
+            try {
+                templateData = JSON.parse(templateDataMatch[1]);
+                template = template.replace(templateDataMatch[0], "");
+            } catch (err) {
+                template = template.replace(templateDataMatch[0], "<!-- Invalid template data -->");
+            }
         }
 
-        let template = fs.readFileSync(templatePath, "utf8");
+        const FFData = FF && FF.getVar("render data");
+            data = {
+            ...(FFData || {}),
+            ...templateData,
+                ...data,
+            };
 
         // Inserting data, e.g. {{name}}
         template = template.replace(
