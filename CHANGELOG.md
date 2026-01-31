@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://github.com/wxn0brP/FalconFrame/compare/v0.6.1...v0.6.2) (2026-01-31)
+
+
+### Features
+
+* render data in file ([b2ae7c7](https://github.com/wxn0brP/FalconFrame/commit/b2ae7c73fe3a333225bb5b5f3f863601a6def2cb))
+
+
+### Bug Fixes
+
+* layout ([0563496](https://github.com/wxn0brP/FalconFrame/commit/0563496b19efde1135e8ec399110de0d576d8ad1))
+* Opts export ([b3372f2](https://github.com/wxn0brP/FalconFrame/commit/b3372f2bf540b4d2d22e1972119657aec56fbd92))
+
 ### [0.6.1](https://github.com/wxn0brP/FalconFrame/compare/v0.6.0...v0.6.1) (2026-01-30)
 
 
