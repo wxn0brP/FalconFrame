@@ -2,11 +2,16 @@ import fs from "fs";
 import path from "path";
 import FalconFrame from ".";
 
+export interface RenderOptions {
+    noLayout?: boolean;
+}
+
 export function renderHTML(
     templatePath: string,
     data: Record<string, any> = {},
     renderedPaths: string[] = [],
-    FF?: FalconFrame
+    FF?: FalconFrame,
+    opts: RenderOptions = {}
 ): string {
     try {
         const realPath = path.resolve(templatePath);
@@ -28,11 +33,11 @@ export function renderHTML(
         }
 
         const FFData = FF && FF.getVar("render data");
-            data = {
+        data = {
             ...(FFData || {}),
             ...templateData,
-                ...data,
-            };
+            ...data,
+        };
 
         // Inserting data, e.g. {{name}}
         template = template.replace(
@@ -48,10 +53,13 @@ export function renderHTML(
                     path.dirname(templatePath),
                     partialName + ".html",
                 );
-                return renderHTML(partialPath, data, [
-                    ...renderedPaths,
-                    realPath,
-                ], FF);
+                return renderHTML(
+                    partialPath,
+                    data,
+                    [...renderedPaths, realPath],
+                    FF,
+                    { noLayout: true }
+                );
             },
         );
 
@@ -70,10 +78,12 @@ export function renderHTML(
 
         // Layout
         const FFLayout = FF && FF.getVar("layout");
-        if (FFLayout) {
+        if (!opts.noLayout && FFLayout) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
             const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
             const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
+
+            template = template.replace(/<!--\s*layout\s*-->|<!--\s*force-layout\s*-->|<!--\s*force-no-layout\s*-->/g, "");
 
             if (hasHtmlStructure && !forceLayout) return template;
             if (!hasHtmlStructure && forceNoLayout) return template;
@@ -82,7 +92,8 @@ export function renderHTML(
                 FFLayout,
                 { ...data, body: template },
                 [...renderedPaths, realPath],
-                FF
+                FF,
+                { noLayout: true }
             );
         }
 
