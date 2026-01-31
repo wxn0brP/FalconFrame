@@ -17,7 +17,7 @@ import type {
     ValidationErrorFormatter
 } from "./types";
 
-export class FalconFrame<Vars extends Record<string, any> = Record<string, any>> extends Router {
+export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
     public logger: Logger;
     public bodyParsers: RouteHandler[] = [];
     public vars: CombinedVars<Vars> = {} as any;
@@ -120,18 +120,16 @@ export class FalconFrame<Vars extends Record<string, any> = Record<string, any>>
         return this;
     }
 
-    setVar(key: keyof CombinedVars<Vars>, value: typeof this.vars[keyof CombinedVars<Vars>]) {
-        // @ts-ignore
+    setVar<K extends keyof CombinedVars<Vars>>(key: K, value: CombinedVars<Vars>[K]) {
         this.vars[key] = value;
+        return this;
     }
 
-    set(key: keyof CombinedVars<Vars>, value: typeof this.vars[keyof CombinedVars<Vars>]) {
-        // @ts-ignore
-        this.vars[key] = value;
+    set<K extends keyof CombinedVars<Vars>>(key: K, value: CombinedVars<Vars>[K]) {
+        return this.setVar(key, value);
     }
 
-    getVar(key: keyof CombinedVars<Vars>): typeof this.vars[keyof CombinedVars<Vars>] {
-        // @ts-ignore
+    getVar<K extends keyof CombinedVars<Vars>>(key: K): CombinedVars<Vars>[K] {
         return this.vars[key];
     }
 
