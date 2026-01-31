@@ -176,7 +176,7 @@ export class FalconFrame<Vars extends Record<string, any> = Record<string, any>>
 export default FalconFrame;
 
 export * as Helpers from "./helpers";
-export { FFOpts as Opts } from "./types";
+export type { FFOpts as Opts } from "./types";
 export { validateBody } from "./valid";
 export {
     FFRequest, FFResponse, renderHTML, RouteHandler, Router
