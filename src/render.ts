@@ -10,7 +10,7 @@ export function renderHTML(
     templatePath: string,
     data: Record<string, any> = {},
     renderedPaths: string[] = [],
-    FF?: FalconFrame,
+    FF?: FalconFrame<any>,
     opts: RenderOptions = {}
 ): string {
     try {

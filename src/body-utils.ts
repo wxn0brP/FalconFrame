@@ -55,7 +55,12 @@ export function getRawBody(req: FFRequest, res: FFResponse, limit: number): Prom
     });
 }
 
-export function getStandardBodyParser(type: string, parser: ParseBodyFunction, FF: FalconFrame, opts: StandardBodyParserOptions): RouteHandler {
+export function getStandardBodyParser(
+    type: string,
+    parser: ParseBodyFunction,
+    FF: FalconFrame<any>,
+    opts: StandardBodyParserOptions
+): RouteHandler {
     const limit = parseLimit(opts.limit || "100k");
 
     return async (req: FFRequest, res: FFResponse, next: () => void) => {

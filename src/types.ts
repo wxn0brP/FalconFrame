@@ -36,7 +36,7 @@ export interface Body {
 export type ParseBodyFunction = (
 	body: string,
 	req: FFRequest,
-	FF: FalconFrame,
+	FF: FalconFrame<any>,
 ) => Promise<Record<string, any>>;
 
 export interface StandardBodyParserOptions {

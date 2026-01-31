@@ -9,7 +9,7 @@ import { validate } from "./valid";
 export function handleRequest(
     req: FFRequest,
     res: FFResponse,
-    FF: FalconFrame,
+    FF: FalconFrame<any>,
 ): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
     res.FF = FF;

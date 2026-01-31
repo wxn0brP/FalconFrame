@@ -7,7 +7,7 @@ import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
 	_ended = false;
-	FF: FalconFrame;
+	FF: FalconFrame<any>;
 
 	/**
 	 * bind end for compatibility
