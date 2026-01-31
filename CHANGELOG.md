@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/wxn0brP/FalconFrame/compare/v0.6.3...v0.7.0) (2026-01-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* simplify body parser API and dependency injection
+
+### Bug Fixes
+
+* FalconFrame generic problem ([410fcf4](https://github.com/wxn0brP/FalconFrame/commit/410fcf40c8ccf1f1441a5fbb0c93c939a9380f06))
+
+
+* simplify body parser API and dependency injection ([bba9ee4](https://github.com/wxn0brP/FalconFrame/commit/bba9ee4ab1d1006566f9481ee66a29a89e6cc42f))
+
 ### [0.6.3](https://github.com/wxn0brP/FalconFrame/compare/v0.6.2...v0.6.3) (2026-01-31)
 
 
