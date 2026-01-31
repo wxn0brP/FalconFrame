@@ -10,7 +10,19 @@ Data from the `data` object is inserted using `{{variable}}` syntax. The engine:
 - Looks for all occurrences of `{{key}}` in the template
 - Strips whitespace around keys when matching
 - Replaces variables with corresponding values from the data object
-- Inserts an empty string for keys that don't exist in the data object
+
+### Internal Template Data
+
+You can define template-specific data directly within an HTML file using a special comment: `<!-- data { "key": "value" } -->`.
+
+This is particularly useful for setting variables (like a page title) that are used in a parent layout. The data is parsed from the content template and passed up to the layout, allowing content pages to control parts of the surrounding layout without any changes in the rendering code.
+
+The data precedence is as follows:
+1. Data passed directly in the `renderHTML` JavaScript call.
+2. Data defined within the template using `<!-- data {} -->`.
+3. Global data set on the FalconFrame instance (if any).
+
+If the JSON inside the comment is invalid, it will be replaced with `<!-- Invalid template data -->`.
 
 ### Partial Inclusion
 
@@ -146,6 +158,59 @@ const data = { title: "My Awesome Site" };
   <main>
     <h2>About Us</h2>
     <p>This is the about page content.</p>
+  </main>
+</body>
+</html>
+```
+
+---
+
+### Internal Template Data Example
+
+This example demonstrates how a content page can set the `<title>` for its parent layout.
+
+**File: `layouts/main.html` (Layout)**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }}</title>
+</head>
+<body>
+  <main>
+    {{ body }}
+  </main>
+</body>
+</html>
+```
+
+**File: `pages/home.html` (Content Template)**
+```html
+<!-- data { "title": "My Awesome Home Page" } -->
+<h2>Welcome!</h2>
+<p>This is the home page content.</p>
+```
+
+**Setup:**
+```javascript
+// Assuming app.setVar("layout", "layouts/main.html") has been called
+app.render("pages/home.html"); 
+// No data needs to be passed via JS for the title
+```
+
+**Result:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Awesome Home Page</title>
+</head>
+<body>
+  <main>
+    <h2>Welcome!</h2>
+    <p>This is the home page content.</p>
   </main>
 </body>
 </html>
