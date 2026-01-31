@@ -54,10 +54,10 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
         };
 
         if (!this.opts.disableJsonParser)
-            this.addBodyParser(json(this as any, { limit: this.opts.bodyLimit }));
+            this.addBodyParser(json({ limit: this.opts.bodyLimit }));
 
         if (!this.opts.disableUrlencodedParser)
-            this.addBodyParser(urlencoded(this as any, { limit: this.opts.bodyLimit }));
+            this.addBodyParser(urlencoded({ limit: this.opts.bodyLimit }));
 
         this.engine(".html", (path, options, callback, FF) => {
             try {

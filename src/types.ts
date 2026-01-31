@@ -36,7 +36,7 @@ export interface Body {
 export type ParseBodyFunction = (
 	body: string,
 	req: FFRequest,
-	FF: FalconFrame<any>,
+	res: FFResponse,
 ) => Promise<Record<string, any>>;
 
 export interface StandardBodyParserOptions {
@@ -44,13 +44,14 @@ export interface StandardBodyParserOptions {
 }
 
 export class FFRequest extends http.IncomingMessage {
-	path!: string;
-	query!: Query;
-	params!: Params;
-	cookies!: Cookies;
-	body!: Body;
-	valid!: (schema: ValidationSchema) => ValidationResult;
-	middleware!: Middleware;
+	FF: FalconFrame<any>;
+	path: string;
+	query: Query;
+	params: Params;
+	cookies: Cookies;
+	body: Body;
+	valid: (schema: ValidationSchema) => ValidationResult;
+	middleware: Middleware;
 	sseId?: string;
 }
 

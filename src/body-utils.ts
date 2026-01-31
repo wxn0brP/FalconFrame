@@ -39,8 +39,6 @@ export function getRawBody(req: FFRequest, res: FFResponse, limit: number): Prom
                 res.status(413);
                 res.FF._413(req, res);
                 req.destroy();
-                // @ts-ignore
-                error.cancel = true;
                 return reject(error);
             }
         });
@@ -58,7 +56,6 @@ export function getRawBody(req: FFRequest, res: FFResponse, limit: number): Prom
 export function getStandardBodyParser(
     type: string,
     parser: ParseBodyFunction,
-    FF: FalconFrame<any>,
     opts: StandardBodyParserOptions
 ): RouteHandler {
     const limit = parseLimit(opts.limit || "100k");
@@ -70,10 +67,10 @@ export function getStandardBodyParser(
 
         try {
             const body = await getRawBody(req, res, limit);
-            req.body = await parser(body, req, FF);
+            req.body = await parser(body, req, res);
             next();
         } catch (err: any) {
-            if (err.cancel) return;
+            if (res._ended) return;
             req.body = {};
             next();
         }

@@ -12,7 +12,9 @@ export function handleRequest(
     FF: FalconFrame<any>,
 ): void {
     Object.setPrototypeOf(res, FFResponse.prototype);
+    req.FF = FF;
     res.FF = FF;
+
     const originalEnd = res.end;
     res.end = function (...any: any[]) {
         res._ended = true;
