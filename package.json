@@ -32,7 +32,7 @@
         "typescript": "*"
     },
     "dependencies": {
-        "@wxn0brp/lucerna-log": "^0.2.0"
+        "@wxn0brp/lucerna-log": "^0.2.2"
     },
     "files": [
         "dist"
