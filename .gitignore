@@ -4,6 +4,7 @@ node_modules
 .suglite_history
 yarn.lock
 package-lock.json
+bun.lock
 
 test.ts
 test.sh
