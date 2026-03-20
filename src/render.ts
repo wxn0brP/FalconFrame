@@ -1,9 +1,11 @@
 import fs from "fs";
 import path from "path";
 import FalconFrame from ".";
+import { CombinedVars } from "./types";
 
 export interface RenderOptions {
     noLayout?: boolean;
+    FFVar?: CombinedVars<any>
 }
 
 export function renderHTML(
@@ -32,7 +34,7 @@ export function renderHTML(
             }
         }
 
-        const FFData = FF && FF.getVar("render data");
+        const FFData = opts.FFVar?.["render data"] || (FF && FF.getVar("render data"));
         data = {
             ...(FFData || {}),
             ...templateData,
@@ -77,7 +79,7 @@ export function renderHTML(
         );
 
         // Layout
-        const FFLayout = FF && FF.getVar("layout");
+        const FFLayout = opts.FFVar?.layout || (FF && FF.getVar("layout"));
         if (!opts.noLayout && FFLayout) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
             const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
