@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/wxn0brP/FalconFrame/compare/v0.7.0...v0.8.0) (2026-03-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* refactor renderHTML to object api
+
+### Features
+
+* improve cors ([04c1bbd](https://github.com/wxn0brP/FalconFrame/commit/04c1bbd7395cc0ccac2559960ae683f5faa7035b))
+* improve renderHTML vars ([9281a8c](https://github.com/wxn0brP/FalconFrame/commit/9281a8ccec806ea25d7bf44b93173a42e554ceec))
+* refactor renderHTML to object api ([5244f71](https://github.com/wxn0brP/FalconFrame/commit/5244f71e83ce982e6aef554e96ded72048eb0d29))
+
 ### [0.7.1](https://github.com/wxn0brP/FalconFrame/compare/v0.7.0...v0.7.1) (2026-03-01)
 
 ## [0.7.0](https://github.com/wxn0brP/FalconFrame/compare/v0.6.3...v0.7.0) (2026-01-31)
