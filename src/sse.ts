@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import type { FFRequest, RouteHandler } from "./types";
 import { FFResponse } from "./res";
+import type { FFRequest, RouteHandler } from "./types";
 
 export class SSEManager {
     private clients = new Map<string, { req: FFRequest; res: FFResponse }>();

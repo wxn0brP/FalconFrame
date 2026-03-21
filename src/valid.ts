@@ -1,4 +1,4 @@
-import { RouteHandler, ValidationErrorFormatter, ValidationResult, ValidationSchema } from "./types";
+import { RouteHandler, ValidationResult, ValidationSchema } from "./types";
 
 export function validate(
 	schema: ValidationSchema,

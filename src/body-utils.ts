@@ -1,4 +1,4 @@
-import FalconFrame, { FFResponse } from ".";
+import { FFResponse } from ".";
 import type { FFRequest, ParseBodyFunction, RouteHandler, StandardBodyParserOptions } from "./types";
 
 export function parseLimit(limit: string | number): number {

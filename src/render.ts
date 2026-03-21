@@ -3,22 +3,33 @@ import path from "path";
 import FalconFrame from ".";
 import { CombinedVars } from "./types";
 
-export interface RenderOptions {
+export interface RenderHTMLOptions {
+    templatePath: string;
+    data?: Record<string, any>;
+    FF?: FalconFrame<any>;
     noLayout?: boolean;
-    FFVar?: CombinedVars<any>
+    FFVar?: CombinedVars<any>;
+    /** don't use, used internally */
+    _renderedPaths?: string[];
 }
 
-export function renderHTML(
-    templatePath: string,
-    data: Record<string, any> = {},
-    renderedPaths: string[] = [],
-    FF?: FalconFrame<any>,
-    opts: RenderOptions = {}
-): string {
+export function renderHTML(options: RenderHTMLOptions) {
     try {
+        let data = options.data || {};
+        const {
+            templatePath,
+            _renderedPaths: renderedPaths = [],
+            FF,
+            noLayout,
+            FFVar,
+        } = options;
+
         const realPath = path.resolve(templatePath);
         if (renderedPaths.includes(realPath))
             return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
+
+        if (!fs.existsSync(templatePath))
+            return `<!-- Template not found: ${templatePath} -->`;
 
         let template = fs.readFileSync(templatePath, "utf8");
 
@@ -34,7 +45,7 @@ export function renderHTML(
             }
         }
 
-        const FFData = opts.FFVar?.["render data"] || (FF && FF.getVar("render data"));
+        const FFData = FFVar?.["render data"] ?? (FF && FF.getVar("render data"));
         data = {
             ...(FFData || {}),
             ...templateData,
@@ -55,13 +66,14 @@ export function renderHTML(
                     path.dirname(templatePath),
                     partialName + ".html",
                 );
-                return renderHTML(
-                    partialPath,
+                return renderHTML({
+                    templatePath: partialPath,
+                    _renderedPaths: [...renderedPaths, realPath],
+                    noLayout: true,
                     data,
-                    [...renderedPaths, realPath],
                     FF,
-                    { noLayout: true }
-                );
+                    FFVar,
+                });
             },
         );
 
@@ -79,8 +91,8 @@ export function renderHTML(
         );
 
         // Layout
-        const FFLayout = opts.FFVar?.layout || (FF && FF.getVar("layout"));
-        if (!opts.noLayout && FFLayout) {
+        const FFLayout = FFVar?.layout ?? (FF && FF.getVar("layout"));
+        if (!noLayout && FFLayout) {
             const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
             const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
             const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
@@ -90,17 +102,21 @@ export function renderHTML(
             if (hasHtmlStructure && !forceLayout) return template;
             if (!hasHtmlStructure && forceNoLayout) return template;
 
-            return renderHTML(
-                FFLayout,
-                { ...data, body: template },
-                [...renderedPaths, realPath],
+            return renderHTML({
+                templatePath: FFLayout,
+                data: {
+                    ...data,
+                    body: template
+                },
+                _renderedPaths: [...renderedPaths, realPath],
+                noLayout: true,
                 FF,
-                { noLayout: true }
-            );
+                FFVar,
+            });
         }
 
         return template;
     } catch (error) {
-        return `<!-- Template not found: ${templatePath} -->`;
+        return `<-- Template ${options.templatePath} has errors -->`;
     }
 }

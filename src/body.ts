@@ -1,5 +1,4 @@
 import querystring from "querystring";
-import FalconFrame from ".";
 import { getStandardBodyParser } from "./body-utils";
 import { RouteHandler, StandardBodyParserOptions } from "./types";
 

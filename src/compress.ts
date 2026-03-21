@@ -1,6 +1,6 @@
-import { createGzip, createDeflate } from "zlib";
-import { FFResponse } from "./res";
 import { Transform } from "stream";
+import { createDeflate, createGzip } from "zlib";
+import { FFResponse } from "./res";
 import { FFRequest, RouteHandler } from "./types";
 
 export function compression(req: FFRequest, res: FFResponse) {

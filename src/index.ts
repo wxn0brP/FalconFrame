@@ -59,9 +59,13 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
         if (!this.opts.disableUrlencodedParser)
             this.addBodyParser(urlencoded({ limit: this.opts.bodyLimit }));
 
-        this.engine(".html", (path, options, callback, FF) => {
+        this.engine(".html", (path, data, callback, FF) => {
             try {
-                const content = renderHTML(path, options, [], FF);
+                const content = renderHTML({
+                    templatePath: path,
+                    data,
+                    FF,
+                });
                 callback(null, content);
             } catch (e) {
                 callback(e);
