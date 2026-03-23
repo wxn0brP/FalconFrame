@@ -29,7 +29,7 @@
     "devDependencies": {
         "@types/node": "*",
         "tsc-alias": "*",
-        "typescript": "^5"
+        "typescript": "^6.0.0"
     },
     "dependencies": {
         "@wxn0brp/lucerna-log": "^0.2.2"
