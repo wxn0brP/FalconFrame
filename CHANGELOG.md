@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.1](https://github.com/wxn0brP/FalconFrame/compare/v0.8.0...v0.8.1) (2026-03-25)
+
+
+### Features
+
+* ts 6 ([07fe121](https://github.com/wxn0brP/FalconFrame/commit/07fe1216dd85e79f461d5484c415942701967c2d))
+
+
+### Bug Fixes
+
+* path traveling ([3229294](https://github.com/wxn0brP/FalconFrame/commit/32292944202ccac6a3ba97d7a31ca786f0ab8d1c))
+
 ## [0.8.0](https://github.com/wxn0brP/FalconFrame/compare/v0.7.0...v0.8.0) (2026-03-21)
 
 
