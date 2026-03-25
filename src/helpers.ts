@@ -85,7 +85,14 @@ export function handleStaticFiles(dirPath: string, opts: StaticServeOptions): Ro
     return (req: FFRequest, res: FFResponse, next: () => void) => {
         if (req.method.toLowerCase() !== "get") return next();
         const apiPath = req.middleware.path;
-        const filePath = path.join(dirPath, req.path.replace(apiPath, ""));
+
+        const unsafePath = req.path.replace(apiPath, "");
+        const filePath = path.join(dirPath, path.normalize(unsafePath));
+
+        const resolvedPath = path.resolve(filePath);
+        const resolvedDir = path.resolve(dirPath);
+        if (!resolvedPath.startsWith(resolvedDir))
+            return next();
 
         try {
             const stats = fs.statSync(filePath);
