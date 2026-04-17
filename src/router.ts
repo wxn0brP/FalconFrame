@@ -1,5 +1,5 @@
-import { handleStaticFiles } from "./helpers";
 import { SSEManager } from "./sse";
+import { handleStaticFiles } from "./static";
 import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 
 export type MiddlewareFn = RouteHandler | Router | { getRouteHandler(): RouteHandler };
