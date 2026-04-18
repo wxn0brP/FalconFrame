@@ -43,6 +43,15 @@ export interface StandardBodyParserOptions {
 	limit?: string | number;
 }
 
+export interface ReRouteOptions {
+	method?: Method;
+	url?: string;
+	path?: string;
+	query?: Query;
+	params?: Params;
+	body?: Body;
+}
+
 export class FFRequest extends http.IncomingMessage {
 	FF: FalconFrame<any>;
 	path: string;
@@ -53,6 +62,7 @@ export class FFRequest extends http.IncomingMessage {
 	valid: (schema: ValidationSchema) => ValidationResult;
 	middleware: Middleware;
 	sseId?: string;
+	reRoute: (opts: ReRouteOptions) => void;
 }
 
 export interface Middleware {

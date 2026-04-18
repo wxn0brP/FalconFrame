@@ -3,7 +3,7 @@ import FalconFrame from ".";
 import { parseCookies } from "./helpers";
 import { getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
-import { FFRequest } from "./types";
+import { FFRequest, ReRouteOptions } from "./types";
 import { validate } from "./valid";
 
 export function handleRequest(
@@ -40,6 +40,16 @@ export function handleRequest(
     req.cookies = parseCookies(req.headers.cookie || "");
     req.params = {};
     req.valid = (schema: any) => validate(schema, req.body);
+
+    req.reRoute = (opts: ReRouteOptions) => {
+        if (opts.method) req.method = opts.method;
+        if (opts.url) req.url = opts.url;
+        if (opts.path) req.path = opts.path;
+        if (opts.query) req.query = opts.query;
+        if (opts.params) req.params = opts.params;
+        if (opts.body) req.body = opts.body;
+        return handleRequest(req, res, FF);
+    };
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
