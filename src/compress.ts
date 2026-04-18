@@ -4,6 +4,9 @@ import { FFResponse } from "./res";
 import { FFRequest, RouteHandler } from "./types";
 
 export function compression(req: FFRequest, res: FFResponse) {
+    if (req._compression) return;
+    req._compression = true;
+
     const encoding = req.headers["accept-encoding"];
 
     if (!encoding || typeof encoding !== "string" || res.headersSent) {

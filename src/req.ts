@@ -3,23 +3,26 @@ import FalconFrame from ".";
 import { parseCookies } from "./helpers";
 import { getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
-import { FFRequest, ReRouteOptions } from "./types";
+import { FFRequest } from "./types";
 import { validate } from "./valid";
 
 export function handleRequest(
     req: FFRequest,
     res: FFResponse,
     FF: FalconFrame<any>,
+    reRoute = false
 ): void {
-    Object.setPrototypeOf(res, FFResponse.prototype);
-    req.FF = FF;
-    res.FF = FF;
+    if (!reRoute) {
+        Object.setPrototypeOf(res, FFResponse.prototype);
+        req.FF = FF;
+        res.FF = FF;
 
-    const originalEnd = res.end;
-    res.end = function (...any: any[]) {
-        res._ended = true;
-        return originalEnd.call(res, ...any);
-    };
+        const originalEnd = res.end;
+        res.end = function (...any: any[]) {
+            res._ended = true;
+            return originalEnd.call(res, ...any);
+        };
+    }
 
     const { logger } = FF;
     try {
@@ -41,14 +44,9 @@ export function handleRequest(
     req.params = {};
     req.valid = (schema: any) => validate(schema, req.body);
 
-    req.reRoute = (opts: ReRouteOptions) => {
-        if (opts.method) req.method = opts.method;
-        if (opts.url) req.url = opts.url;
-        if (opts.path) req.path = opts.path;
-        if (opts.query) req.query = opts.query;
-        if (opts.params) req.params = opts.params;
-        if (opts.body) req.body = opts.body;
-        return handleRequest(req, res, FF);
+    req.reRoute = (fn) => {
+        fn(req);
+        handleRequest(req, res, FF, true);
     };
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
@@ -140,6 +138,12 @@ export function handleRequest(
     ) {
         logger.debug("Method does not require body. Executing middlewares");
         req.body = {};
+        next();
+        return;
+    }
+
+    if (reRoute) {
+        logger.debug("Re-route. Executing middlewares");
         next();
         return;
     }
