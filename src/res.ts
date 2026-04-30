@@ -74,14 +74,15 @@ export class FFResponse extends http.ServerResponse {
 	}
 
 	/**
-	 * Set status code to 302 and set location header to the provided url.
+	 * Set status code to 303 and set location header to the provided url.
 	 * If end is true, ends the response.
 	 * @param url The url to redirect to
+	 * @param status Status code to set
 	 * @param end Whether to end the response after setting the headers
 	 * @returns The response object
 	 */
-	redirect(url: string, end = true) {
-		this.statusCode = 302;
+	redirect(url: string, status = 303, end = true) {
+		this.statusCode = status;
 		this.setHeader("Location", url);
 		if (end) this.end();
 		return this;
