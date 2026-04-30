@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.2](https://github.com/wxn0brP/FalconFrame/compare/v0.8.1...v0.8.2) (2026-04-30)
+
+
+### Features
+
+* rebuild reRoute ([f531e4f](https://github.com/wxn0brP/FalconFrame/commit/f531e4fff9412e2f41d568295c8c99d65dffa040))
+* reRoute ([46a7ffd](https://github.com/wxn0brP/FalconFrame/commit/46a7ffd227adcebb4029741b7a1a122a04eed46e))
+
+
+### Bug Fixes
+
+* redirect ([39917cb](https://github.com/wxn0brP/FalconFrame/commit/39917cb2c89ff97bed205d8cdbb3df0b9ea808cc))
+
 ### [0.8.1](https://github.com/wxn0brP/FalconFrame/compare/v0.8.0...v0.8.1) (2026-03-25)
 
 
