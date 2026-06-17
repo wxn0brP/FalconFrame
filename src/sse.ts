@@ -3,17 +3,17 @@ import { FFResponse } from "./res";
 import type { FFRequest, RouteHandler } from "./types";
 
 export class SSEManager {
-    private clients = new Map<string, { req: FFRequest; res: FFResponse }>();
+    _clients = new Map<string, { req: FFRequest; res: FFResponse }>();
 
-    public getMiddleware(lastHandler?: RouteHandler): RouteHandler {
+    getMiddleware(lastHandler?: RouteHandler): RouteHandler {
         return (req, res, next) => {
             res.sseInit();
 
             const id = randomUUID();
-            this.clients.set(id, { req, res });
+            this._clients.set(id, { req, res });
 
             req.on("close", () => {
-                this.clients.delete(id);
+                this._clients.delete(id);
             });
             req.sseId = id;
 
@@ -21,28 +21,28 @@ export class SSEManager {
         };
     }
 
-    public getClients() {
-        return this.clients;
+    getClients() {
+        return this._clients;
     }
 
-    public sendAll(data: any) {
-        for (const { res } of this.clients.values()) {
+    sendAll(data: any) {
+        for (const { res } of this._clients.values()) {
             res.sseSend(data);
         }
     }
 
-    public sendTo(id: string, data: any) {
-        const client = this.clients.get(id);
+    sendTo(id: string, data: any) {
+        const client = this._clients.get(id);
         if (client) {
             client.res.sseSend(data);
         }
     }
 
-    public disconnect(id: string) {
-        const client = this.clients.get(id);
+    disconnect(id: string) {
+        const client = this._clients.get(id);
         if (client) {
             client.res.end();
-            this.clients.delete(id);
+            this._clients.delete(id);
         }
     }
 }

@@ -18,26 +18,26 @@ import type {
 } from "./types";
 
 export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
-    public logger: Logger;
-    public bodyParsers: RouteHandler[] = [];
-    public vars: CombinedVars<Vars> = {} as any;
-    public opts: FFOpts = {};
-    public engines: Record<string, EngineCallback> = {};
+    logger: Logger;
+    bodyParsers: RouteHandler[] = [];
+    vars: CombinedVars<Vars> = {} as any;
+    opts: FFOpts = {};
+    engines: Record<string, EngineCallback> = {};
 
-    public _400_formatter: ValidationErrorFormatter = (err) => {
+    _400_formatter: ValidationErrorFormatter = (err) => {
         return {
             err: true,
             msg: "Bad request",
             errors: err,
         }
     }
-    public _404: RouteHandler = (req, res) => {
+    _404: RouteHandler = (req, res) => {
         res.end("404: File had second thoughts");
     }
-    public _413: RouteHandler = (req, res) => {
+    _413: RouteHandler = (req, res) => {
         res.end("413: Cat is too fat");
     }
-    public _500: ErrorHandler = (err, req, res) => {
+    _500: ErrorHandler = (err, req, res) => {
         res.end("500: The code had an existential crisis");
     }
 

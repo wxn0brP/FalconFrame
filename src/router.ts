@@ -5,7 +5,7 @@ import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 export type MiddlewareFn = RouteHandler | Router | { getRouteHandler(): RouteHandler };
 
 export class Router {
-	public middlewares: Middleware[] = [];
+	middlewares: Middleware[] = [];
 
 	addRoute(method: Method, path: string, ...handlers: RouteHandler[]) {
 		const handler = handlers.pop();
