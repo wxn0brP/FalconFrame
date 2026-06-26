@@ -1,25 +1,24 @@
 # FalconFrame
 
-> Lightweight modular TypeScript web framework built for speed and clarity.
+A minimal, modular TypeScript web library.
 
-**FalconFrame** is a minimalist web framework inspired by the middleware-first style, with routing similar to Express, but written in pure TypeScript. It supports static files, data validation, and cookie management, all without external dependencies apart from a logger.
+## Features
 
-## ✨ Features
+- Zero-dependency routing engine
+- Middleware chaining
+- Static file serving
+- Request validation via inline schemas
+- OpenAPI document generation
+- Cookie management
+- Debuggable logger
 
-- 🚀 Zero-dependency routing engine
-- 🧱 Middleware chaining
-- 📁 Static file serving
-- 📦 Request validation via inline schemas
-- 🍪 Cookie management
-- 🔍 Debuggable logger
-
-## 📦 Installation
+## Installation
 
 ```bash
-yarn add @wxn0brp/falcon-frame
+bun add @wxn0brp/falcon-frame
 ```
 
-## 🚦 Usage Example
+## Usage Example
 
 ```ts
 import FalconFrame, { validateBody } from "@wxn0brp/falcon-frame";
@@ -83,13 +82,13 @@ app.post(
 // Protected route
 app.get("/dashboard", requireAuth, (req, res) => {
     return {
-        message: `👑 Welcome to the dashboard, ${req.cookies.session}`,
+        message: `Welcome to the dashboard, ${req.cookies.session}`,
     });
 });
 
 app.post("/logout", (req, res) => {
     res.cookie("session", "", { maxAge: 0 });
-    res.json({ message: "👋 Logged out" });
+    res.json({ message: "Logged out" });
 });
 
 // if no route matches
@@ -101,6 +100,6 @@ app.set404((req, res) => {
 app.l(3000);
 ```
 
-## 📜 License
+## License
 
-Published under the MIT license
+Published under the MIT license.
