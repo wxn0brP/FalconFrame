@@ -6,7 +6,7 @@
     "author": "wxn0brP",
     "license": "MIT",
     "type": "module",
-    "description": "Lightweight modular TypeScript web framework",
+    "description": "Lightweight modular TypeScript web library",
     "homepage": "https://github.com/wxn0brP/FalconFrame",
     "repository": {
         "type": "git",
@@ -15,7 +15,6 @@
     "keywords": [
         "http",
         "web",
-        "framework",
         "typescript",
         "modular",
         "lightweight",
