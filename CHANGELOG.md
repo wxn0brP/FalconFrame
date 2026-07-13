@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.3](https://github.com/wxn0brP/FalconFrame/compare/v0.8.2...v0.8.3) (2026-07-13)
+
+
+### Features
+
+* x-request-id ([e63d69a](https://github.com/wxn0brP/FalconFrame/commit/e63d69a8df8728c52e01e02d9964500700a8455a))
+
 ### [0.8.2](https://github.com/wxn0brP/FalconFrame/compare/v0.8.1...v0.8.2) (2026-04-30)
 
 
