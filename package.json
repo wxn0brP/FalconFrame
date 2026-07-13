@@ -28,10 +28,10 @@
     "devDependencies": {
         "@types/node": "*",
         "tsc-alias": "*",
-        "typescript": "^6"
+        "typescript": "^7"
     },
     "dependencies": {
-        "@wxn0brp/lucerna-log": "^0.2.2"
+        "@wxn0brp/lucerna-log": "^0.2.4"
     },
     "files": [
         "dist"
