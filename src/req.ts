@@ -50,10 +50,12 @@ export function handleRequest(
         handleRequest(req, res, FF, true);
     };
 
-    if (req.headers["x-request-id"])
-        res.setHeader("x-request-id", req.headers["x-request-id"]);
-    else if (FF.opts.xRequestId)
-        res.setHeader("x-request-id", randomUUID());
+    if (FF.opts.xRequestId !== "disable") {
+        if (req.headers["x-request-id"])
+            res.setHeader("x-request-id", req.headers["x-request-id"]);
+        else if (FF.opts.xRequestId === "auto")
+            res.setHeader("x-request-id", randomUUID());
+    }
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 

@@ -122,7 +122,7 @@ export interface FFOpts {
 	bodyLimit?: string;
 	disableJsonParser?: boolean;
 	disableUrlencodedParser?: boolean;
-	xRequestId?: boolean;
+	xRequestId?: "auto" | "disable" | "manual";
 }
 
 export type FFVars = {
