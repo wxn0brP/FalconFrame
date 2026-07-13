@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { URL } from "url";
 import FalconFrame from ".";
 import { parseCookies } from "./helpers";
@@ -48,6 +49,11 @@ export function handleRequest(
         fn(req);
         handleRequest(req, res, FF, true);
     };
+
+    if (req.headers["x-request-id"])
+        res.setHeader("x-request-id", req.headers["x-request-id"]);
+    else if (FF.opts.xRequestId)
+        res.setHeader("x-request-id", randomUUID());
 
     logger.info(`Incoming request: ${req.method} ${req.url}`);
 
