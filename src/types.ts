@@ -15,7 +15,7 @@ export type ErrorHandler = (
 	res: FFResponse
 ) => void | any;
 
-export type Method = "get" | "post" | "put" | "delete" | "all";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "all";
 
 export interface Params {
 	[key: string]: string;

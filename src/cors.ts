@@ -11,7 +11,7 @@ function setHeader(res: FFResponse, opts: Opts) {
     if (opts.accessControlAllowMethods)
         res.setHeader(
             "Access-Control-Allow-Methods",
-            "GET,POST,PUT,DELETE,OPTIONS",
+            "GET,POST,PUT,DELETE,PATCH,OPTIONS",
         );
     if (opts.accessControlAllowHeaders)
         res.setHeader(

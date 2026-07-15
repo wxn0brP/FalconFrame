@@ -62,6 +62,11 @@ export class Router {
 		return this;
 	}
 
+	patch(path: string, ...handlers: RouteHandler[]) {
+		this.addRoute("patch", path, ...handlers);
+		return this;
+	}
+
 	all(path: string, ...handlers: RouteHandler[]) {
 		this.addRoute("all", path, ...handlers);
 		return this;
