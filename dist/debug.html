@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>FalconFrame Debug</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+            --get: #58a6ff;
+            --post: #3fb950;
+            --put: #d29922;
+            --delete: #f85149;
+            --patch: #bc8cff;
+            --radius: 6px;
+            --font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            font-family: var(--font);
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            filter: brightness(1.2);
+        }
+
+        .btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .filters {
+            padding: 8px 20px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .filter-group input {
+            font-family: var(--font);
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            width: 180px;
+            outline: none;
+            text-transform: none;
+        }
+
+        .method-filters {
+            display: flex;
+            gap: 4px;
+            text-transform: none;
+        }
+
+        .method-chip {
+            font-family: var(--font);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .method-chip.active {
+            border-color: currentColor;
+        }
+
+        .method-chip.get.active {
+            color: var(--get)
+        }
+
+        .method-chip.post.active {
+            color: var(--post)
+        }
+
+        .method-chip.put.active {
+            color: var(--put)
+        }
+
+        .method-chip.delete.active {
+            color: var(--delete)
+        }
+
+        .method-chip.patch.active {
+            color: var(--patch)
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+        }
+
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 6px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            white-space: nowrap;
+        }
+
+        tr[data-row] {
+            cursor: pointer;
+        }
+
+        tr[data-row]:hover td {
+            background: rgba(88, 166, 255, 0.04);
+        }
+
+        .method {
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .method.get {
+            color: var(--get)
+        }
+
+        .method.post {
+            color: var(--post)
+        }
+
+        .method.put {
+            color: var(--put)
+        }
+
+        .method.delete {
+            color: var(--delete)
+        }
+
+        .method.patch {
+            color: var(--patch)
+        }
+
+        .status {
+            font-weight: 600
+        }
+
+        .status.s2xx {
+            color: var(--success)
+        }
+
+        .status.s3xx {
+            color: var(--accent)
+        }
+
+        .status.s4xx {
+            color: var(--warning)
+        }
+
+        .status.s5xx {
+            color: var(--danger)
+        }
+
+        .duration {
+            color: var(--text-muted)
+        }
+
+        .duration.slow {
+            color: var(--warning)
+        }
+
+        .duration.very-slow {
+            color: var(--danger)
+        }
+
+        .url-cell {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-row td {
+            padding: 0;
+            background: rgba(22, 27, 34, 0.6);
+        }
+
+        .detail-inner {
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-inner>* {
+            flex: 1 1 300px;
+            min-width: 240px;
+        }
+
+        .detail-section h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .detail-section pre {
+            font-family: var(--font);
+            font-size: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 8px 12px;
+            max-height: 200px;
+            overflow: auto;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .time {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="filters">
+        <div class="filter-group">
+            <label for="urlFilter">URL</label>
+            <input type="text" id="urlFilter" placeholder="Filter by URL...">
+        </div>
+        <div class="filter-group">
+            <label for="statusFilter">Status</label>
+            <input type="text" id="statusFilter" placeholder="e.g. 200, 4xx">
+        </div>
+        <div class="filter-group">
+            <span>Methods</span>
+            <div class="method-filters" id="methodFilters"></div>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table id="logTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Method</th>
+                    <th>URL</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="logBody">
+                <tr class="empty">
+                    <td colspan="6">
+                        <p>Waiting for requests...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        const METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+        const logBody = document.querySelector("#logBody");
+        const urlFilter = document.querySelector("#urlFilter");
+        const statusFilter = document.querySelector("#statusFilter");
+        const methodFilters = document.querySelector("#methodFilters");
+        const emptyRow = logBody.querySelector(".empty");
+        let entries = [];
+        let seq = 0;
+        let expanded = new Set();
+        let activeMethods = new Set(METHODS);
+
+        function statusClass(code) {
+            if (code < 300) return "s2xx";
+            if (code < 400) return "s3xx";
+            if (code < 500) return "s4xx";
+            return "s5xx";
+        }
+
+        function durationClass(ms) {
+            if (ms > 1000) return "very-slow";
+            if (ms > 300) return "slow";
+            return "";
+        }
+
+        function formatJSON(obj) {
+            try {
+                return JSON.stringify(obj, null, 2);
+            } catch {
+                return String(obj);
+            }
+        }
+
+        function esc(str) {
+            const el = document.createElement("span");
+            el.textContent = str;
+            return el.innerHTML;
+        }
+
+        function buildMethodChips() {
+            methodFilters.innerHTML = METHODS.map(m =>
+                `<button class="method-chip ${m.toLowerCase()} active" data-method="${m}">${m}</button>`
+            ).join("");
+            methodFilters.querySelectorAll(".method-chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const m = chip.dataset.method;
+                    if (activeMethods.has(m)) {
+                        activeMethods.delete(m);
+                        chip.classList.remove("active");
+                    } else {
+                        activeMethods.add(m);
+                        chip.classList.add("active");
+                    }
+                    render();
+                });
+            });
+        }
+
+        function matchEntry(e) {
+            if (!activeMethods.has(e.method)) return false;
+            if (urlFilter.value) {
+                const q = urlFilter.value.toLowerCase();
+                if (!e.url.toLowerCase().includes(q)) return false;
+            }
+            if (statusFilter.value) {
+                const regex = new RegExp(statusFilter.value.trim().replaceAll("x", "\\d"), "i");
+                if (!regex.test(String(e.status))) return false;
+            }
+            return true;
+        }
+
+        function render() {
+            const filtered = entries.filter(matchEntry).reverse();
+
+            if (filtered.length === 0) {
+                logBody.innerHTML = `<tr class="empty"><td colspan="6"><p>No matching requests</p></td></tr>`;
+                return;
+            }
+
+            logBody.innerHTML = filtered.map((e, i) => {
+                const idx = filtered.length - i;
+                const dur = e.duration != null ? `${e.duration}ms` : "—";
+                const rowId = `${idx}@${e.time}`;
+                const isExpanded = expanded.has(rowId);
+                const escUrl = esc(e.url);
+
+                let html = `<tr data-row="${rowId}">`;
+                html += `<td>${idx}</td>`;
+                html += `<td><span class="method ${e.method.toLowerCase()}">${esc(e.method)}</span></td>`;
+                html += `<td><span class="url-cell" title="${escUrl}">${escUrl}</span></td>`;
+                html += `<td><span class="status ${statusClass(e.status)}">${e.status}</span></td>`;
+                html += `<td><span class="duration ${durationClass(e.duration)}">${dur}</span></td>`;
+                html += `<td class="time">${new Date(e.time).toLocaleTimeString()}</td>`;
+                html += `</tr>`;
+
+                if (isExpanded) {
+                    html += `<tr class="detail-row"><td colspan="6">`;
+                    html += `<div class="detail-inner">`;
+                    html += `<div class="detail-section"><h4>Headers</h4><pre>${esc(formatJSON(e.headers))}</pre></div>`;
+                    html += `<div class="detail-section"><h4>Query</h4><pre>${esc(formatJSON(e.query))}</pre></div>`;
+                    html += `<div class="detail-section"><h4>Cookies</h4><pre>${esc(formatJSON(e.cookies))}</pre></div>`;
+                    html += `<div class="detail-section"><h4>Body</h4><pre>${esc(formatJSON(e.body))}</pre></div>`;
+                    html += `</div></td></tr>`;
+                }
+
+                return html;
+            }).join("");
+        }
+
+        logBody.addEventListener("click", (e) => {
+            const row = e.target.closest("tr[data-row]");
+            if (!row) return;
+            const rid = row.dataset.row;
+            expanded.has(rid) ? expanded.delete(rid) : expanded.add(rid);
+            render();
+        });
+
+        function addEntry(entry) {
+            entries.push(entry);
+            if (entries.length > 500) entries = entries.slice(-500);
+            render();
+        }
+
+        urlFilter.addEventListener("input", render);
+        statusFilter.addEventListener("input", render);
+
+        buildMethodChips();
+
+        const pass = new URLSearchParams(window.location.search).get("pass") || "";
+        const sseUrl = window.location.pathname.replace(/\/?$/, "") + "/sse" + (pass ? "?pass=" + encodeURIComponent(pass) : "");
+
+        function connectSSE() {
+            const es = new EventSource(sseUrl);
+
+            es.onopen = () => {
+                document.title = "FalconFrame Debug | Connected";
+            };
+
+            es.addEventListener("message", (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    addEntry(data);
+                } catch { }
+            });
+
+            es.onerror = () => {
+                document.title = "FalconFrame Debug | Disconnected";
+                es.close();
+                setTimeout(connectSSE, 2000);
+            };
+        }
+
+        connectSSE();
+    </script>
+</body>
+
+</html>
