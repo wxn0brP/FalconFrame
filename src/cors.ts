@@ -16,7 +16,7 @@ function setHeader(res: FFResponse, opts: Opts) {
     if (opts.accessControlAllowHeaders)
         res.setHeader(
             "Access-Control-Allow-Headers",
-            "Content-Type, Authorization",
+            "Content-Type, Authorization, x-request-id",
         );
 }
 

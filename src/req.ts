@@ -51,13 +51,19 @@ export function handleRequest(
     };
 
     if (FF.opts.xRequestId !== "disable") {
-        if (req.headers["x-request-id"])
-            res.setHeader("x-request-id", req.headers["x-request-id"]);
-        else if (FF.opts.xRequestId === "auto")
-            res.setHeader("x-request-id", randomUUID());
+        if (req.headers["x-request-id"]) {
+            req.id = req.headers["x-request-id"] as string;
+            res.setHeader("x-request-id", req.id);
+        } else if (FF.opts.xRequestId === "auto") {
+            req.id = randomUUID();
+            res.setHeader("x-request-id", req.id);
+        }
     }
 
-    logger.info(`Incoming request: ${req.method} ${req.url}`);
+    logger.info(
+        `Incoming request: ${req.method} ${req.url}` +
+        (req.id ? ` [${req.id}]` : ""),
+    );
 
     const middlewaresPath = req.path + "/";
     const middlewares = getMiddlewares(

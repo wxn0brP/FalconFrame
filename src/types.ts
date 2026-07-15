@@ -52,6 +52,7 @@ export class FFRequest extends http.IncomingMessage {
 	body: Body;
 	valid: (schema: ValidationSchema) => ValidationResult;
 	middleware: Middleware;
+	id?: string;
 	sseId?: string;
 	reRoute: (fn: (req: FFRequest) => void) => void;
 	_compression?: true;
