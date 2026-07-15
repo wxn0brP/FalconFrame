@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.4](https://github.com/wxn0brP/FalconFrame/compare/v0.8.3...v0.8.4) (2026-07-15)
+
+
+### Features
+
+* debug panel ([03b9d7d](https://github.com/wxn0brP/FalconFrame/commit/03b9d7d769f6ae513db04522ec4528085f775a48))
+* patch method support ([80aa33a](https://github.com/wxn0brP/FalconFrame/commit/80aa33a1f937bc8b1d21e1a1c4f5bfed3dc6da67))
+
+
+### Bug Fixes
+
+* x-request-id ([5bfcd87](https://github.com/wxn0brP/FalconFrame/commit/5bfcd87e19e9bbbbd000ef1c03506fc8050d3425))
+
 ### [0.8.3](https://github.com/wxn0brP/FalconFrame/compare/v0.8.2...v0.8.3) (2026-07-13)
 
 
