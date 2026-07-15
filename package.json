@@ -23,7 +23,8 @@
         "middleware-chain"
     ],
     "scripts": {
-        "build": "tsc && tsc-alias"
+        "build": "tsc && tsc-alias",
+        "copy": "cp src/debug.html dist/debug.html"
     },
     "devDependencies": {
         "@types/node": "*",
