@@ -8,7 +8,6 @@ A minimal, modular TypeScript web library.
 - Middleware chaining
 - Static file serving
 - Request validation via inline schemas
-- OpenAPI document generation
 - Cookie management
 - Debuggable logger
 
