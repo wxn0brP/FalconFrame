@@ -1,7 +1,22 @@
 import { Transform } from "stream";
-import { createDeflate, createGzip } from "zlib";
+import { createBrotliCompress, createDeflate, createGzip } from "zlib";
 import { FFResponse } from "./res";
 import { FFRequest, RouteHandler } from "./types";
+
+function isCompressible(contentType: string) {
+	if (!contentType) return true;
+	const type = contentType.split(";")[0].trim().toLowerCase();
+	if (/^image\/(?!svg\+xml)/.test(type)) return false;
+	if (/^(video|audio)\//.test(type)) return false;
+	if (type === "text/event-stream") return false;
+	if (
+		/^application\/(zip|gzip|x-gzip|x-bzip|x-bzip2|x-xz|x-rar|x-7z|x-tar|x-compress|wasm)$/.test(
+			type,
+		)
+	)
+		return false;
+	return true;
+}
 
 export function compression(req: FFRequest, res: FFResponse) {
 	if (req._compression) return;
@@ -13,45 +28,61 @@ export function compression(req: FFRequest, res: FFResponse) {
 		return;
 	}
 
-	let compressionStream: Transform;
+	let createCompressor: () => Transform;
 	let encodingType: string;
 
-	if (/\bgzip\b/.test(encoding)) {
+	if (/\bbr\b/.test(encoding)) {
+		encodingType = "br";
+		createCompressor = createBrotliCompress;
+	} else if (/\bgzip\b/.test(encoding)) {
 		encodingType = "gzip";
-		compressionStream = createGzip();
+		createCompressor = createGzip;
 	} else if (/\bdeflate\b/.test(encoding)) {
 		encodingType = "deflate";
-		compressionStream = createDeflate();
+		createCompressor = createDeflate;
 	} else {
 		return;
 	}
 
-	res.setHeader("Content-Encoding", encodingType);
-	res.removeHeader("Content-Length");
-
 	const originalWrite = res.write;
 	const originalEnd = res.end;
+	let compressionStream: Transform | null = null;
+	let initialized = false;
 
-	compressionStream.on("data", chunk => {
-		originalWrite.call(res, chunk);
-	});
+	function init() {
+		if (initialized) return compressionStream !== null;
+		initialized = true;
 
-	compressionStream.on("end", () => {
-		originalEnd.call(res);
-	});
+		const contentType = res.getHeader("content-type") as string;
+		if (!isCompressible(contentType)) return false;
 
-	compressionStream.on("error", err => {
-		if (!res.headersSent) {
-			res.statusCode = 500;
+		compressionStream = createCompressor();
+		res.setHeader("Content-Encoding", encodingType);
+		res.removeHeader("Content-Length");
+
+		compressionStream.on("data", chunk => {
+			originalWrite.call(res, chunk);
+		});
+
+		compressionStream.on("end", () => {
 			originalEnd.call(res);
-		} else {
-			res.destroy(err);
-		}
-	});
+		});
 
-	res.on("close", () => {
-		compressionStream.destroy();
-	});
+		compressionStream.on("error", err => {
+			if (!res.headersSent) {
+				res.statusCode = 500;
+				originalEnd.call(res);
+			} else {
+				res.destroy(err);
+			}
+		});
+
+		res.on("close", () => {
+			compressionStream.destroy();
+		});
+
+		return true;
+	}
 
 	// @ts-ignore
 	res.write = (...args: any[]) => {
@@ -60,6 +91,12 @@ export function compression(req: FFRequest, res: FFResponse) {
 		const enc = typeof encoding === "function" ? undefined : encoding;
 
 		if (!res.headersSent) {
+			if (!init()) {
+				res.write = originalWrite;
+				res.end = originalEnd;
+				res.writeHead(res.statusCode);
+				return originalWrite.call(res, chunk, enc, callback);
+			}
 			res.writeHead(res.statusCode);
 		}
 		return compressionStream.write(chunk, enc, callback);
@@ -80,6 +117,17 @@ export function compression(req: FFRequest, res: FFResponse) {
 		} else if (typeof encoding === "function") {
 			finalCb = encoding;
 			finalEncoding = undefined;
+		}
+
+		if (!res.headersSent) {
+			if (!init()) {
+				res.write = originalWrite;
+				res.end = originalEnd;
+				if (finalCb) res.once("finish", finalCb);
+				if (finalChunk) originalWrite.call(res, finalChunk, finalEncoding);
+				originalEnd.call(res);
+				return res;
+			}
 		}
 
 		if (finalCb) res.once("finish", finalCb);
