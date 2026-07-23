@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.6](https://github.com/wxn0brP/FalconFrame/compare/v0.8.5...v0.8.6) (2026-07-23)
+
+
+### Features
+
+* improve compression ([ddd8144](https://github.com/wxn0brP/FalconFrame/commit/ddd81442a8e5a95060e083fa41d8b77a87759e54))
+* improve debug ([ed88a14](https://github.com/wxn0brP/FalconFrame/commit/ed88a145932e0d403b26123d2ea7104c8a063290))
+
 ### [0.8.5](https://github.com/wxn0brP/FalconFrame/compare/v0.8.4...v0.8.5) (2026-07-18)
 
 ### [0.8.4](https://github.com/wxn0brP/FalconFrame/compare/v0.8.3...v0.8.4) (2026-07-15)
