@@ -333,9 +333,9 @@
         const methodFilters = document.querySelector("#methodFilters");
         const emptyRow = logBody.querySelector(".empty");
         let entries = [];
-        let seq = 0;
-        let expanded = new Set();
-        let activeMethods = new Set(METHODS);
+        const seq = 0;
+        const expanded = new Set();
+        const activeMethods = new Set(METHODS);
 
         function statusClass(code) {
             if (code < 300) return "s2xx";

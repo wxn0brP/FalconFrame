@@ -12,7 +12,7 @@ export type RouteHandler = (
 export type ErrorHandler = (
 	err: Error,
 	req: FFRequest,
-	res: FFResponse
+	res: FFResponse,
 ) => void | any;
 
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "all";
@@ -86,7 +86,9 @@ export interface ValidationResult {
 	};
 }
 
-export type ValidationErrorFormatter = (errors: ValidationResult["validErrors"]) => Record<string, any>;
+export type ValidationErrorFormatter = (
+	errors: ValidationResult["validErrors"],
+) => Record<string, any>;
 
 export type BeforeHandleRequest = (
 	req: http.IncomingMessage,
@@ -106,7 +108,7 @@ export type EngineCallback = (
 	path: string,
 	data: any,
 	callback: (e: any, rendered?: string) => void,
-	FF?: FalconFrame
+	FF?: FalconFrame,
 ) => void;
 
 export interface RenderOptions {
@@ -129,8 +131,8 @@ export interface FFOpts {
 export type FFVars = {
 	"render data": Record<string, any>;
 	"view engine": string;
-	"views": string;
-	"layout": string;
+	views: string;
+	layout: string;
 };
 
 export type CombinedVars<ExtraVars> = ExtraVars & FFVars;

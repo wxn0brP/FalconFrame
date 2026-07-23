@@ -28,6 +28,7 @@
     },
     "devDependencies": {
         "@types/node": "*",
+        "@wxn0brp/biome": "*",
         "tsc-alias": "*",
         "typescript": "^7"
     },

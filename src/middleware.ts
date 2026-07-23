@@ -33,7 +33,7 @@ export function matchMiddleware(
 			let matches = true;
 			for (let i = 0; i < middlewareParts.length; i++) {
 				if (middlewareParts[i].startsWith(":")) {
-					continue;
+					// continue;
 				} else if (middlewareParts[i] !== urlParts[i]) {
 					matches = false;
 					break;
@@ -74,14 +74,13 @@ export function getMiddlewares(
 		if (!matches) continue;
 
 		if (middleware.router) {
-			const nested = getMiddlewares(
-				middleware.router,
-				matchUrl,
-				fullPath,
-			);
+			const nested = getMiddlewares(middleware.router, matchUrl, fullPath);
 			result.push(...nested);
 		} else {
-			result.push({ ...middleware, path: fullPath });
+			result.push({
+				...middleware,
+				path: fullPath,
+			});
 		}
 	}
 

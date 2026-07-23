@@ -31,10 +31,7 @@ export function validate(
 					}
 					break;
 				case "min":
-					if (
-						typeof value === "string" &&
-						value.length < parseInt(param)
-					) {
+					if (typeof value === "string" && value.length < parseInt(param)) {
 						fieldErrors.push(
 							`${key} must be at least ${param} characters long`,
 						);
@@ -44,24 +41,20 @@ export function validate(
 					}
 					break;
 				case "max":
-					if (
-						typeof value === "string" &&
-						value.length > parseInt(param)
-					) {
-						fieldErrors.push(
-							`${key} must not exceed ${param} characters`,
-						);
+					if (typeof value === "string" && value.length > parseInt(param)) {
+						fieldErrors.push(`${key} must not exceed ${param} characters`);
 					}
 					if (typeof value === "number" && value > parseInt(param)) {
 						fieldErrors.push(`${key} must not exceed ${param}`);
 					}
 					break;
-				case "email":
+				case "email": {
 					const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 					if (!emailRegex.test(value)) {
 						fieldErrors.push(`${key} must be a valid email`);
 					}
 					break;
+				}
 			}
 		}
 
@@ -71,7 +64,10 @@ export function validate(
 		}
 	}
 
-	return { valid: isValid, validErrors: errors };
+	return {
+		valid: isValid,
+		validErrors: errors,
+	};
 }
 
 export function validateBody(schema: ValidationSchema): RouteHandler {

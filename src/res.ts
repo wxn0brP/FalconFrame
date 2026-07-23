@@ -117,7 +117,7 @@ export class FFResponse extends http.ServerResponse {
 
 		const viewsDir =
 			opts.baseDir ??
-			(opts.notUseViews ? "." : (ff.getVar("views") as string || "."));
+			(opts.notUseViews ? "." : (ff.getVar("views") as string) || ".");
 
 		let engineName = path.extname(view);
 		let filePath = view;
@@ -143,18 +143,25 @@ export class FFResponse extends http.ServerResponse {
 		const fullPath = path.resolve(viewsDir, filePath);
 
 		try {
-			engine(fullPath, data, (err, str) => {
-				if (err) {
-					ff.logger.error(`Error rendering view: ${err}`);
-					this.status(500).end("Server Error: Failed to render view.");
-				} else {
-					this.ct(opts.contentType || "text/html");
-					this.end(str);
-				}
-			}, opts.notShareFF ? undefined : this.FF);
+			engine(
+				fullPath,
+				data,
+				(err, str) => {
+					if (err) {
+						ff.logger.error(`Error rendering view: ${err}`);
+						this.status(500).end("Server Error: Failed to render view.");
+					} else {
+						this.ct(opts.contentType || "text/html");
+						this.end(str);
+					}
+				},
+				opts.notShareFF ? undefined : this.FF,
+			);
 		} catch (err) {
 			ff.logger.error(`Unhandled error in template engine: ${err}`);
-			this.status(500).end("Server Error: Unhandled exception in template engine.");
+			this.status(500).end(
+				"Server Error: Unhandled exception in template engine.",
+			);
 		}
 
 		return this;

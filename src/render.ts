@@ -4,119 +4,131 @@ import FalconFrame from ".";
 import { CombinedVars } from "./types";
 
 export interface RenderHTMLOptions {
-    templatePath: string;
-    data?: Record<string, any>;
-    FF?: FalconFrame<any>;
-    noLayout?: boolean;
-    FFVar?: CombinedVars<any>;
-    /** don't use, used internally */
-    _renderedPaths?: string[];
+	templatePath: string;
+	data?: Record<string, any>;
+	FF?: FalconFrame<any>;
+	noLayout?: boolean;
+	FFVar?: CombinedVars<any>;
+	/** don't use, used internally */
+	_renderedPaths?: string[];
 }
 
 export function renderHTML(options: RenderHTMLOptions) {
-    try {
-        let data = options.data || {};
-        const {
-            templatePath,
-            _renderedPaths: renderedPaths = [],
-            FF,
-            noLayout,
-            FFVar,
-        } = options;
+	try {
+		let data = options.data || {};
+		const {
+			templatePath,
+			_renderedPaths: renderedPaths = [],
+			FF,
+			noLayout,
+			FFVar,
+		} = options;
 
-        const realPath = path.resolve(templatePath);
-        if (renderedPaths.includes(realPath))
-            return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
+		const realPath = path.resolve(templatePath);
+		if (renderedPaths.includes(realPath))
+			return `<!-- Circular dependency detected: tried to render ${templatePath} again -->`;
 
-        if (!fs.existsSync(templatePath))
-            return `<!-- Template not found: ${templatePath} -->`;
+		if (!fs.existsSync(templatePath))
+			return `<!-- Template not found: ${templatePath} -->`;
 
-        let template = fs.readFileSync(templatePath, "utf8");
+		let template = fs.readFileSync(templatePath, "utf8");
 
-        // Loading internal data, e.g. <!-- data { "title": "My title" } -->
-        const templateDataMatch = template.match(/<!--\s*data\s*(\{.*?\})\s*-->/s);
-        let templateData: Record<string, any> = {};
-        if (templateDataMatch) {
-            try {
-                templateData = JSON.parse(templateDataMatch[1]);
-                template = template.replace(templateDataMatch[0], "");
-            } catch (err) {
-                template = template.replace(templateDataMatch[0], "<!-- Invalid template data -->");
-            }
-        }
+		// Loading internal data, e.g. <!-- data { "title": "My title" } -->
+		const templateDataMatch = template.match(/<!--\s*data\s*(\{.*?\})\s*-->/s);
+		let templateData: Record<string, any> = {};
+		if (templateDataMatch) {
+			try {
+				templateData = JSON.parse(templateDataMatch[1]);
+				template = template.replace(templateDataMatch[0], "");
+			} catch (err) {
+				template = template.replace(
+					templateDataMatch[0],
+					"<!-- Invalid template data -->",
+				);
+			}
+		}
 
-        const FFData = FFVar?.["render data"] ?? (FF && FF.getVar("render data"));
-        data = {
-            ...(FFData || {}),
-            ...templateData,
-            ...data,
-        };
+		const FFData = FFVar?.["render data"] ?? (FF && FF.getVar("render data"));
+		data = {
+			...(FFData || {}),
+			...templateData,
+			...data,
+		};
 
-        // Inserting data, e.g. {{name}}
-        template = template.replace(
-            /{{(.*?)}}/g,
-            (_, key) => data[key.trim()] || "",
-        );
+		// Inserting data, e.g. {{name}}
+		template = template.replace(
+			/{{(.*?)}}/g,
+			(_, key) => data[key.trim()] || "",
+		);
 
-        // Loading partials, e.g. <!-- include header -->
-        template = template.replace(
-            /<!--\s*include\s*(.*?)\s*-->/g,
-            (_, partialName) => {
-                const partialPath = path.join(
-                    path.dirname(templatePath),
-                    partialName + ".html",
-                );
-                return renderHTML({
-                    templatePath: partialPath,
-                    _renderedPaths: [...renderedPaths, realPath],
-                    noLayout: true,
-                    data,
-                    FF,
-                    FFVar,
-                });
-            },
-        );
+		// Loading partials, e.g. <!-- include header -->
+		template = template.replace(
+			/<!--\s*include\s*(.*?)\s*-->/g,
+			(_, partialName) => {
+				const partialPath = path.join(
+					path.dirname(templatePath),
+					partialName + ".html",
+				);
+				return renderHTML({
+					templatePath: partialPath,
+					_renderedPaths: [
+						...renderedPaths,
+						realPath,
+					],
+					noLayout: true,
+					data,
+					FF,
+					FFVar,
+				});
+			},
+		);
 
-        // Loading files, e.g. /* include style.css */
-        template = template.replace(
-            /\/\*\s*include\s*(.*?)\s*\*\//g,
-            (_, fileName) => {
-                fileName = fileName.trim();
-                try {
-                    return fs.readFileSync(fileName, "utf8");
-                } catch (error) {
-                    return `/* File not found: ${fileName} */`;
-                }
-            }
-        );
+		// Loading files, e.g. /* include style.css */
+		template = template.replace(
+			/\/\*\s*include\s*(.*?)\s*\*\//g,
+			(_, fileName) => {
+				fileName = fileName.trim();
+				try {
+					return fs.readFileSync(fileName, "utf8");
+				} catch (error) {
+					return `/* File not found: ${fileName} */`;
+				}
+			},
+		);
 
-        // Layout
-        const FFLayout = FFVar?.layout ?? (FF && FF.getVar("layout"));
-        if (!noLayout && FFLayout) {
-            const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
-            const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
-            const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
+		// Layout
+		const FFLayout = FFVar?.layout ?? (FF && FF.getVar("layout"));
+		if (!noLayout && FFLayout) {
+			const hasHtmlStructure = /<\s*html|<\s*body/i.test(template);
+			const forceLayout = /<!--\s*force-layout\s*-->/.test(template);
+			const forceNoLayout = /<!--\s*force-no-layout\s*-->/.test(template);
 
-            template = template.replace(/<!--\s*layout\s*-->|<!--\s*force-layout\s*-->|<!--\s*force-no-layout\s*-->/g, "");
+			template = template.replace(
+				/<!--\s*layout\s*-->|<!--\s*force-layout\s*-->|<!--\s*force-no-layout\s*-->/g,
+				"",
+			);
 
-            if (hasHtmlStructure && !forceLayout) return template;
-            if (!hasHtmlStructure && forceNoLayout) return template;
+			if (hasHtmlStructure && !forceLayout) return template;
+			if (!hasHtmlStructure && forceNoLayout) return template;
 
-            return renderHTML({
-                templatePath: FFLayout,
-                data: {
-                    ...data,
-                    body: template
-                },
-                _renderedPaths: [...renderedPaths, realPath],
-                noLayout: true,
-                FF,
-                FFVar,
-            });
-        }
+			return renderHTML({
+				templatePath: FFLayout,
+				data: {
+					...data,
+					body: template,
+				},
+				_renderedPaths: [
+					...renderedPaths,
+					realPath,
+				],
+				noLayout: true,
+				FF,
+				FFVar,
+			});
+		}
 
-        return template;
-    } catch (error) {
-        return `<-- Template ${options.templatePath} has errors -->`;
-    }
+		return template;
+	} catch (error) {
+		return `<-- Template ${options.templatePath} has errors -->`;
+	}
 }

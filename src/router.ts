@@ -2,15 +2,24 @@ import { SSEManager } from "./sse";
 import { handleStaticFiles } from "./static";
 import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
 
-export type MiddlewareFn = RouteHandler | Router | { getRouteHandler(): RouteHandler };
+export type MiddlewareFn =
+	| RouteHandler
+	| Router
+	| {
+			getRouteHandler(): RouteHandler;
+	  };
 
 export class Router {
 	middlewares: Middleware[] = [];
 
 	addRoute(method: Method, path: string, ...handlers: RouteHandler[]) {
 		const handler = handlers.pop();
-		handlers.forEach((middleware) => this.use(path, middleware));
-		return this.middlewares.push({ path, middleware: handler, method });
+		handlers.forEach(middleware => this.use(path, middleware));
+		return this.middlewares.push({
+			path,
+			middleware: handler,
+			method,
+		});
 	}
 
 	use(
@@ -82,7 +91,7 @@ export class Router {
 	}
 
 	sse(path: string, ...handlers: RouteHandler[]) {
-		const lastHandler = handlers.pop() || (() => { });
+		const lastHandler = handlers.pop() || (() => {});
 
 		const manager = new SSEManager();
 		handlers.push(manager.getMiddleware(lastHandler));
