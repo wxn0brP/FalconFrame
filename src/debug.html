@@ -236,6 +236,11 @@
             text-overflow: ellipsis;
         }
 
+        .url-copy {
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+
         .detail-row td {
             padding: 0;
             background: rgba(22, 27, 34, 0.6);
@@ -253,11 +258,40 @@
             min-width: 240px;
         }
 
+        .detail-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
         .detail-section h4 {
             font-size: 11px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin: 0;
+        }
+
+        .copy-btn {
+            font-family: var(--font);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--success);
+            color: var(--success);
         }
 
         .detail-section pre {
@@ -358,6 +392,14 @@
             }
         }
 
+        function isEmpty(obj) {
+            if (!obj || typeof obj !== "object") return true;
+            const keys = Object.keys(obj);
+            if (keys.length === 0) return true;
+            if (keys.length === 1 && keys[0] === "" && obj[""] === "") return true;
+            return false;
+        }
+
         function esc(str) {
             const el = document.createElement("span");
             el.textContent = str;
@@ -414,7 +456,7 @@
                 let html = `<tr data-row="${rowId}">`;
                 html += `<td>${idx}</td>`;
                 html += `<td><span class="method ${e.method.toLowerCase()}">${esc(e.method)}</span></td>`;
-                html += `<td><span class="url-cell" title="${escUrl}">${escUrl}</span></td>`;
+                html += `<td><span class="url-cell" title="${escUrl}">${escUrl}</span><button class="copy-btn url-copy" data-copy-url="${esc(e.url.replace(/"/g, '&quot;'))}">Copy</button></td>`;
                 html += `<td><span class="status ${statusClass(e.status)}">${e.status}</span></td>`;
                 html += `<td><span class="duration ${durationClass(e.duration)}">${dur}</span></td>`;
                 html += `<td class="time">${new Date(e.time).toLocaleTimeString()}</td>`;
@@ -423,10 +465,10 @@
                 if (isExpanded) {
                     html += `<tr class="detail-row"><td colspan="6">`;
                     html += `<div class="detail-inner">`;
-                    html += `<div class="detail-section"><h4>Headers</h4><pre>${esc(formatJSON(e.headers))}</pre></div>`;
-                    html += `<div class="detail-section"><h4>Query</h4><pre>${esc(formatJSON(e.query))}</pre></div>`;
-                    html += `<div class="detail-section"><h4>Cookies</h4><pre>${esc(formatJSON(e.cookies))}</pre></div>`;
-                    html += `<div class="detail-section"><h4>Body</h4><pre>${esc(formatJSON(e.body))}</pre></div>`;
+                    if (!isEmpty(e.headers)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Headers</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.headers))}</pre></div>`;
+                    if (!isEmpty(e.query)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Query</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.query))}</pre></div>`;
+                    if (!isEmpty(e.cookies)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Cookies</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.cookies))}</pre></div>`;
+                    if (!isEmpty(e.body)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Body</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.body))}</pre></div>`;
                     html += `</div></td></tr>`;
                 }
 
@@ -435,6 +477,35 @@
         }
 
         logBody.addEventListener("click", (e) => {
+            const copyBtn = e.target.closest("[data-copy]");
+            if (copyBtn) {
+                const pre = copyBtn.closest(".detail-section").querySelector("pre");
+                navigator.clipboard.writeText(pre.textContent).then(() => {
+                    copyBtn.textContent = "Copied!";
+                    copyBtn.classList.add("copied");
+                    setTimeout(() => {
+                        copyBtn.textContent = "Copy";
+                        copyBtn.classList.remove("copied");
+                    }, 1500);
+                });
+                return;
+            }
+
+            const urlCopyBtn = e.target.closest("[data-copy-url]");
+            if (urlCopyBtn) {
+                navigator.clipboard.writeText(urlCopyBtn.dataset.copyUrl).then(() => {
+                    urlCopyBtn.textContent = "Copied!";
+                    urlCopyBtn.classList.add("copied");
+                    setTimeout(() => {
+                        urlCopyBtn.textContent = "Copy";
+                        urlCopyBtn.classList.remove("copied");
+                    }, 1500);
+                });
+                return;
+            }
+
+            if (e.target.closest(".detail-row")) return;
+
             const row = e.target.closest("tr[data-row]");
             if (!row) return;
             const rid = row.dataset.row;
