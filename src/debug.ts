@@ -44,15 +44,15 @@ export function createDebug(opts: DebugOptions = {}): Router | RouteHandler {
 
 	const router = new Router();
 
-	router.get(url, (req, res, next) => {
-		if (!isAllowed(req)) return next();
+	router.get(url, (req, res) => {
+		if (!isAllowed(req)) return req.FF._404(req, res);
 		res.sendFile(join(import.meta.dirname, "debug.html"));
 	});
 
 	const sse = router.sse(
 		url + "/sse",
 		(req, res, next) => {
-			if (!isAllowed(req)) return req.FF._413(req, res);
+			if (!isAllowed(req)) return req.FF._404(req, res);
 			next();
 		},
 		() => {},
