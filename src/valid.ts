@@ -161,9 +161,10 @@ export function validate(
 		}
 
 		if (regexRules && regexRules[key] !== undefined) {
-			const regex = regexRules[key] instanceof RegExp
-				? regexRules[key] as RegExp
-				: new RegExp(regexRules[key] as string);
+			const regex =
+				regexRules[key] instanceof RegExp
+					? (regexRules[key] as RegExp)
+					: new RegExp(regexRules[key] as string);
 			if (!regex.test(value)) {
 				fieldErrors.push(`${key} format is invalid`);
 			}
@@ -181,7 +182,10 @@ export function validate(
 	};
 }
 
-export function validateBody(schema: ValidationSchema, regexRules?: Record<string, RegExp | string>): RouteHandler {
+export function validateBody(
+	schema: ValidationSchema,
+	regexRules?: Record<string, RegExp | string>,
+): RouteHandler {
 	return (req, res, next) => {
 		const validationResult = req.valid(schema, regexRules);
 		if (!validationResult.valid) {
