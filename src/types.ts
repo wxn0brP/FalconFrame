@@ -39,6 +39,11 @@ export type ParseBodyFunction = (
 	res: FFResponse,
 ) => Record<string, any> | Promise<Record<string, any>>;
 
+export interface BodyParserEntry {
+	parse: ParseBodyFunction;
+	limit: number;
+}
+
 export interface StandardBodyParserOptions {
 	limit?: string | number;
 }
@@ -127,8 +132,6 @@ export interface RenderOptions {
 export interface FFOpts {
 	loggerOpts?: LoggerOptions;
 	bodyLimit?: string;
-	disableJsonParser?: boolean;
-	disableUrlencodedParser?: boolean;
 	disableParser?: {
 		json?: boolean;
 		urlencoded?: boolean;

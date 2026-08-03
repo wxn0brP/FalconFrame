@@ -1,6 +1,7 @@
 import { Logger } from "@wxn0brp/lucerna-log";
 import http from "http";
 import * as bodyParser from "./body";
+import { parseLimit } from "./body-utils";
 import { createCORS } from "./cors";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
@@ -8,18 +9,21 @@ import { FFResponse } from "./res";
 import { Router } from "./router";
 import type {
 	BeforeHandleRequest,
+	BodyParserEntry,
 	CombinedVars,
 	EngineCallback,
 	ErrorHandler,
 	FFOpts,
 	FFRequest,
+	ParseBodyFunction,
 	RouteHandler,
+	StandardBodyParserOptions,
 	ValidationErrorFormatter,
 } from "./types";
 
 export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 	logger: Logger;
-	bodyParsers: RouteHandler[] = [];
+	bodyParsers: Record<string, BodyParserEntry> = {};
 	vars: CombinedVars<Vars> = {} as any;
 	opts: FFOpts = {};
 	engines: Record<string, EngineCallback> = {};
@@ -61,24 +65,47 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 			"toml",
 		]);
 
-		const parsers = {
-			json: this.opts.disableJsonParser,
-			urlencoded: this.opts.disableUrlencodedParser,
-			json5: false,
-			yaml: false,
-			toml: false,
-			xml: false,
-			text: false,
+		const parsers: Record<
+			string,
+			{
+				fn: ParseBodyFunction;
+				ct: string;
+			}
+		> = {
+			json: {
+				fn: bodyParser.json,
+				ct: "application/json",
+			},
+			urlencoded: {
+				fn: bodyParser.urlencoded,
+				ct: "application/x-www-form-urlencoded",
+			},
+			json5: {
+				fn: bodyParser.json5,
+				ct: "application/json5",
+			},
+			yaml: {
+				fn: bodyParser.yaml,
+				ct: "application/yaml",
+			},
+			toml: {
+				fn: bodyParser.toml,
+				ct: "application/toml",
+			},
+			xml: {
+				fn: bodyParser.xml,
+				ct: "application/xml",
+			},
+			text: {
+				fn: bodyParser.text,
+				ct: "text/plain",
+			},
 		};
 
-		for (const [key, legacyDisabled] of Object.entries(parsers)) {
-			if (legacyDisabled || dp[key as keyof typeof dp]) continue;
+		for (const [key, { fn, ct }] of Object.entries(parsers)) {
+			if (dp[key as keyof typeof dp]) continue;
 			if (bunOnly.has(key) && !isBun) continue;
-			this.addBodyParser(
-				bodyParser[key]({
-					limit: this.opts.bodyLimit,
-				}),
-			);
+			this.addBodyParser(ct, fn);
 		}
 
 		this.engine(".html", (path, data, callback, FF) => {
@@ -95,8 +122,15 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		});
 	}
 
-	addBodyParser(parser: RouteHandler) {
-		this.bodyParsers.push(parser);
+	addBodyParser(
+		contentType: string,
+		parser: ParseBodyFunction,
+		opts: StandardBodyParserOptions = {},
+	) {
+		this.bodyParsers[contentType] = {
+			parse: parser,
+			limit: parseLimit(opts.limit || this.opts.bodyLimit || "10m"),
+		};
 		return this;
 	}
 

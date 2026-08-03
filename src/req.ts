@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { URL } from "url";
 import FalconFrame from ".";
+import { getContentType, getRawBody } from "./body-utils";
 import { parseCookies } from "./helpers";
 import { getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
@@ -171,18 +172,30 @@ export function handleRequest(
 	}
 
 	req.body = {};
-	let bodyParserIndex = 0;
-	function nextBodyParser() {
-		if (bodyParserIndex >= FF.bodyParsers.length) {
-			logger.debug("No more body parsers. Executing middlewares");
-			return next();
-		}
+	const ct = getContentType(req) || "application/json";
+	const entry = FF.bodyParsers[ct];
+
+	if (!entry) {
 		logger.debug(
-			`Executing body parser ${bodyParserIndex} of ${FF.bodyParsers.length}`,
+			"No body parser found for content-type. Executing middlewares",
 		);
-		const bodyParser = FF.bodyParsers[bodyParserIndex++];
-		bodyParser(req, res, nextBodyParser);
+		next();
+		return;
 	}
 
-	nextBodyParser();
+	logger.debug(`Executing body parser for content-type: ${ct}`);
+	getRawBody(req, res, entry.limit)
+		.then(async rawBody => {
+			try {
+				req.body = (await entry.parse(rawBody, req, res)) ?? {};
+				req.isBodyParsed = true;
+			} catch (err: any) {
+				if (!res._ended) req.body = {};
+			}
+			next();
+		})
+		.catch(() => {
+			if (!res._ended) req.body = {};
+			next();
+		});
 }

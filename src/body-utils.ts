@@ -1,10 +1,5 @@
-import { FFResponse } from ".";
-import type {
-	FFRequest,
-	ParseBodyFunction,
-	RouteHandler,
-	StandardBodyParserOptions,
-} from "./types";
+import { FFResponse } from "./res";
+import type { FFRequest } from "./types";
 
 export function parseLimit(limit: string | number): number {
 	if (!limit) return 0;
@@ -60,33 +55,4 @@ export function getRawBody(
 			reject(err);
 		});
 	});
-}
-
-export function getStandardBodyParser(
-	type: string,
-	parser: ParseBodyFunction,
-	opts: StandardBodyParserOptions,
-): RouteHandler {
-	const limit = parseLimit(opts.limit || "100k");
-
-	return async (req: FFRequest, res: FFResponse, next: () => void) => {
-		if (getContentType(req) !== type) return next();
-		if (
-			req.body &&
-			typeof req.body === "object" &&
-			Object.keys(req.body).length
-		)
-			return next();
-
-		try {
-			const body = await getRawBody(req, res, limit);
-			req.body = (await parser(body, req, res)) ?? {};
-			req.isBodyParsed = true;
-			next();
-		} catch (err: any) {
-			if (res._ended) return;
-			req.body = {};
-			next();
-		}
-	};
 }
