@@ -5,6 +5,7 @@ import { FFRequest, RouteHandler } from "./types";
 export interface DebugOptions {
 	url?: string;
 	hosts?: string[];
+	logs?: boolean;
 }
 
 export function createDebug(opts: DebugOptions = {}): Router | RouteHandler {
@@ -15,6 +16,7 @@ export function createDebug(opts: DebugOptions = {}): Router | RouteHandler {
 			"127.0.0.1",
 			"::1",
 		],
+		logs = true,
 	} = opts;
 
 	if (
@@ -78,6 +80,8 @@ export function createDebug(opts: DebugOptions = {}): Router | RouteHandler {
 
 		next();
 	});
+
+	if (logs) router.post("/logs", () => "ok");
 
 	return router;
 }

@@ -392,6 +392,13 @@
             }
         }
 
+        function formatBody(e) {
+            if (e.method === "POST" && e.url.startsWith("/logs") && Array.isArray(e.body)) {
+                return e.body.join("\n");
+            }
+            return formatJSON(e.body);
+        }
+
         function isEmpty(obj) {
             if (!obj || typeof obj !== "object") return true;
             const keys = Object.keys(obj);
@@ -468,7 +475,7 @@
                     if (!isEmpty(e.headers)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Headers</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.headers))}</pre></div>`;
                     if (!isEmpty(e.query)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Query</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.query))}</pre></div>`;
                     if (!isEmpty(e.cookies)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Cookies</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.cookies))}</pre></div>`;
-                    if (!isEmpty(e.body)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Body</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatJSON(e.body))}</pre></div>`;
+                    if (!isEmpty(e.body)) html += `<div class="detail-section"><div class="detail-section-header"><h4>Body</h4><button class="copy-btn" data-copy>Copy</button></div><pre>${esc(formatBody(e))}</pre></div>`;
                     html += `</div></td></tr>`;
                 }
 
