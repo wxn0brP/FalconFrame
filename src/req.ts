@@ -44,12 +44,19 @@ export function handleRequest(
 	req.cookies = parseCookies(req.headers.cookie || "");
 	req.params = {};
 	req.valid = (schema: any, regexRules?: any) =>
-		validate(schema, req.body, regexRules);
+		validate({
+			schema,
+			data: req.body,
+			regexRules,
+			isBodyParsed: req.isBodyParsed,
+		});
 
 	req.reRoute = fn => {
 		fn(req);
 		handleRequest(req, res, FF, true);
 	};
+
+	req.isBodyParsed = false;
 
 	if (FF.opts.xRequestId !== "disable") {
 		if (req.headers["x-request-id"]) {

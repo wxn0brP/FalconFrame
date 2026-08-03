@@ -58,6 +58,7 @@ export class FFRequest extends http.IncomingMessage {
 	id?: string;
 	sseId?: string;
 	reRoute: (fn: (req: FFRequest) => void) => void;
+	isBodyParsed: boolean;
 	_compression?: true;
 }
 

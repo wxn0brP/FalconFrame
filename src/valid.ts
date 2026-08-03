@@ -6,12 +6,27 @@ const optionalKeys = new Set([
 	"opt",
 ]);
 
-export function validate(
-	schema: ValidationSchema,
-	data: any,
-	regexRules?: Record<string, RegExp | string>,
-): ValidationResult {
-	const errors: any = {};
+export interface ValidateBody {
+	schema: ValidationSchema;
+	data: any;
+	regexRules: Record<string, RegExp | string>;
+	isBodyParsed: boolean;
+}
+
+export function validate(opts: ValidateBody): ValidationResult {
+	if (!opts.isBodyParsed) {
+		return {
+			valid: false,
+			validErrors: {
+				_body: [
+					"Request body could not be parsed. Check Content-Type header and body format.",
+				],
+			},
+		};
+	}
+
+	const { schema, data, regexRules } = opts;
+	const errors: Record<string, string[]> = {};
 	let isValid = true;
 
 	for (const key in schema) {

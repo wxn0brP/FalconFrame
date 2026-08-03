@@ -81,6 +81,7 @@ export function getStandardBodyParser(
 		try {
 			const body = await getRawBody(req, res, limit);
 			req.body = (await parser(body, req, res)) || {};
+			req.isBodyParsed = true;
 			next();
 		} catch (err: any) {
 			if (res._ended) return;
