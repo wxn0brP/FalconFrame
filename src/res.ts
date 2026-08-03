@@ -53,7 +53,7 @@ export class FFResponse extends http.ServerResponse {
 	cookie(name: string, value: string, options: CookieOptions = {}) {
 		let cookie = `${name}=${encodeURIComponent(value)}`;
 
-		if (options.maxAge) cookie += `; Max-Age=${options.maxAge}`;
+		if (options.maxAge !== undefined) cookie += `; Max-Age=${options.maxAge}`;
 		if (options.path) cookie += `; Path=${options.path}`;
 		if (options.httpOnly) cookie += `; HttpOnly`;
 		if (options.secure) cookie += `; Secure`;
@@ -61,6 +61,13 @@ export class FFResponse extends http.ServerResponse {
 
 		this.setHeader("Set-Cookie", cookie);
 		return this;
+	}
+
+	clearCookie(name: string, options: CookieOptions = {}) {
+		return this.cookie(name, "", {
+			...options,
+			maxAge: 0,
+		});
 	}
 
 	/**

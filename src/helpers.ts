@@ -1,5 +1,5 @@
 import path from "path";
-import { Cookies } from "./types";
+import { Cookies, FFRequest } from "./types";
 
 export function parseCookies(cookieHeader: string): Cookies {
 	const cookies: Cookies = {};
@@ -9,6 +9,16 @@ export function parseCookies(cookieHeader: string): Cookies {
 		cookies[name.trim()] = value;
 	});
 	return cookies;
+}
+
+export function getIP(req: FFRequest) {
+	const forwarded = req.headers["x-forwarded-for"];
+	if (forwarded) {
+		return (typeof forwarded === "string" ? forwarded : forwarded[0])
+			.split(",")[0]
+			.trim();
+	}
+	return req.socket.remoteAddress || "";
 }
 
 const mimeTypes: Record<string, string> = {

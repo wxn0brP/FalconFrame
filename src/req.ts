@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
-import { parseCookies } from "./helpers";
+import { getIP, parseCookies } from "./helpers";
 import { getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
@@ -43,6 +43,7 @@ export function handleRequest(
 	}
 
 	req.cookies = parseCookies(req.headers.cookie || "");
+	req.ip = getIP(req);
 	req.params = {};
 	req.valid = (schema: any, regexRules?: any) =>
 		validate({
@@ -56,6 +57,7 @@ export function handleRequest(
 		fn(req);
 		handleRequest(req, res, FF, true);
 	};
+	req.header = (name: string) => (req.headers[name.toLowerCase()] as any) || "";
 
 	req.isBodyParsed = false;
 
