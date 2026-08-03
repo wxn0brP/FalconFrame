@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/wxn0brP/FalconFrame/compare/v0.8.7...v0.9.0) (2026-08-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* replace body parser chain with content-type map
+
+### Features
+
+* "body is not parsed" error ([7065e7a](https://github.com/wxn0brP/FalconFrame/commit/7065e7ad3d9c1392f12341a8c224742d25cba5c6))
+* add req.ip & req.header & res.clearCookie() ([ee54b51](https://github.com/wxn0brP/FalconFrame/commit/ee54b5118788e31529b7dffa2cb75ac80a4db954))
+* improve validate ([4e23b7e](https://github.com/wxn0brP/FalconFrame/commit/4e23b7e0301eccd75b33d9c88d29e3fc779c9386))
+* new body parsers ([2266cc3](https://github.com/wxn0brP/FalconFrame/commit/2266cc3f3bdeda69666fde57306efe5f3532c628))
+
+
+### Bug Fixes
+
+* debug not allowed ([ba1c384](https://github.com/wxn0brP/FalconFrame/commit/ba1c384059987874dd7fd8f63b52a1e50387c5e4))
+* json5 ([1fb5670](https://github.com/wxn0brP/FalconFrame/commit/1fb5670e73703d07cbd2361e81e69a24af9b2143))
+* parse null req.body ([2d0dad2](https://github.com/wxn0brP/FalconFrame/commit/2d0dad25508f1719414257be8d2f5d8e11e45924))
+* validate regex ([6d0c90c](https://github.com/wxn0brP/FalconFrame/commit/6d0c90c209e8976a82767e758aff413c5c0955a2))
+
+
+* replace body parser chain with content-type map ([05a0c9f](https://github.com/wxn0brP/FalconFrame/commit/05a0c9f4e503c4d577f4aa40f952a8bbff10ea69))
+
 ### [0.8.7](https://github.com/wxn0brP/FalconFrame/compare/v0.8.6...v0.8.7) (2026-08-03)
 
 
