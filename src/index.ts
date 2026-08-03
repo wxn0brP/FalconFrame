@@ -1,6 +1,6 @@
 import { Logger } from "@wxn0brp/lucerna-log";
 import http from "http";
-import { json, urlencoded } from "./body";
+import * as bodyParser from "./body";
 import { createCORS } from "./cors";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
@@ -53,19 +53,33 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 			...opts,
 		};
 
-		if (!this.opts.disableJsonParser)
-			this.addBodyParser(
-				json({
-					limit: this.opts.bodyLimit,
-				}),
-			);
+		const dp = this.opts.disableParser || {};
+		const isBun = !!(globalThis as any).Bun;
+		const bunOnly = new Set([
+			"json5",
+			"yaml",
+			"toml",
+		]);
 
-		if (!this.opts.disableUrlencodedParser)
+		const parsers = {
+			json: this.opts.disableJsonParser,
+			urlencoded: this.opts.disableUrlencodedParser,
+			json5: false,
+			yaml: false,
+			toml: false,
+			xml: false,
+			text: false,
+		};
+
+		for (const [key, legacyDisabled] of Object.entries(parsers)) {
+			if (legacyDisabled || dp[key as keyof typeof dp]) continue;
+			if (bunOnly.has(key) && !isBun) continue;
 			this.addBodyParser(
-				urlencoded({
+				bodyParser[key]({
 					limit: this.opts.bodyLimit,
 				}),
 			);
+		}
 
 		this.engine(".html", (path, data, callback, FF) => {
 			try {

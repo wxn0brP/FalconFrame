@@ -27,7 +27,7 @@
         "copy": "cp src/debug.html dist/debug.html"
     },
     "devDependencies": {
-        "@types/node": "*",
+        "@types/bun": "*",
         "@wxn0brp/biome": "*",
         "tsc-alias": "*",
         "typescript": "^7"

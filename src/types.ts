@@ -37,7 +37,7 @@ export type ParseBodyFunction = (
 	body: string,
 	req: FFRequest,
 	res: FFResponse,
-) => Promise<Record<string, any>>;
+) => Record<string, any> | Promise<Record<string, any>>;
 
 export interface StandardBodyParserOptions {
 	limit?: string | number;
@@ -50,7 +50,10 @@ export class FFRequest extends http.IncomingMessage {
 	params: Params;
 	cookies: Cookies;
 	body: Body;
-	valid: (schema: ValidationSchema, regexRules?: Record<string, RegExp | string>) => ValidationResult;
+	valid: (
+		schema: ValidationSchema,
+		regexRules?: Record<string, RegExp | string>,
+	) => ValidationResult;
 	middleware: Middleware;
 	id?: string;
 	sseId?: string;
@@ -125,6 +128,15 @@ export interface FFOpts {
 	bodyLimit?: string;
 	disableJsonParser?: boolean;
 	disableUrlencodedParser?: boolean;
+	disableParser?: {
+		json?: boolean;
+		urlencoded?: boolean;
+		json5?: boolean;
+		yaml?: boolean;
+		toml?: boolean;
+		xml?: boolean;
+		text?: boolean;
+	};
 	xRequestId?: "auto" | "disable" | "manual";
 }
 
