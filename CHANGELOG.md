@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.8.7](https://github.com/wxn0brP/FalconFrame/compare/v0.8.6...v0.8.7) (2026-08-03)
+
+
+### Features
+
+* logs in debug panel ([1f556a4](https://github.com/wxn0brP/FalconFrame/commit/1f556a4dfc4bba1d74fc4e33d6ff94aaf5d2fdad))
+
 ### [0.8.6](https://github.com/wxn0brP/FalconFrame/compare/v0.8.5...v0.8.6) (2026-07-23)
 
 
