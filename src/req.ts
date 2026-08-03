@@ -43,7 +43,7 @@ export function handleRequest(
 
 	req.cookies = parseCookies(req.headers.cookie || "");
 	req.params = {};
-	req.valid = (schema: any) => validate(schema, req.body);
+	req.valid = (schema: any, regexRules?: any) => validate(schema, req.body, regexRules);
 
 	req.reRoute = fn => {
 		fn(req);

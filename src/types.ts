@@ -50,7 +50,7 @@ export class FFRequest extends http.IncomingMessage {
 	params: Params;
 	cookies: Cookies;
 	body: Body;
-	valid: (schema: ValidationSchema) => ValidationResult;
+	valid: (schema: ValidationSchema, regexRules?: Record<string, RegExp | string>) => ValidationResult;
 	middleware: Middleware;
 	id?: string;
 	sseId?: string;

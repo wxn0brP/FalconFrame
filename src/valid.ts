@@ -9,6 +9,7 @@ const optionalKeys = new Set([
 export function validate(
 	schema: ValidationSchema,
 	data: any,
+	regexRules?: Record<string, RegExp | string>,
 ): ValidationResult {
 	const errors: any = {};
 	let isValid = true;
@@ -141,13 +142,6 @@ export function validate(
 					}
 					break;
 				}
-				case "regex": {
-					const regex = new RegExp(param);
-					if (!regex.test(value)) {
-						fieldErrors.push(`${key} format is invalid`);
-					}
-					break;
-				}
 				case "same": {
 					const otherValue = data[param];
 					if (value !== otherValue) {
@@ -166,6 +160,15 @@ export function validate(
 			}
 		}
 
+		if (regexRules && regexRules[key] !== undefined) {
+			const regex = regexRules[key] instanceof RegExp
+				? regexRules[key] as RegExp
+				: new RegExp(regexRules[key] as string);
+			if (!regex.test(value)) {
+				fieldErrors.push(`${key} format is invalid`);
+			}
+		}
+
 		if (fieldErrors.length > 0) {
 			isValid = false;
 			errors[key] = fieldErrors;
@@ -178,9 +181,9 @@ export function validate(
 	};
 }
 
-export function validateBody(schema: ValidationSchema): RouteHandler {
+export function validateBody(schema: ValidationSchema, regexRules?: Record<string, RegExp | string>): RouteHandler {
 	return (req, res, next) => {
-		const validationResult = req.valid(schema);
+		const validationResult = req.valid(schema, regexRules);
 		if (!validationResult.valid) {
 			const errorResponse = res.FF._400_formatter(validationResult.validErrors);
 			res.status(400).json(errorResponse);

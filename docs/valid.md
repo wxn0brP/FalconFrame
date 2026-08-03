@@ -28,6 +28,26 @@ if (result.valid) {
 }
 ```
 
+## Regex Validation
+
+Regex patterns are passed as a separate parameter to avoid conflicts with the `|` and `:` separators used in schema rules:
+
+```typescript
+const schema = {
+  website: "required|string",
+  code: "required|string"
+};
+
+const regexRules = {
+  website: /^https?:\/\/.+/,
+  code: "^[A-Z]{3}-[0-9]{4}$"
+};
+
+const result = validate(schema, data, regexRules);
+```
+
+Both `RegExp` objects and string patterns are supported.
+
 ## Schema Format
 
 Schemas are defined as objects where keys are field names and values are pipe-separated rule strings:
@@ -91,7 +111,6 @@ validate(schema, { email: "valid@example.com" }); // Valid
 | Rule | Description |
 |------|-------------|
 | `email` | Must be a valid email format |
-| `regex:pattern` | Must match the provided regular expression |
 
 ## Examples
 
@@ -136,9 +155,15 @@ const schema = {
 const schema = {
   email: "optional|email",
   bio: "optional|string|max:500",
-  website: "optional|regex:^https?:\/\/.+",
+  website: "optional|string",
   social: "optional|object"
 };
+
+const regexRules = {
+  website: /^https?:\/\/.+/
+};
+
+validate(schema, data, regexRules);
 ```
 
 ## Middleware Usage
@@ -155,6 +180,26 @@ app.post("/register",
   }),
   (req, res) => {
     // Validation passed, proceed with registration
+    res.json({ success: true });
+  }
+);
+```
+
+With regex validation:
+
+```typescript
+app.post("/profile",
+  validateBody(
+    {
+      website: "optional|string",
+      phone: "required|string"
+    },
+    {
+      website: /^https?:\/\/.+/,
+      phone: "^\\+?[0-9]{9,15}$"
+    }
+  ),
+  (req, res) => {
     res.json({ success: true });
   }
 );
