@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.2](https://github.com/wxn0brP/FalconFrame/compare/v0.9.1...v0.9.2) (2026-08-11)
+
+
+### Bug Fixes
+
+* app.static + HEAD ([880c539](https://github.com/wxn0brP/FalconFrame/commit/880c539d02d2e3858f20f7a8fb94ac2face00254))
+
 ### [0.9.1](https://github.com/wxn0brP/FalconFrame/compare/v0.9.0...v0.9.1) (2026-08-11)
 
 
