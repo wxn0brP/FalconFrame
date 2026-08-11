@@ -59,7 +59,7 @@ export class FFResponse extends http.ServerResponse {
 		if (options.secure) cookie += `; Secure`;
 		if (options.sameSite) cookie += `; SameSite=${options.sameSite}`;
 
-		this.setHeader("Set-Cookie", cookie);
+		this.appendHeader("Set-Cookie", cookie);
 		return this;
 	}
 

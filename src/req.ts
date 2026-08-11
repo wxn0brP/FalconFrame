@@ -29,20 +29,20 @@ export function handleRequest(
 	const { logger } = FF;
 	try {
 		const [path, params] = (req.url || "").split("?");
-		const normalizedPath = path.replace(/\/{2,}/g, "/");
+		const normalizedPath = decodeURIComponent(path).replace(/\/{2,}/g, "/");
 		const parsedUrl = new URL(
 			normalizedPath + (params ? `?${params}` : ""),
 			"http://localhost",
 		);
-		req.path = decodeURIComponent(parsedUrl.pathname) || "/";
+		req.path = parsedUrl.pathname || "/";
 		req.query = Object.fromEntries(parsedUrl.searchParams);
+		req.cookies = parseCookies(req.headers.cookie || "");
 	} catch (e) {
-		logger.error(`Error parsing URL (${req.url}): ${e}`);
+		logger.error(`Error parsing request (${req.url}): ${e}`);
 		res.status(400).end("400: Bad request");
 		return;
 	}
 
-	req.cookies = parseCookies(req.headers.cookie || "");
 	req.ip = getIP(req);
 	req.params = {};
 	req.valid = (schema: any, regexRules?: any) =>
@@ -197,7 +197,9 @@ export function handleRequest(
 			next();
 		})
 		.catch(() => {
-			if (!res._ended) req.body = {};
-			next();
+			if (!res._ended) {
+				req.body = {};
+				next();
+			}
 		});
 }

@@ -5,10 +5,12 @@ export function parseLimit(limit: string | number): number {
 	if (!limit) return 0;
 	if (typeof limit === "number") return limit;
 	if (typeof limit !== "string") return 0;
-	limit = limit.toLowerCase().replace("b", "");
 
-	const match = limit.match(/^(\d+)([kmg])?$/i);
-	if (!match) return 0;
+	const match = limit
+		.toLowerCase()
+		.replace(/b$/, "")
+		.match(/^(\d+)([kmg])?$/);
+	if (!match) throw new Error(`Invalid body limit: ${limit}`);
 
 	const num = parseInt(match[1], 10);
 	const unit = match[2]?.toLowerCase();
@@ -35,20 +37,23 @@ export function getRawBody(
 	limit: number,
 ): Promise<string> {
 	return new Promise((resolve, reject) => {
-		let body = "";
+		const chunks: Buffer[] = [];
+		let total = 0;
+
 		req.on("data", chunk => {
-			body += chunk.toString();
-			if (limit && body.length > limit) {
-				const error = new Error("Payload Too Large");
+			const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+			total += buf.length;
+			if (limit && total > limit) {
 				res.status(413);
 				res.FF._413(req, res);
 				req.destroy();
-				return reject(error);
+				return reject(new Error("Payload Too Large"));
 			}
+			chunks.push(buf);
 		});
 
 		req.on("end", () => {
-			resolve(body);
+			resolve(Buffer.concat(chunks).toString());
 		});
 
 		req.on("error", err => {

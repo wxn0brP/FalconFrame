@@ -86,6 +86,7 @@ export class Router {
 			dirPath = apiPath;
 			apiPath = "/";
 		}
+		if (dirPath === "/") throw new Error("Cannot serve root directory");
 		this.use(apiPath, handleStaticFiles(dirPath, opts));
 		return this;
 	}
