@@ -56,12 +56,17 @@ export function handleStaticFiles(
 		}
 
 		res.ct(getContentType(filePath, opts.utf8));
+		if (req.method === "HEAD") {
+			res.setHeader("Content-Length", stats.size);
+			res.end();
+			return true;
+		}
 		fs.createReadStream(filePath).pipe(res);
 		return true;
 	};
 
 	return (req: FFRequest, res: FFResponse, next: () => void) => {
-		if (req.method.toLowerCase() !== "get") return next();
+		if (req.method !== "GET" && req.method !== "HEAD") return next();
 		const apiPath = req.middleware.path;
 
 		const unsafePath = req.path.replace(apiPath, "");
