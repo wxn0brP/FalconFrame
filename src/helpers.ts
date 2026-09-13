@@ -2,7 +2,7 @@ import path from "path";
 import { Cookies, FFRequest } from "./types";
 
 export function parseCookies(cookieHeader: string): Cookies {
-	const cookies: Cookies = {};
+	const cookies = Object.create(null) as Cookies;
 	cookieHeader.split(";").forEach(cookie => {
 		const [name, ...valueParts] = cookie.split("=");
 		const value = decodeURIComponent(valueParts.join("=").trim());
