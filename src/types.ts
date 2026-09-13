@@ -140,7 +140,6 @@ export interface FFOpts {
 		json5?: boolean;
 		yaml?: boolean;
 		toml?: boolean;
-		xml?: boolean;
 		text?: boolean;
 	};
 	xRequestId?: "auto" | "disable" | "manual";

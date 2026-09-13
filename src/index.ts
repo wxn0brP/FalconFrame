@@ -92,10 +92,6 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 				fn: bodyParser.toml,
 				ct: "application/toml",
 			},
-			xml: {
-				fn: bodyParser.xml,
-				ct: "application/xml",
-			},
 			text: {
 				fn: bodyParser.text,
 				ct: "text/plain",
