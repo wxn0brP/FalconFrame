@@ -252,6 +252,7 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 
 export default FalconFrame;
 
+export { OfflineEngine, OfflineRequest, OfflineResponse } from "./engine";
 export * as Helpers from "./helpers";
 export type { FFOpts as Opts } from "./types";
 export { validateBody } from "./valid";

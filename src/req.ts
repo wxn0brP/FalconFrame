@@ -3,7 +3,7 @@ import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
 import { getIP, parseCookies } from "./helpers";
-import { getMiddlewares, matchMiddleware } from "./middleware";
+import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
 import { validate } from "./valid";
@@ -112,17 +112,7 @@ export function handleRequest(
 			`Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`,
 		);
 
-		if (middleware.path.includes(":")) {
-			const middlewareParts = middleware.path.split("/");
-			const reqPathParts = req.path.split("/");
-			req.params = {};
-			for (let i = 0; i < middlewareParts.length; i++) {
-				if (middlewareParts[i].startsWith(":")) {
-					const paramName = middlewareParts[i].slice(1);
-					req.params[paramName] = reqPathParts[i];
-				}
-			}
-		}
+		req.params = extractParams(middleware.path, req.path);
 		req.middleware = middleware;
 		try {
 			const result = await middleware.middleware(req, res, next);

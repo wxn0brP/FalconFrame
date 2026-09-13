@@ -86,3 +86,19 @@ export function getMiddlewares(
 
 	return result;
 }
+
+export function extractParams(
+	routePath: string,
+	requestPath: string,
+): Record<string, string> {
+	const params: Record<string, string> = {};
+	if (!routePath.includes(":")) return params;
+	const routeParts = routePath.split("/");
+	const pathParts = requestPath.split("/");
+	for (let i = 0; i < routeParts.length; i++) {
+		if (routeParts[i].startsWith(":")) {
+			params[routeParts[i].slice(1)] = pathParts[i];
+		}
+	}
+	return params;
+}
