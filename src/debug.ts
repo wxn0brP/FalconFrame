@@ -30,7 +30,8 @@ export function createDebug(opts: DebugOptions = {}): Router | RouteHandler {
 	const pass = process.env.FF_DEBUG_PASS;
 
 	function isHostAllowed(req: FFRequest) {
-		return hosts.some(h => h === req.socket.remoteAddress);
+		const ip = req.ip || req.socket.remoteAddress || "";
+		return hosts.some(h => h === ip);
 	}
 
 	function checkAuth(req: FFRequest) {
