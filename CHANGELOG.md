@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.3](https://github.com/wxn0brP/FalconFrame/compare/v0.9.2...v0.9.3) (2026-09-15)
+
+
+### Features
+
+* offline mode ([3d2f084](https://github.com/wxn0brP/FalconFrame/commit/3d2f08489dbbe2c12f00c483751b6b7dbc6cc0b1))
+* remove damaged xml body parser ([756eb32](https://github.com/wxn0brP/FalconFrame/commit/756eb32111d66f7dddab04d26d123b101e3f85be))
+
+
+### Bug Fixes
+
+* cookies Prototype Pollution ([81b83a7](https://github.com/wxn0brP/FalconFrame/commit/81b83a788ab50cce84f868152184bf96b7ae39ac))
+* debug panel security ([130324e](https://github.com/wxn0brP/FalconFrame/commit/130324e66c56b7f70f2d7e9595bb2c27a8d07294))
+
 ### [0.9.2](https://github.com/wxn0brP/FalconFrame/compare/v0.9.1...v0.9.2) (2026-08-11)
 
 
