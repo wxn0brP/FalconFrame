@@ -108,7 +108,7 @@ export class Router {
 		return this;
 	}
 
-	router(path: string) {
+	router(path: string = "/") {
 		const router = new Router();
 		this.use(path, router);
 		return router;
