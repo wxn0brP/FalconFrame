@@ -202,4 +202,16 @@ export class FFResponse extends http.ServerResponse {
 		this.write(`data: ${data}\n\n`);
 		return this;
 	}
+
+	/**
+	 * Sends a Server-Sent Event with an event type to the client.
+	 * @param event The event type
+	 * @param data The data to be sent. If an object, it will be JSON.stringified.
+	 * @returns The response object
+	 */
+	sseEventSend(event: string, data: string | object) {
+		if (typeof data === "object") data = JSON.stringify(data);
+		this.write(`event: ${event}\ndata: ${data}\n\n`);
+		return this;
+	}
 }

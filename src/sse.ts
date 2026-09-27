@@ -35,23 +35,29 @@ export class SSEManager {
 	}
 
 	sendAll(data: any) {
-		for (const { res } of this._clients.values()) {
-			res.sseSend(data);
-		}
+		for (const { res } of this._clients.values()) res.sseSend(data);
 	}
 
 	sendTo(id: string, data: any) {
 		const client = this._clients.get(id);
-		if (client) {
-			client.res.sseSend(data);
-		}
+		if (!client) return;
+		client.res.sseSend(data);
+	}
+
+	sendEventAll(event: string, data: any) {
+		for (const { res } of this._clients.values()) res.sseEventSend(event, data);
+	}
+
+	sendEventTo(id: string, event: string, data: any) {
+		const client = this._clients.get(id);
+		if (!client) return;
+		client.res.sseEventSend(event, data);
 	}
 
 	disconnect(id: string) {
 		const client = this._clients.get(id);
-		if (client) {
-			client.res.end();
-			this._clients.delete(id);
-		}
+		if (!client) return;
+		client.res.end();
+		this._clients.delete(id);
 	}
 }
