@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.4](https://github.com/wxn0brP/FalconFrame/compare/v0.9.3...v0.9.4) (2026-09-27)
+
+
+### Features
+
+* make router path optional ([824fa87](https://github.com/wxn0brP/FalconFrame/commit/824fa87738e165d4078490f4d0e769bb76401a02))
+* sse event ([25ed14c](https://github.com/wxn0brP/FalconFrame/commit/25ed14cbf25f48e0fdc5e21afc56ba378a78e9cd))
+
 ### [0.9.3](https://github.com/wxn0brP/FalconFrame/compare/v0.9.2...v0.9.3) (2026-09-15)
 
 
