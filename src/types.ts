@@ -115,6 +115,12 @@ export interface StaticServeOptions {
 	notRenderHtml?: boolean;
 }
 
+export interface StaticFileOptions {
+	utf8?: boolean;
+	etag?: boolean;
+	errorIfFileNotFound?: boolean;
+}
+
 export type EngineCallback = (
 	path: string,
 	data: any,

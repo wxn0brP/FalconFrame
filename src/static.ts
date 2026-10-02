@@ -2,7 +2,59 @@ import fs from "fs";
 import path from "path";
 import { ensureLeadingDot, getContentType } from "./helpers";
 import { FFResponse } from "./res";
-import { FFRequest, RouteHandler, StaticServeOptions } from "./types";
+import {
+	FFRequest,
+	RouteHandler,
+	StaticFileOptions,
+	StaticServeOptions,
+} from "./types";
+
+export function handleSingleFile(
+	filePath: string,
+	opts: StaticFileOptions,
+): RouteHandler {
+	opts = {
+		utf8: true,
+		etag: true,
+		errorIfFileNotFound: true,
+		...opts,
+	};
+
+	if (opts.errorIfFileNotFound && !fs.existsSync(filePath))
+		throw new Error(`File ${filePath} does not exist`);
+
+	return (req, res, next) => {
+		if (req.method !== "GET" && req.method !== "HEAD") return next();
+
+		let stats: fs.Stats;
+		try {
+			stats = fs.statSync(filePath);
+		} catch (e) {
+			res.statusCode = 404;
+			res.FF._404(req, res);
+			return;
+		}
+
+		if (opts.etag) {
+			const etag = `W/"${stats.size}-${stats.mtime.getTime()}"`;
+			if (req.headers["if-none-match"] === etag) {
+				res.status(304).end();
+				return;
+			}
+			res.setHeader("ETag", etag);
+		}
+
+		res.ct(getContentType(filePath, opts.utf8));
+
+		if (req.method === "HEAD") {
+			res.setHeader("Content-Length", stats.size);
+			res.end();
+			return;
+		}
+
+		fs.createReadStream(filePath).pipe(res);
+	};
+}
 
 export function handleStaticFiles(
 	dirPath: string,
@@ -65,7 +117,7 @@ export function handleStaticFiles(
 		return true;
 	};
 
-	return (req: FFRequest, res: FFResponse, next: () => void) => {
+	return (req, res, next) => {
 		if (req.method !== "GET" && req.method !== "HEAD") return next();
 		const apiPath = req.middleware.path;
 

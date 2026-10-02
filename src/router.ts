@@ -1,6 +1,12 @@
 import { SSEManager } from "./sse";
-import { handleStaticFiles } from "./static";
-import { Method, Middleware, RouteHandler, StaticServeOptions } from "./types";
+import { handleSingleFile, handleStaticFiles } from "./static";
+import {
+	Method,
+	Middleware,
+	RouteHandler,
+	StaticFileOptions,
+	StaticServeOptions,
+} from "./types";
 
 export type MiddlewareFn =
 	| RouteHandler
@@ -88,6 +94,11 @@ export class Router {
 		}
 		if (dirPath === "/") throw new Error("Cannot serve root directory");
 		this.use(apiPath, handleStaticFiles(dirPath, opts));
+		return this;
+	}
+
+	file(routePath: string, filePath: string, opts: StaticFileOptions = {}) {
+		this.use(routePath, handleSingleFile(filePath, opts));
 		return this;
 	}
 
