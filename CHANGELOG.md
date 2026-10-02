@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.5](https://github.com/wxn0brP/FalconFrame/compare/v0.9.4...v0.9.5) (2026-10-02)
+
+
+### Features
+
+* handleSingleFile ([a0193c3](https://github.com/wxn0brP/FalconFrame/commit/a0193c3a11ec05ad19686bc90261f2c66fe7e501))
+
+
+### Bug Fixes
+
+* type export ([c690f1c](https://github.com/wxn0brP/FalconFrame/commit/c690f1c49b666a1a9605106e00dc05bd4d03ea66))
+
 ### [0.9.4](https://github.com/wxn0brP/FalconFrame/compare/v0.9.3...v0.9.4) (2026-09-27)
 
 
