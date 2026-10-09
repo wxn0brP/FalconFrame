@@ -15,6 +15,7 @@ import type {
 	ErrorHandler,
 	FFOpts,
 	FFRequest,
+	FinalHandler,
 	ParseBodyFunction,
 	RouteHandler,
 	StandardBodyParserOptions,
@@ -35,10 +36,10 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 			errors: err,
 		};
 	};
-	_404: RouteHandler = (req, res) => {
+	_404: FinalHandler = (req, res) => {
 		res.end("404: File had second thoughts");
 	};
-	_413: RouteHandler = (req, res) => {
+	_413: FinalHandler = (req, res) => {
 		res.end("413: Cat is too fat");
 	};
 	_500: ErrorHandler = (err, req, res) => {
@@ -233,11 +234,11 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		this._400_formatter = formatter;
 	}
 
-	set404(handler: RouteHandler) {
+	set404(handler: FinalHandler) {
 		this._404 = handler;
 	}
 
-	set413(handler: RouteHandler) {
+	set413(handler: FinalHandler) {
 		this._413 = handler;
 	}
 
@@ -253,4 +254,11 @@ export type { OfflineRequest, OfflineResponse } from "./engine";
 export * as Helpers from "./helpers";
 export type { FFOpts as Opts } from "./types";
 export { validateBody } from "./valid";
-export { FFRequest, FFResponse, renderHTML, RouteHandler, Router };
+export {
+	FFRequest,
+	FFResponse,
+	FinalHandler,
+	renderHTML,
+	RouteHandler,
+	Router,
+};
