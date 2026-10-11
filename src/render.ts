@@ -63,8 +63,16 @@ export function renderHTML(options: RenderHTMLOptions) {
 
 		// Loading partials, e.g. <!-- include header -->
 		template = template.replace(
-			/<!--\s*include\s*(.*?)\s*-->/g,
-			(_, partialName) => {
+			/<!--\s*include\s+([^\s{]+)(?:\s+(\{[\s\S]*?\}))?\s*-->/g,
+			(_, partialName, json) => {
+				let includeData: Record<string, any> = {};
+				if (json) {
+					try {
+						includeData = JSON.parse(json);
+					} catch (error) {
+						return "<!-- Invalid include data -->";
+					}
+				}
 				const partialPath = path.join(
 					path.dirname(templatePath),
 					partialName + ".html",
@@ -76,7 +84,10 @@ export function renderHTML(options: RenderHTMLOptions) {
 						realPath,
 					],
 					noLayout: true,
-					data,
+					data: {
+						...data,
+						...includeData,
+					},
 					FF,
 					FFVar,
 				});

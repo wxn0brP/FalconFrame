@@ -139,6 +139,21 @@ const data = { username: "JaneDoe" };
 </div>
 ```
 
+**File: `views/dashboard.html` (with inline data)**
+```html
+<!-- include partials/header { "username": "Guest" } -->
+<p>Dashboard content.</p>
+```
+
+When `username` is not in the outer data, the JSON default applies:
+
+```html
+<header>
+  <h1>Welcome, Guest</h1>
+</header>
+<p>Dashboard content.</p>
+```
+
 ---
 
 ### Layout Handling Example
