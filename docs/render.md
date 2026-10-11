@@ -79,6 +79,34 @@ const data = { name: "Alex" };
 
 ---
 
+### Loop Example
+
+**File: `template.html`**
+```html
+<ul>
+<!-- each items as item -->
+  <li>{{ i }}. {{ item.label }}</li>
+<!-- /each -->
+</ul>
+<p><!-- range 3 -->{{ i }} <!-- /range --></p>
+```
+
+**Data:**
+```javascript
+const data = { items: [ { label: "One" }, { label: "Two" } ] };
+```
+
+**Result:**
+```html
+<ul>
+  <li>0. One</li>
+  <li>1. Two</li>
+</ul>
+<p>0 1 2 </p>
+```
+
+---
+
 ### Partial Inclusion Example
 
 **File: `views/profile.html`**

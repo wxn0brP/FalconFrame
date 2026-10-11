@@ -55,11 +55,11 @@ export function renderHTML(options: RenderHTMLOptions) {
 			...data,
 		};
 
+		// Preliminary loop rendering
+		template = expandLoops(template, data);
+
 		// Inserting data, e.g. {{name}}
-		template = template.replace(
-			/{{(.*?)}}/g,
-			(_, key) => data[key.trim()] || "",
-		);
+		template = interpolate(template, data);
 
 		// Loading partials, e.g. <!-- include header -->
 		template = template.replace(
@@ -131,4 +131,56 @@ export function renderHTML(options: RenderHTMLOptions) {
 	} catch (error) {
 		return `<-- Template ${options.templatePath} has errors -->`;
 	}
+}
+
+function resolvePath(data: Record<string, any>, key: string) {
+	let value: any = data;
+	for (const part of key.split(".")) {
+		if (value == null) return undefined;
+		value = value[part];
+	}
+	return value;
+}
+
+export function interpolate(template: string, data: Record<string, any>) {
+	return template.replace(
+		/{{(.*?)}}/g,
+		(_, key) => resolvePath(data, key.trim()) ?? "",
+	);
+}
+
+export function expandLoops(template: string, data: Record<string, any>) {
+	return template
+		.replace(
+			/<!--\s*each\s+(\w+)\s+as\s+(\w+)\s*-->([\s\S]*?)<!--\s*\/each\s*-->/g,
+			(_, key, itemVar, body) =>
+				((resolvePath(data, key) as any[]) ?? [])
+					.map((value: any, index: number) =>
+						interpolate(body, {
+							...data,
+							[itemVar]: value,
+							i: index,
+						}),
+					)
+					.join(""),
+		)
+		.replace(
+			/<!--\s*range\s+(\w+)\s*-->([\s\S]*?)<!--\s*\/range\s*-->/g,
+			(_, key, body) => {
+				const range = Array.from(
+					{
+						length: +key,
+					},
+					(_, i) => i,
+				);
+				return range
+					.map((i: number) =>
+						interpolate(body, {
+							...data,
+							i,
+						}),
+					)
+					.join("");
+			},
+		);
 }
