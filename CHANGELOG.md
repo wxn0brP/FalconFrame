@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.7](https://github.com/wxn0brP/FalconFrame/compare/v0.9.6...v0.9.7) (2026-10-14)
+
+
+### Features
+
+* include with inline data ([b019ef3](https://github.com/wxn0brP/FalconFrame/commit/b019ef3fb4cf7b416dfbc17a5ef3fba061ce41be))
+* render loop & resolvePath ([81346d0](https://github.com/wxn0brP/FalconFrame/commit/81346d0d8896d5b3f21e22cc7e100bdacefb7990))
+
 ### [0.9.6](https://github.com/wxn0brP/FalconFrame/compare/v0.9.5...v0.9.6) (2026-10-09)
 
 ### [0.9.5](https://github.com/wxn0brP/FalconFrame/compare/v0.9.4...v0.9.5) (2026-10-02)
