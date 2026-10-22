@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.8](https://github.com/wxn0brP/FalconFrame/compare/v0.9.7...v0.9.8) (2026-10-22)
+
+
+### Features
+
+* improve mine type ([db752c3](https://github.com/wxn0brP/FalconFrame/commit/db752c35089376f8ce8b9af625203803adba6a76))
+
 ### [0.9.7](https://github.com/wxn0brP/FalconFrame/compare/v0.9.6...v0.9.7) (2026-10-14)
 
 
