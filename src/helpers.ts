@@ -1,5 +1,5 @@
-import path from "path";
 import { Cookies, FFRequest } from "./types";
+export { getContentType } from "./encoding";
 
 export function parseCookies(cookieHeader: string): Cookies {
 	const cookies = Object.create(null) as Cookies;
@@ -19,36 +19,6 @@ export function getIP(req: FFRequest) {
 			.trim();
 	}
 	return req.socket.remoteAddress || "";
-}
-
-const mimeTypes: Record<string, string> = {
-	".html": "text/html",
-	".css": "text/css",
-	".js": "application/javascript",
-	".json": "application/json",
-	".json5": "application/json5",
-	".yaml": "application/yaml",
-	".yml": "application/yaml",
-	".toml": "application/toml",
-	".png": "image/png",
-	".jpg": "image/jpeg",
-	".jpeg": "image/jpeg",
-	".gif": "image/gif",
-	".svg": "image/svg+xml",
-	".ico": "image/x-icon",
-	".txt": "text/plain",
-	".pdf": "application/pdf",
-};
-
-function _getContentType(filePath: string): string {
-	const ext = path.extname(filePath).toLowerCase();
-	return mimeTypes[ext] || "application/octet-stream";
-}
-
-export function getContentType(filePath: string, utf8 = false): string {
-	let contentType = _getContentType(filePath);
-	if (utf8) contentType += "; charset=utf-8";
-	return contentType;
 }
 
 export const ensureLeadingDot = (str: string) =>

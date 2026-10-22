@@ -2,7 +2,8 @@ import { createReadStream } from "fs";
 import http from "http";
 import path from "path";
 import FalconFrame from ".";
-import { ensureLeadingDot, getContentType } from "./helpers";
+import { ensureLeadingDot } from "./helpers";
+import { getContentType } from "./encoding";
 import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
@@ -105,7 +106,7 @@ export class FFResponse extends http.ServerResponse {
 	 * @returns The response object.
 	 */
 	sendFile(filePath: string, contentType?: string) {
-		if (contentType === "utf8") contentType = getContentType(filePath);
+		if (contentType === "utf8") contentType = getContentType(filePath, true);
 		this.ct(contentType || getContentType(filePath));
 		createReadStream(filePath).pipe(this);
 		this._ended = true;

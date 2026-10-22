@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { ensureLeadingDot, getContentType } from "./helpers";
+import { ensureLeadingDot } from "./helpers";
+import { getContentType } from "./encoding";
 import { FFResponse } from "./res";
 import {
 	FFRequest,
