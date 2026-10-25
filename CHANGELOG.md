@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.9](https://github.com/wxn0brP/FalconFrame/compare/v0.9.8...v0.9.9) (2026-10-25)
+
+
+### Features
+
+* improve proxy ip resolution, body timeout and compression rework ([ef00d02](https://github.com/wxn0brP/FalconFrame/commit/ef00d0207b092030fc8e2dca5d10a618a3086909))
+
 ### [0.9.8](https://github.com/wxn0brP/FalconFrame/compare/v0.9.7...v0.9.8) (2026-10-22)
 
 
