@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ensureLeadingDot } from "./helpers";
+import { ensureLeadingDot, streamFile } from "./helpers";
 import { getContentType } from "./encoding";
 import { FFResponse } from "./res";
 import {
@@ -46,14 +46,14 @@ export function handleSingleFile(
 		}
 
 		res.ct(getContentType(filePath, opts.utf8));
+		res.setHeader("Content-Length", stats.size);
 
 		if (req.method === "HEAD") {
-			res.setHeader("Content-Length", stats.size);
 			res.end();
 			return;
 		}
 
-		fs.createReadStream(filePath).pipe(res);
+		streamFile(res, filePath);
 	};
 }
 
@@ -109,12 +109,12 @@ export function handleStaticFiles(
 		}
 
 		res.ct(getContentType(filePath, opts.utf8));
+		res.setHeader("Content-Length", stats.size);
 		if (req.method === "HEAD") {
-			res.setHeader("Content-Length", stats.size);
 			res.end();
 			return true;
 		}
-		fs.createReadStream(filePath).pipe(res);
+		streamFile(res, filePath);
 		return true;
 	};
 

@@ -13,6 +13,10 @@ The framework recognizes the following variables:
 
 | Variable | Purpose |
 |----------|---------|
-| `NODE_ENV` | When set to `"production"`, disables the debug endpoint |
-| `FF_DEBUG_PRODUCTION_ENABLED` | Overrides the production block; if truthy, the debug endpoint works even in production |
-| `FF_DEBUG_PASS` | If set, requires a `?pass=...` query parameter matching this value to access the debug page |
+| `PORT` | Default port used by `app.l(port)` when set |
+| `NODE_ENV` | When set to `"production"`, disables the debug panel |
+| `FF_DEBUG_PRODUCTION_ENABLED` | Overrides the production block; if truthy, the debug panel works even in production |
+| `FF_DEBUG_PASS` | Stable debug secret, used instead of a generated token. The token can be passed as `?pass=...`, `Authorization: Bearer ...`, or exchanged for the `ff_debug` cookie |
+
+See [debug.md](debug.md) for the token flow and [config.md](config.md) for all constructor options.
+

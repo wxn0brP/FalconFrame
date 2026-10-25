@@ -35,29 +35,55 @@ export function getRawBody(
 	req: FFRequest,
 	res: FFResponse,
 	limit: number,
+	timeout = 60_000,
 ): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const chunks: Buffer[] = [];
 		let total = 0;
+		let settled = false;
+
+		const timer = setTimeout(() => {
+			if (settled) return;
+			settled = true;
+			res.status(408);
+			res.setHeader("Connection", "close");
+			res.FF._408(req, res);
+			if (!res.writableEnded) res.end();
+			res.once("finish", () => req.destroy());
+			reject(
+				Object.assign(new Error("Request body timeout"), {
+					statusCode: 408,
+				}),
+			);
+		}, timeout);
+
+		const finish = (fn: () => void) => {
+			if (settled) return;
+			settled = true;
+			clearTimeout(timer);
+			fn();
+		};
 
 		req.on("data", chunk => {
+			if (settled) return;
 			const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
 			total += buf.length;
 			if (limit && total > limit) {
 				res.status(413);
 				res.FF._413(req, res);
+				finish(() => reject(new Error("Payload Too Large")));
 				req.destroy();
-				return reject(new Error("Payload Too Large"));
+				return;
 			}
 			chunks.push(buf);
 		});
 
 		req.on("end", () => {
-			resolve(Buffer.concat(chunks).toString());
+			finish(() => resolve(Buffer.concat(chunks).toString()));
 		});
 
 		req.on("error", err => {
-			reject(err);
+			finish(() => reject(err));
 		});
 	});
 }

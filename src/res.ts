@@ -1,9 +1,8 @@
-import { createReadStream } from "fs";
 import http from "http";
 import path from "path";
 import FalconFrame from ".";
-import { ensureLeadingDot } from "./helpers";
 import { getContentType } from "./encoding";
+import { ensureLeadingDot, streamFile } from "./helpers";
 import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
@@ -108,7 +107,7 @@ export class FFResponse extends http.ServerResponse {
 	sendFile(filePath: string, contentType?: string) {
 		if (contentType === "utf8") contentType = getContentType(filePath, true);
 		this.ct(contentType || getContentType(filePath));
-		createReadStream(filePath).pipe(this);
+		streamFile(this, filePath);
 		this._ended = true;
 		return this;
 	}
@@ -190,6 +189,7 @@ export class FFResponse extends http.ServerResponse {
 		this.setHeader("Content-Type", "text/event-stream");
 		this.setHeader("Cache-Control", "no-cache");
 		this.setHeader("Connection", "keep-alive");
+		this.flushHeaders();
 		return this;
 	}
 

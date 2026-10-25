@@ -9,10 +9,7 @@ export type RouteHandler = (
 	next: () => void,
 ) => void | any;
 
-export type FinalHandler = (
-	req: FFRequest,
-	res: FFResponse,
-) => void | any;
+export type FinalHandler = (req: FFRequest, res: FFResponse) => void | any;
 
 export type ErrorHandler = (
 	err: Error,
@@ -21,6 +18,34 @@ export type ErrorHandler = (
 ) => void | any;
 
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "all";
+
+/**
+ * How the client IP is resolved behind a proxy.
+ * - `"auto"` (default): trust proxy headers only when the TCP peer is loopback,
+ *   which covers local tunnels (`cloudflared`, nginx, caddy) without trusting
+ *   spoofable headers from remote peers.
+ * - `true`: trust proxy headers from any peer.
+ * - `false`: never trust proxy headers.
+ * - `string[]`: trust proxy headers only from the listed proxy addresses.
+ */
+export type ProxyMode = "auto" | boolean | string[];
+
+export interface DebugOptions {
+	/** URL path of the debug panel. Defaults to `/debug`. */
+	path?: string;
+	/** @deprecated use `path` */
+	url?: string;
+	/** Extra allowlist of client IPs. Empty by default, the token is the gate. */
+	hosts?: string[];
+	/** Enable the endpoint. Defaults to `NODE_ENV !== "production"`. */
+	enabled?: boolean;
+	/** Stable secret. If omitted, a random token is generated at startup. */
+	pass?: string;
+	/** Throttle failed token attempts. Defaults to `true`. */
+	rateLimit?: boolean;
+	/** @deprecated */
+	logs?: boolean;
+}
 
 export interface Params {
 	[key: string]: string;
@@ -53,6 +78,15 @@ export interface StandardBodyParserOptions {
 	limit?: string | number;
 }
 
+export interface CompressionOptions {
+	/** Responses smaller than this (in bytes) are sent uncompressed. Defaults to 1024. */
+	threshold?: number;
+	/** Brotli quality, 0-11. Defaults to 4. */
+	brotliQuality?: number;
+	/** gzip/deflate level, 0-9. Defaults to 6. */
+	gzipLevel?: number;
+}
+
 export class FFRequest extends http.IncomingMessage {
 	FF: FalconFrame<any>;
 	path: string;
@@ -60,7 +94,12 @@ export class FFRequest extends http.IncomingMessage {
 	params: Params;
 	cookies: Cookies;
 	body: Body;
+	/** Raw TCP peer address. */
+	socketIp: string;
+	/** Resolved client address (respects the `proxy` option). */
 	ip: string;
+	/** True when proxy headers were used to resolve `ip`. */
+	isProxied: boolean;
 	header: (name: string) => string;
 	valid: (
 		schema: ValidationSchema,
@@ -145,6 +184,16 @@ export interface RenderOptions {
 export interface FFOpts {
 	loggerOpts?: LoggerOptions;
 	bodyLimit?: string;
+	/** Client IP resolution behind a proxy. Defaults to `"auto"`. */
+	proxy?: ProxyMode;
+	/** Body parser used when the request has no `Content-Type`. Defaults to `"json"`. */
+	defaultBodyParser?: "json" | false;
+	/** Enable parsing of YAML, TOML and JSON5 request bodies. Defaults to `false`. */
+	untrustedBodyParsers?: boolean;
+	/** Request body read timeout in milliseconds. Defaults to 60000. */
+	bodyTimeout?: number;
+	/** Debug panel. `true`/`false` or an options object. */
+	debug?: boolean | DebugOptions;
 	disableParser?: {
 		json?: boolean;
 		urlencoded?: boolean;

@@ -77,8 +77,6 @@ const data = { name: "Alex" };
 <p>Welcome to our site.</p>
 ```
 
----
-
 ### Loop Example
 
 **File: `template.html`**
@@ -104,8 +102,6 @@ const data = { items: [ { label: "One" }, { label: "Two" } ] };
 </ul>
 <p>0 1 2 </p>
 ```
-
----
 
 ### Partial Inclusion Example
 
@@ -153,8 +149,6 @@ When `username` is not in the outer data, the JSON default applies:
 </header>
 <p>Dashboard content.</p>
 ```
-
----
 
 ### Layout Handling Example
 
@@ -206,8 +200,6 @@ const data = { title: "My Awesome Site" };
 </html>
 ```
 
----
-
 ### Internal Template Data Example
 
 This example demonstrates how a content page can set the `<title>` for its parent layout.
@@ -258,8 +250,6 @@ app.render("pages/home.html");
 </body>
 </html>
 ```
-
----
 
 ### Raw File Inclusion Example
 

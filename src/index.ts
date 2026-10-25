@@ -2,7 +2,9 @@ import { Logger } from "@wxn0brp/lucerna-log";
 import http from "http";
 import * as bodyParser from "./body";
 import { parseLimit } from "./body-utils";
+import { resolveConfig, type ResolvedConfig, isDebugEnabled } from "./config";
 import { createCORS } from "./cors";
+import { createDebug, generateDebugToken } from "./debug";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
@@ -11,6 +13,7 @@ import type {
 	BeforeHandleRequest,
 	BodyParserEntry,
 	CombinedVars,
+	DebugOptions,
 	EngineCallback,
 	ErrorHandler,
 	FFOpts,
@@ -27,7 +30,14 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 	bodyParsers: Record<string, BodyParserEntry> = {};
 	vars: CombinedVars<Vars> = {} as any;
 	opts: FFOpts = {};
+	config: ResolvedConfig;
 	engines: Record<string, EngineCallback> = {};
+	_debug?: {
+		path: string;
+		pass: string;
+		generated: boolean;
+		enabled?: boolean;
+	};
 
 	_400_formatter: ValidationErrorFormatter = err => {
 		return {
@@ -41,6 +51,9 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 	};
 	_413: FinalHandler = (req, res) => {
 		res.end("413: Cat is too fat");
+	};
+	_408: FinalHandler = (req, res) => {
+		res.end("408: The request took a nap");
 	};
 	_500: ErrorHandler = (err, req, res) => {
 		res.end("500: The code had an existential crisis");
@@ -57,10 +70,16 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 			bodyLimit: "10m",
 			...opts,
 		};
+		this.config = resolveConfig(this.opts);
 
-		const dp = this.opts.disableParser || {};
+		const dp = this.config.disableParser || {};
 		const isBun = !!(globalThis as any).Bun;
 		const bunOnly = new Set([
+			"json5",
+			"yaml",
+			"toml",
+		]);
+		const untrusted = new Set([
 			"json5",
 			"yaml",
 			"toml",
@@ -101,6 +120,7 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 
 		for (const [key, { fn, ct }] of Object.entries(parsers)) {
 			if (dp[key as keyof typeof dp]) continue;
+			if (untrusted.has(key) && !this.config.untrustedBodyParsers) continue;
 			if (bunOnly.has(key) && !isBun) continue;
 			this.addBodyParser(ct, fn);
 		}
@@ -126,7 +146,10 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 	) {
 		this.bodyParsers[contentType] = {
 			parse: parser,
-			limit: parseLimit(opts.limit || this.opts.bodyLimit || "10m"),
+			limit:
+				opts.limit !== undefined
+					? parseLimit(opts.limit)
+					: this.config.bodyLimit,
 		};
 		return this;
 	}
@@ -151,19 +174,68 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 			parsedPort = port;
 		}
 
+		let printUrl = false;
 		if (typeof callback === "boolean") {
-			if (callback)
-				callback = () => {
-					console.log(
-						`[FF] Server running on http://${host || "localhost"}:${parsedPort}`,
-					);
-				};
-			else callback = () => {};
+			printUrl = callback;
+			callback = () => {};
 		}
 		const cb = callback || (() => {});
 
-		server.listen(parsedPort, host || "0.0.0.0", cb);
+		server.listen(parsedPort, host || "0.0.0.0", () => {
+			const address = server.address();
+			const actualPort =
+				address && typeof address === "object" ? address.port : parsedPort;
+
+			if (printUrl) {
+				console.log(
+					`[FF] Server running on http://${host || "localhost"}:${actualPort}`,
+				);
+			}
+
+			if (this._debug && isDebugEnabled(this._debug.enabled)) {
+				const urlHost =
+					host && host !== "0.0.0.0" && host !== "::" ? host : "localhost";
+				const token = this._debug.generated ? `?pass=${this._debug.pass}` : "";
+				console.log(
+					`[FF] Debug panel: http://${urlHost}:${actualPort}${this._debug.path}${token}`,
+				);
+			}
+
+			cb();
+		});
 		return server;
+	}
+
+	/**
+	 * Mount the debug panel. Without an explicit `pass` a random token is
+	 * generated and printed together with the URL on `listen()`.
+	 */
+	debug(opts: DebugOptions = {}) {
+		const resolved = this.config.debug;
+		const path = opts.path ?? opts.url ?? resolved.path;
+		const explicitPass =
+			opts.pass ?? resolved.pass ?? process.env.FF_DEBUG_PASS;
+		const pass = explicitPass ?? generateDebugToken();
+		const enabled = opts.enabled ?? resolved.enabled;
+
+		this._debug = {
+			path,
+			pass,
+			generated: !explicitPass,
+			enabled,
+		};
+
+		this.use(
+			createDebug(
+				{
+					...opts,
+					path,
+					pass,
+				},
+				resolved,
+			),
+		);
+		return this;
 	}
 
 	getApp(beforeHandleRequest?: BeforeHandleRequest) {
@@ -242,6 +314,10 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		this._413 = handler;
 	}
 
+	set408(handler: FinalHandler) {
+		this._408 = handler;
+	}
+
 	set500(handler: ErrorHandler) {
 		this._500 = handler;
 	}
@@ -252,7 +328,10 @@ export default FalconFrame;
 export { OfflineEngine } from "./engine";
 export type { OfflineRequest, OfflineResponse } from "./engine";
 export * as Helpers from "./helpers";
-export type { FFOpts as Opts } from "./types";
+export { compression, compressionMiddleware } from "./compress";
+export { createDebug, generateDebugToken } from "./debug";
+export type { DebugOptions } from "./debug";
+export type { FFOpts as Opts, ProxyMode, CompressionOptions } from "./types";
 export { validateBody } from "./valid";
 export {
 	FFRequest,

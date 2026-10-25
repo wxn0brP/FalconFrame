@@ -10,6 +10,10 @@ A minimal, modular TypeScript web library.
 - Request validation via inline schemas
 - Cookie management
 - Debuggable logger
+- Debug panel
+- Proxy-aware client IP resolution
+- Body limits and read timeouts
+- Compression middleware
 
 ## Installation
 
@@ -23,6 +27,7 @@ bun add @wxn0brp/falcon-frame
 import FalconFrame, { validateBody } from "@wxn0brp/falcon-frame";
 const app = new FalconFrame();
 
+app.debug();
 app.setOrigin("*");
 
 const USERS = {

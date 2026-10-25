@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
-import { getIP, parseCookies } from "./helpers";
+import { parseCookies, resolveRequestInfo } from "./helpers";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
@@ -43,7 +43,10 @@ export function handleRequest(
 		return;
 	}
 
-	req.ip = getIP(req);
+	const requestInfo = resolveRequestInfo(req, FF.config.proxy);
+	req.socketIp = requestInfo.socketIp;
+	req.ip = requestInfo.ip;
+	req.isProxied = requestInfo.isProxied;
 	req.params = {};
 	req.valid = (schema: any, regexRules?: any) =>
 		validate({
@@ -61,18 +64,19 @@ export function handleRequest(
 
 	req.isBodyParsed = false;
 
-	if (FF.opts.xRequestId !== "disable") {
+	if (FF.config.xRequestId !== "disable") {
 		if (req.headers["x-request-id"]) {
 			req.id = req.headers["x-request-id"] as string;
 			res.setHeader("x-request-id", req.id);
-		} else if (FF.opts.xRequestId === "auto") {
+		} else if (FF.config.xRequestId === "auto") {
 			req.id = randomUUID();
 			res.setHeader("x-request-id", req.id);
 		}
 	}
 
+	const logUrl = (req.url || "").replace(/([?&]pass=)[^&]*/i, "$1***");
 	logger.info(
-		`Incoming request: ${req.method} ${req.url}` +
+		`Incoming request: ${req.method} ${logUrl}` +
 			(req.id ? ` [${req.id}]` : ""),
 	);
 
@@ -164,19 +168,29 @@ export function handleRequest(
 	}
 
 	req.body = {};
-	const ct = getContentType(req) || "application/json";
-	const entry = FF.bodyParsers[ct];
+	const ct = getContentType(req);
+	let entry = ct ? FF.bodyParsers[ct] : undefined;
+
+	if (!ct && FF.config.defaultBodyParser === "json") {
+		entry = FF.bodyParsers["application/json"];
+	}
 
 	if (!entry) {
-		logger.debug(
-			"No body parser found for content-type. Executing middlewares",
-		);
+		if (ct) {
+			logger.debug(
+				`No body parser found for content-type ${ct}. Executing middlewares`,
+			);
+		} else {
+			logger.debug("No content-type. Executing middlewares");
+		}
 		next();
 		return;
 	}
 
-	logger.debug(`Executing body parser for content-type: ${ct}`);
-	getRawBody(req, res, entry.limit)
+	logger.debug(
+		`Executing body parser for content-type: ${ct ?? "default (json)"}`,
+	);
+	getRawBody(req, res, entry.limit, FF.config.bodyTimeout)
 		.then(async rawBody => {
 			try {
 				req.body = (await entry.parse(rawBody, req, res)) ?? {};
@@ -186,10 +200,15 @@ export function handleRequest(
 			}
 			next();
 		})
-		.catch(() => {
-			if (!res._ended) {
-				req.body = {};
-				next();
+		.catch((err: any) => {
+			if (res._ended) return;
+			if (err?.statusCode === 408) {
+				res.status(408);
+				res.FF._408(req, res);
+				if (!res.writableEnded) res.end();
+				return;
 			}
+			req.body = {};
+			next();
 		});
 }
