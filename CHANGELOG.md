@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.10](https://github.com/wxn0brP/FalconFrame/compare/v0.9.9...v0.9.10) (2026-10-30)
+
+
+### Features
+
+* https support ([d106268](https://github.com/wxn0brP/FalconFrame/commit/d1062689377323fe840e7c3ed3929c89f8bca1fe))
+
+
+### Bug Fixes
+
+* static path traversal and dotfile exposure ([266f45a](https://github.com/wxn0brP/FalconFrame/commit/266f45a5f781dc5c2cd59131ca475bb2eaa0cd31))
+
 ### [0.9.9](https://github.com/wxn0brP/FalconFrame/compare/v0.9.8...v0.9.9) (2026-10-25)
 
 
