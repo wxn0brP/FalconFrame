@@ -1,7 +1,5 @@
 # FalconFrame Variables
 
-The framework recognizes the following variables:
-
 | Variable | Purpose | Usage |
 |----------|---------|-------|
 | `layout` | Specifies the layout template to wrap around content | Used by the template engine when rendering views; when present, the template will be rendered inside the layout template with the content passed as the `body` variable |

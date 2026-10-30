@@ -1,6 +1,6 @@
 # FalconFrame
 
-A minimal, modular TypeScript web library.
+A minimal, modular TypeScript http server library.
 
 ## Features
 
@@ -12,6 +12,7 @@ A minimal, modular TypeScript web library.
 - Debuggable logger
 - Debug panel
 - Proxy-aware client IP resolution
+- HTTPS via environment variables, both servers with `app.l()`
 - Body limits and read timeouts
 - Compression middleware
 

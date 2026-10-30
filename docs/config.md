@@ -1,7 +1,5 @@
 # Configuration
 
-All framework options are passed to the constructor. Related concerns live in their own pages: [debug.md](debug.md), [proxy.md](proxy.md), [compression.md](compression.md), [render.md](render.md), [valid.md](valid.md).
-
 ## Options
 
 | Option | Default | Description |
