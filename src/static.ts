@@ -10,6 +10,40 @@ import {
 	StaticServeOptions,
 } from "./types";
 
+const WELL_KNOWN = ".well-known";
+
+function normalizeMount(apiPath: string) {
+	const trimmed = apiPath.replace(/\/+$/, "");
+	return trimmed === "" ? "/" : trimmed;
+}
+
+function relativeToMount(mount: string, requestPath: string) {
+	if (mount === "/") return requestPath;
+	if (requestPath === mount) return "/";
+	if (!requestPath.startsWith(`${mount}/`)) return null;
+	return requestPath.slice(mount.length);
+}
+
+function isAllowedRelative(relative: string, dotfiles: boolean) {
+	const segments = relative.split("/").filter(Boolean);
+
+	for (let i = 0; i < segments.length; i++) {
+		const segment = segments[i];
+
+		if (segment === "." || segment === "..") return false;
+		if (segment.includes("\\") || segment.includes("\0")) return false;
+		if (process.platform === "win32" && segment.includes(":")) return false;
+
+		if (dotfiles) continue;
+		if (!segment.startsWith(".")) continue;
+		if (i === 0 && segment === WELL_KNOWN) continue;
+
+		return false;
+	}
+
+	return true;
+}
+
 export function handleSingleFile(
 	filePath: string,
 	opts: StaticFileOptions,
@@ -67,6 +101,7 @@ export function handleStaticFiles(
 		renderData: {},
 		etag: true,
 		errorIfDirNotFound: true,
+		dotfiles: false,
 		...opts,
 	};
 
@@ -89,9 +124,10 @@ export function handleStaticFiles(
 				(!opts.notRenderHtml && filePath.endsWith(".html"));
 
 			if (renderStatement) {
-				const relativePath = filePath
-					.replace(dirPath + "/", "")
-					.replace(".html", "");
+				const relativePath = path
+					.relative(path.resolve(dirPath), filePath)
+					.replaceAll(path.sep, "/")
+					.replace(/\.html$/, "");
 				res.render(filePath, opts.renderData?.[relativePath] || {}, {
 					notUseViews: true,
 				});
@@ -120,14 +156,17 @@ export function handleStaticFiles(
 
 	return (req, res, next) => {
 		if (req.method !== "GET" && req.method !== "HEAD") return next();
-		const apiPath = req.middleware.path;
 
-		const unsafePath = req.path.replace(apiPath, "");
-		const filePath = path.join(dirPath, path.normalize(unsafePath));
+		const mount = normalizeMount(req.middleware.path);
+		const relative = relativeToMount(mount, req.path);
+		if (relative === null) return next();
+		if (!isAllowedRelative(relative, !!opts.dotfiles)) return next();
 
-		const resolvedPath = path.resolve(filePath);
-		const resolvedDir = path.resolve(dirPath);
-		if (!resolvedPath.startsWith(resolvedDir)) return next();
+		const root = path.resolve(dirPath);
+		const filePath = path.resolve(root, `.${relative === "/" ? "" : relative}`);
+		const rel = path.relative(root, filePath);
+		if (rel === ".." || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel))
+			return next();
 
 		try {
 			const stats = fs.statSync(filePath);

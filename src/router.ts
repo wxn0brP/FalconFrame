@@ -87,11 +87,26 @@ export class Router {
 		return this;
 	}
 
-	static(apiPath: string, dirPath?: string, opts: StaticServeOptions = {}) {
-		if (!dirPath) {
-			dirPath = apiPath;
+	static(dirPath: string, opts?: StaticServeOptions): this;
+	static(apiPath: string, dirPath: string, opts?: StaticServeOptions): this;
+	static(
+		apiPathOrDir: string,
+		dirOrOpts?: string | StaticServeOptions,
+		maybeOpts: StaticServeOptions = {},
+	) {
+		let apiPath = apiPathOrDir;
+		let dirPath: string;
+		let opts: StaticServeOptions;
+
+		if (typeof dirOrOpts === "string") {
+			dirPath = dirOrOpts;
+			opts = maybeOpts;
+		} else {
+			dirPath = apiPathOrDir;
 			apiPath = "/";
+			opts = dirOrOpts ?? {};
 		}
+
 		if (dirPath === "/") throw new Error("Cannot serve root directory");
 		this.use(apiPath, handleStaticFiles(dirPath, opts));
 		return this;

@@ -161,6 +161,8 @@ export interface StaticServeOptions {
 	etag?: boolean;
 	errorIfDirNotFound?: boolean;
 	notRenderHtml?: boolean;
+	/** Allow serving dotfiles. `.well-known` is always allowed as the first segment. Defaults to false. */
+	dotfiles?: boolean;
 }
 
 export interface StaticFileOptions {

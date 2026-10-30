@@ -1,5 +1,7 @@
 # Configuration
 
+Related concerns: [debug.md](debug.md), [proxy.md](proxy.md), [compression.md](compression.md), [render.md](render.md), [static.md](static.md), [valid.md](valid.md).
+
 ## Options
 
 | Option | Default | Description |
