@@ -46,15 +46,29 @@ function trustsProxy(proxy: ProxyMode, socketIp: string) {
 	return isLoopback(socketIp);
 }
 
+function forwardedProto(req: FFRequest): "http" | "https" | undefined {
+	const header = req.headers["x-forwarded-proto"];
+	const value = Array.isArray(header) ? header[0] : header;
+	if (!value) return undefined;
+
+	const proto = value.split(",")[0]?.trim().toLowerCase();
+	return proto === "http" || proto === "https" ? proto : undefined;
+}
+
 export function resolveRequestInfo(req: FFRequest, proxy: ProxyMode = "auto") {
 	const socketIp = normalizeIp(req.socket.remoteAddress || "");
 	const forwarded = forwardedIp(req);
-	const isProxied = trustsProxy(proxy, socketIp) && !!forwarded;
+	const trusted = trustsProxy(proxy, socketIp);
+	const isProxied = trusted && !!forwarded;
+	const protocol =
+		(trusted ? forwardedProto(req) : undefined) ??
+		((req.socket as any)?.encrypted ? "https" : "http");
 
 	return {
 		socketIp,
 		ip: isProxied ? normalizeIp(forwarded as string) : socketIp,
 		isProxied,
+		protocol,
 	};
 }
 

@@ -47,6 +47,8 @@ export function handleRequest(
 	req.socketIp = requestInfo.socketIp;
 	req.ip = requestInfo.ip;
 	req.isProxied = requestInfo.isProxied;
+	req.protocol = requestInfo.protocol;
+	req.secure = requestInfo.protocol === "https";
 	req.params = {};
 	req.valid = (schema: any, regexRules?: any) =>
 		validate({

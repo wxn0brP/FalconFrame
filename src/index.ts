@@ -1,10 +1,12 @@
 import { Logger } from "@wxn0brp/lucerna-log";
 import http from "http";
+import https from "https";
 import * as bodyParser from "./body";
 import { parseLimit } from "./body-utils";
 import { resolveConfig, type ResolvedConfig, isDebugEnabled } from "./config";
 import { createCORS } from "./cors";
 import { createDebug, generateDebugToken } from "./debug";
+import { resolveHTTPSConfig } from "./https";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
 import { FFResponse } from "./res";
@@ -27,6 +29,7 @@ import type {
 
 export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 	logger: Logger;
+	httpsServer?: https.Server;
 	bodyParsers: Record<string, BodyParserEntry> = {};
 	vars: CombinedVars<Vars> = {} as any;
 	opts: FFOpts = {};
@@ -192,18 +195,21 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 				);
 			}
 
-			if (this._debug && isDebugEnabled(this._debug.enabled)) {
-				const urlHost =
-					host && host !== "0.0.0.0" && host !== "::" ? host : "localhost";
-				const token = this._debug.generated ? `?pass=${this._debug.pass}` : "";
-				console.log(
-					`[FF] Debug panel: http://${urlHost}:${actualPort}${this._debug.path}${token}`,
-				);
-			}
-
+			this.printDebugUrl("http", host, actualPort);
 			cb();
 		});
 		return server;
+	}
+
+	private printDebugUrl(scheme: "http" | "https", host: string, port: number) {
+		if (!this._debug || !isDebugEnabled(this._debug.enabled)) return;
+
+		const urlHost =
+			host && host !== "0.0.0.0" && host !== "::" ? host : "localhost";
+		const token = this._debug.generated ? `?pass=${this._debug.pass}` : "";
+		console.log(
+			`[FF] Debug panel: ${scheme}://${urlHost}:${port}${this._debug.path}${token}`,
+		);
 	}
 
 	/**
@@ -295,11 +301,30 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 
 	/**
 	 * Listens to the specified port, or the environment variable PORT if available.
+	 * HTTPS starts as an additional server when `HTTPS_KEY` and `HTTPS_CERT` are set,
+	 * on `HTTPS_PORT` (default 443).
 	 * @param port - The port number to listen to.
-	 * @returns The server object returned by the listen method.
+	 * @returns The HTTP server object. The HTTPS server is available as `httpsServer`.
 	 */
 	l(port: number) {
-		return this.listen(+process.env.PORT || port, true);
+		const server = this.listen(+process.env.PORT || port, true);
+
+		const httpsConfig = resolveHTTPSConfig();
+		if (!httpsConfig) return server;
+
+		this.httpsServer = https.createServer(httpsConfig.options, this.getApp());
+		this.httpsServer.listen(httpsConfig.port, "0.0.0.0", () => {
+			const address = this.httpsServer?.address();
+			const actualPort =
+				address && typeof address === "object"
+					? address.port
+					: httpsConfig.port;
+
+			console.log(`[FF] Server running on https://localhost:${actualPort}`);
+			this.printDebugUrl("https", "0.0.0.0", actualPort);
+		});
+
+		return server;
 	}
 
 	set400Formatter(formatter: ValidationErrorFormatter) {
@@ -327,6 +352,7 @@ export default FalconFrame;
 
 export { OfflineEngine } from "./engine";
 export type { OfflineRequest, OfflineResponse } from "./engine";
+export { resolveHTTPSConfig } from "./https";
 export * as Helpers from "./helpers";
 export { compression, compressionMiddleware } from "./compress";
 export { createDebug, generateDebugToken } from "./debug";

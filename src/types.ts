@@ -100,6 +100,10 @@ export class FFRequest extends http.IncomingMessage {
 	ip: string;
 	/** True when proxy headers were used to resolve `ip`. */
 	isProxied: boolean;
+	/** Request protocol, respects `x-forwarded-proto` from a trusted proxy. */
+	protocol: "http" | "https";
+	/** True when the request came over HTTPS, directly or via a trusted proxy. */
+	secure: boolean;
 	header: (name: string) => string;
 	valid: (
 		schema: ValidationSchema,
