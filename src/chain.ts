@@ -1,4 +1,5 @@
-import { FFResponse } from ".";
+import { isEnded } from "./helpers";
+import type { FFResponse } from "./res";
 import type { FFRequest, Middleware } from "./types";
 
 export interface ChainHooks {
@@ -46,7 +47,7 @@ export function createChain(
 		try {
 			hooks.start?.(middleware);
 			const result = await middleware.middleware(req, res, nextFor(seq));
-			if (result && !res._ended) hooks.result?.(result);
+			if (result && !isEnded(res)) hooks.result?.(result);
 		} catch (err) {
 			hooks.error?.(err, middleware);
 		} finally {
@@ -62,7 +63,7 @@ export function createChain(
 			if (called) throw new Error("next() called multiple times");
 			called = true;
 
-			if (res._ended) return Promise.resolve();
+			if (isEnded(res)) return Promise.resolve();
 
 			if (index >= middlewares.length) {
 				hooks.exhausted?.();

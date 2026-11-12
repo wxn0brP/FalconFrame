@@ -6,7 +6,6 @@ import { ensureLeadingDot, streamFile } from "./helpers";
 import { CookieOptions, RenderOptions } from "./types";
 
 export class FFResponse extends http.ServerResponse {
-	_ended = false;
 	FF: FalconFrame<any>;
 
 	/**
@@ -108,7 +107,6 @@ export class FFResponse extends http.ServerResponse {
 		if (contentType === "utf8") contentType = getContentType(filePath, true);
 		this.ct(contentType || getContentType(filePath));
 		streamFile(this, filePath);
-		this._ended = true;
 		return this;
 	}
 

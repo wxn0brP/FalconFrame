@@ -3,7 +3,13 @@ import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
 import { createChain } from "./chain";
-import { parseCookies, resolveRequestInfo, safe404, safe500 } from "./helpers";
+import {
+	parseCookies,
+	resolveRequestInfo,
+	isEnded,
+	safe404,
+	safe500,
+} from "./helpers";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
@@ -19,12 +25,6 @@ export function handleRequest(
 		Object.setPrototypeOf(res, FFResponse.prototype);
 		req.FF = FF;
 		res.FF = FF;
-
-		const originalEnd = res.end;
-		res.end = (...any: any[]) => {
-			res._ended = true;
-			return originalEnd.call(res, ...any);
-		};
 	}
 
 	const { logger } = FF;
@@ -127,9 +127,7 @@ export function handleRequest(
 				`Unhandled error in middleware for path [${middleware.path}]:`,
 				err.stack || err,
 			);
-			if (!res.headersSent && !res.writableEnded) {
-				safe500(err, req, res);
-			}
+			safe500(err, req, res);
 		},
 		exhausted() {
 			safe404(req, res);
@@ -192,12 +190,12 @@ export function handleRequest(
 				req.body = (await entry.parse(rawBody, req, res)) ?? {};
 				req.isBodyParsed = true;
 			} catch (err: any) {
-				if (!res._ended) req.body = {};
+				if (!isEnded(res)) req.body = {};
 			}
 			void next();
 		})
 		.catch((err: any) => {
-			if (res._ended) return;
+			if (isEnded(res)) return;
 			if (err?.statusCode === 408) {
 				res.status(408);
 				res.FF._408(req, res);

@@ -37,7 +37,7 @@ interface Res {
 	statusCode: number;
 	headers: Record<string, string>;
 	body: any;
-	_ended: boolean;
+	writableEnded: boolean;
 	FF: FalconFrame<any>;
 	json: (data: any) => void;
 	send: (data: string) => void;
@@ -71,20 +71,20 @@ export class OfflineEngine {
 			statusCode: 200,
 			headers: {},
 			body: "",
-			_ended: false,
+			writableEnded: false,
 			FF: this.ff,
 			json: (data: any) => {
 				res.headers["content-type"] = "application/json";
 				res.body = data;
-				res._ended = true;
+				res.writableEnded = true;
 			},
 			send: (data: string) => {
 				res.body = data;
-				res._ended = true;
+				res.writableEnded = true;
 			},
 			end: (data: string) => {
 				res.body = data;
-				res._ended = true;
+				res.writableEnded = true;
 			},
 			status: (code: number) => {
 				res.statusCode = code;
@@ -169,9 +169,7 @@ export class OfflineEngine {
 				else res.json(result);
 			},
 			error: err => {
-				if (!res._ended) {
-					safe500(err, req as any, res as unknown as FFResponse);
-				}
+				safe500(err, req as any, res as unknown as FFResponse);
 			},
 			exhausted: () => {
 				safe404(req as any, res as unknown as FFResponse);

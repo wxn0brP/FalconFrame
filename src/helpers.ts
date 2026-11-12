@@ -76,25 +76,31 @@ export function getIP(req: FFRequest, proxy: ProxyMode = "auto") {
 	return resolveRequestInfo(req, proxy).ip;
 }
 
+export function isEnded(res: FFResponse) {
+	return res.writableEnded || res.destroyed || res.headersSent;
+}
+
 export function safe500(err: Error, req: FFRequest, res: FFResponse) {
+	if (isEnded(res)) return;
 	res.status(500);
 	const ff = req.FF || res.FF;
 	try {
 		ff._500(err, req, res);
 	} catch (e: any) {
 		ff.logger.error("Error in 500 handler:", e?.stack || e);
-		if (!res.writableEnded && !res._ended) res.end("Internal Server Error");
+		if (!isEnded(res)) res.end("Internal Server Error");
 	}
 }
 
 export function safe404(req: FFRequest, res: FFResponse) {
+	if (isEnded(res)) return;
 	res.status(404);
 	const ff = req.FF || res.FF;
 	try {
 		ff._404(req, res);
 	} catch (e: any) {
 		ff.logger.error("Error in 404 handler:", e?.stack || e);
-		if (!res.writableEnded && !res._ended) res.end("Not Found");
+		if (!isEnded(res)) res.end("Not Found");
 	}
 }
 

@@ -9,6 +9,7 @@ import { createDebug, generateDebugToken } from "./debug";
 import { resolveHTTPSConfig } from "./https";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
+import { isEnded } from "./helpers";
 import { FFResponse } from "./res";
 import { Router } from "./router";
 import type {
@@ -248,7 +249,7 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		return async (req: any, res: any) => {
 			if (beforeHandleRequest) {
 				const result = await beforeHandleRequest(req, res);
-				if (result || (res as FFResponse)._ended) return;
+				if (result || isEnded(res)) return;
 			}
 			handleRequest(req as FFRequest, res as FFResponse, this as any);
 		};
