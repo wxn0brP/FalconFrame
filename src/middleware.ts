@@ -75,7 +75,20 @@ export function getMiddlewares(
 
 		if (middleware.router) {
 			const nested = getMiddlewares(middleware.router, matchUrl, fullPath);
-			result.push(...nested);
+			if (middleware.api) {
+				result.push(
+					...nested.map(m =>
+						m.api
+							? m
+							: {
+									...m,
+									api: true as const,
+								},
+					),
+				);
+			} else {
+				result.push(...nested);
+			}
 		} else {
 			result.push({
 				...middleware,

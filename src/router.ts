@@ -17,6 +17,7 @@ export type MiddlewareFn =
 
 export class Router {
 	middlewares: Middleware[] = [];
+	isApi = true;
 
 	addRoute(method: Method, path: string, ...handlers: RouteHandler[]) {
 		const handler = handlers.pop();
@@ -46,6 +47,7 @@ export class Router {
 		};
 
 		if (middlewareFn instanceof Router) {
+			if (middlewareFn.isApi) middleware.api = true;
 			middleware.router = middlewareFn.middlewares;
 		} else if ("getRouteHandler" in middlewareFn) {
 			middleware.middleware = middlewareFn.getRouteHandler();
@@ -134,8 +136,14 @@ export class Router {
 		return this;
 	}
 
-	router(path: string = "/") {
+	router(
+		path: string = "/",
+		opts: {
+			api?: boolean;
+		} = {},
+	) {
 		const router = new Router();
+		router.isApi = opts.api ?? true;
 		this.use(path, router);
 		return router;
 	}

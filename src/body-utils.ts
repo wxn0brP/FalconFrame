@@ -1,5 +1,6 @@
 import { FFResponse } from "./res";
 import type { FFRequest } from "./types";
+import { safe408, safe413 } from "./safe";
 
 export function parseLimit(limit: string | number): number {
 	if (!limit) return 0;
@@ -47,7 +48,7 @@ export function getRawBody(
 			settled = true;
 			res.status(408);
 			res.setHeader("Connection", "close");
-			res.FF._408(req, res);
+			safe408(req, res);
 			if (!res.writableEnded) res.end();
 			res.once("finish", () => req.destroy());
 			reject(
@@ -69,8 +70,7 @@ export function getRawBody(
 			const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
 			total += buf.length;
 			if (limit && total > limit) {
-				res.status(413);
-				res.FF._413(req, res);
+				safe413(req, res);
 				finish(() => reject(new Error("Payload Too Large")));
 				req.destroy();
 				return;

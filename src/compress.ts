@@ -7,7 +7,7 @@ import {
 } from "zlib";
 import { FFResponse } from "./res";
 import { CompressionOptions, FFRequest, RouteHandler } from "./types";
-import { safe500 } from "./helpers";
+import { safe500 } from "./safe";
 
 function isCompressible(contentType: string) {
 	if (!contentType) return true;

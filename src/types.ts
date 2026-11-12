@@ -124,6 +124,7 @@ export interface Middleware {
 	use?: true;
 	router?: Middleware[];
 	customParser?: true;
+	api?: true;
 }
 
 export interface CookieOptions {

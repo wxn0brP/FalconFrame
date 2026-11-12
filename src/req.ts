@@ -3,13 +3,8 @@ import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
 import { createChain } from "./chain";
-import {
-	parseCookies,
-	resolveRequestInfo,
-	isEnded,
-	safe404,
-	safe500,
-} from "./helpers";
+import { parseCookies, resolveRequestInfo } from "./helpers";
+import { isEnded, safe404, safe408, safe500 } from "./safe";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
@@ -127,7 +122,7 @@ export function handleRequest(
 				`Unhandled error in middleware for path [${middleware.path}]:`,
 				err.stack || err,
 			);
-			safe500(err, req, res);
+			safe500(err, req, res, middleware);
 		},
 		exhausted() {
 			safe404(req, res);
@@ -197,8 +192,7 @@ export function handleRequest(
 		.catch((err: any) => {
 			if (isEnded(res)) return;
 			if (err?.statusCode === 408) {
-				res.status(408);
-				res.FF._408(req, res);
+				safe408(req, res);
 				if (!res.writableEnded) res.end();
 				return;
 			}

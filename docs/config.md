@@ -53,12 +53,54 @@ An unparsed body makes `req.valid(...)` return an error instead of silently acce
 | Body read exceeds `bodyTimeout` | `408` | `set408` |
 | File read error | `404` / `500` | `set404` / `set500` |
 | Unhandled error in a handler | `500` | `set500` |
+| Validation errors formatting | `400` | `set400Formatter` |
 
-Requests with `408` or `413` never continue to the route handler.
+All error handlers live on `app.errorHandlers` (`ErrorHandlers` instance):
 
 ```typescript
-app.set413((req, res) => res.status(413).json({ error: "Too large" }));
-app.set408((req, res) => res.status(408).json({ error: "Timeout" }));
+app.errorHandlers.set413((req, res) => res.status(413).json({ error: "Too large" }));
+app.errorHandlers.set408((req, res) => res.status(408).json({ error: "Timeout" }));
+```
+
+The top-level `app.set413(...)` methods and `app._413` fields are deprecated
+but still delegate to `app.errorHandlers`.
+
+### API (JSON) error handlers
+
+API endpoints should return JSON errors, not HTML pages. FalconFrame picks a
+dedicated handler set for such requests — no `try/catch` needed in handlers.
+
+| Case | Status | JSON handler |
+|------|--------|--------------|
+| Body exceeds `bodyLimit` | `413` | `set413Api` |
+| Body read exceeds `bodyTimeout` | `408` | `set408Api` |
+| File read error | `404` / `500` | `set404Api` / `set500Api` |
+| Unhandled error in a handler | `500` | `set500Api` |
+
+The JSON handlers have defaults (`{ err: true, msg: "..." }`) and can be overridden:
+
+```typescript
+app.errorHandlers.set500Api((err, req, res) =>
+	res.json({ err: true, msg: "Server error" }),
+);
+```
+
+A request is treated as API when:
+
+1. the route was registered on a sub-router created with `router()` — those are
+   API by default. Pass `{ api: false }` for routers serving HTML pages;
+2. the client explicitly sends `Accept: application/json`.
+
+An explicit `Accept: text/html` request (a browser navigation) always receives
+the regular HTML error response, even on api routers.
+
+```typescript
+const app = new FalconFrame();
+
+const api = app.router("/api"); // api by default
+api.get("/users", handler); // thrown errors -> JSON 500
+
+const pages = app.router("/pages", { api: false }); // HTML errors
 ```
 
 ## Examples

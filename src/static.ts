@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { ensureLeadingDot, safe404, streamFile } from "./helpers";
+import { ensureLeadingDot, streamFile } from "./helpers";
+import { safe404 } from "./safe";
 import { getContentType } from "./encoding";
 import { FFResponse } from "./res";
 import {

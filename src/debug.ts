@@ -1,7 +1,8 @@
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { join } from "path";
 import { isDebugEnabled } from "./config";
-import { isLoopback, normalizeIp, safe404 } from "./helpers";
+import { isLoopback, normalizeIp } from "./helpers";
+import { safe404 } from "./safe";
 import { Router } from "./router";
 import type { FFResponse } from "./res";
 import type { DebugOptions, FFRequest } from "./types";

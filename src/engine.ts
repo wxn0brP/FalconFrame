@@ -1,7 +1,8 @@
 import { FalconFrame } from "./index";
 import { getContentType } from "./body-utils";
 import { createChain } from "./chain";
-import { parseCookies, safe404, safe500 } from "./helpers";
+import { parseCookies } from "./helpers";
+import { safe404, safe500 } from "./safe";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { validate } from "./valid";
 import type { FFResponse } from "./res";
@@ -168,8 +169,8 @@ export class OfflineEngine {
 				if (typeof result === "string") res.send(result);
 				else res.json(result);
 			},
-			error: err => {
-				safe500(err, req as any, res as unknown as FFResponse);
+			error: (err, middleware) => {
+				safe500(err, req as any, res as unknown as FFResponse, middleware);
 			},
 			exhausted: () => {
 				safe404(req as any, res as unknown as FFResponse);

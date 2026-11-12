@@ -204,7 +204,9 @@ export function validateBody(
 	return (req, res, next) => {
 		const validationResult = req.valid(schema, regexRules);
 		if (!validationResult.valid) {
-			const errorResponse = res.FF._400_formatter(validationResult.validErrors);
+			const errorResponse = res.FF.errorHandlers._400_formatter(
+				validationResult.validErrors,
+			);
 			res.status(400).json(errorResponse);
 			return;
 		}

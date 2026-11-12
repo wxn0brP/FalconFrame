@@ -1,4 +1,4 @@
-import { isEnded } from "./helpers";
+import { isEnded } from "./safe";
 import type { FFResponse } from "./res";
 import type { FFRequest, Middleware } from "./types";
 

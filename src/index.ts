@@ -7,9 +7,10 @@ import { resolveConfig, type ResolvedConfig, isDebugEnabled } from "./config";
 import { createCORS } from "./cors";
 import { createDebug, generateDebugToken } from "./debug";
 import { resolveHTTPSConfig } from "./https";
+import { ErrorHandlers } from "./error-handlers";
 import { renderHTML } from "./render";
 import { handleRequest } from "./req";
-import { isEnded } from "./helpers";
+import { isEnded } from "./safe";
 import { FFResponse } from "./res";
 import { Router } from "./router";
 import type {
@@ -43,25 +44,7 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		enabled?: boolean;
 	};
 
-	_400_formatter: ValidationErrorFormatter = err => {
-		return {
-			err: true,
-			msg: "Bad request",
-			errors: err,
-		};
-	};
-	_404: FinalHandler = (req, res) => {
-		res.end("404: File had second thoughts");
-	};
-	_413: FinalHandler = (req, res) => {
-		res.end("413: Cat is too fat");
-	};
-	_408: FinalHandler = (req, res) => {
-		res.end("408: The request took a nap");
-	};
-	_500: ErrorHandler = (err, req, res) => {
-		res.end("500: The code had an existential crisis");
-	};
+	errorHandlers: ErrorHandlers = new ErrorHandlers();
 
 	constructor(opts: Partial<FFOpts> = {}) {
 		super();
@@ -328,24 +311,29 @@ export class FalconFrame<Vars extends Record<string, any> = {}> extends Router {
 		return server;
 	}
 
+	/** @deprecated use `app.errorHandlers.set400Formatter` */
 	set400Formatter(formatter: ValidationErrorFormatter) {
-		this._400_formatter = formatter;
+		this.errorHandlers.set400Formatter(formatter);
 	}
 
+	/** @deprecated use `app.errorHandlers.set404` */
 	set404(handler: FinalHandler) {
-		this._404 = handler;
+		this.errorHandlers.set404(handler);
 	}
 
+	/** @deprecated use `app.errorHandlers.set413` */
 	set413(handler: FinalHandler) {
-		this._413 = handler;
+		this.errorHandlers.set413(handler);
 	}
 
+	/** @deprecated use `app.errorHandlers.set408` */
 	set408(handler: FinalHandler) {
-		this._408 = handler;
+		this.errorHandlers.set408(handler);
 	}
 
+	/** @deprecated use `app.errorHandlers.set500` */
 	set500(handler: ErrorHandler) {
-		this._500 = handler;
+		this.errorHandlers.set500(handler);
 	}
 }
 
@@ -354,6 +342,7 @@ export default FalconFrame;
 export { OfflineEngine } from "./engine";
 export type { OfflineRequest, OfflineResponse } from "./engine";
 export { resolveHTTPSConfig } from "./https";
+export { ErrorHandlers } from "./error-handlers";
 export * as Helpers from "./helpers";
 export { compression, compressionMiddleware } from "./compress";
 export { createDebug, generateDebugToken } from "./debug";
