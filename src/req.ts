@@ -2,7 +2,8 @@ import { randomUUID } from "crypto";
 import { URL } from "url";
 import FalconFrame from ".";
 import { getContentType, getRawBody } from "./body-utils";
-import { parseCookies, resolveRequestInfo } from "./helpers";
+import { createChain } from "./chain";
+import { parseCookies, resolveRequestInfo, safe404, safe500 } from "./helpers";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { FFResponse } from "./res";
 import { FFRequest } from "./types";
@@ -100,47 +101,40 @@ export function handleRequest(
 	);
 
 	if (matchedMiddlewares.length === 0) {
-		res.status(404);
-		FF._404(req, res);
+		safe404(req, res);
 		return;
 	}
 
-	let middlewareIndex = 0;
-	async function next() {
-		if (middlewareIndex >= matchedMiddlewares.length) {
-			res.status(404);
-			FF._404(req, res);
-			return;
-		}
-
-		const middleware = matchedMiddlewares[middlewareIndex++];
-		logger.debug(
-			`Executing middleware ${middlewareIndex} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`,
-		);
-
-		req.params = extractParams(middleware.path, req.path);
-		req.middleware = middleware;
-		try {
-			const result = await middleware.middleware(req, res, next);
-			if (result && !res._ended) {
-				if (typeof result === "string") {
-					return res.end(result);
-				} else if (typeof result === "object") {
-					if (result instanceof FFResponse) return res.end();
-					return res.json(result);
-				}
+	let started = 0;
+	const next = createChain(req, res, matchedMiddlewares, {
+		start(middleware) {
+			logger.debug(
+				`Executing middleware ${++started} of ${matchedMiddlewares.length} matched for path [${middleware.path}]`,
+			);
+			req.params = extractParams(middleware.path, req.path);
+			req.middleware = middleware;
+		},
+		result(result) {
+			if (typeof result === "string") {
+				return res.end(result);
+			} else if (typeof result === "object") {
+				if (result instanceof FFResponse) return res.end();
+				return res.json(result);
 			}
-		} catch (err: any) {
+		},
+		error(err: any, middleware) {
 			logger.error(
 				`Unhandled error in middleware for path [${middleware.path}]:`,
 				err.stack || err,
 			);
 			if (!res.headersSent && !res.writableEnded) {
-				res.status(500);
-				FF._500(err, req, res);
+				safe500(err, req, res);
 			}
-		}
-	}
+		},
+		exhausted() {
+			safe404(req, res);
+		},
+	});
 
 	const hasCustomParserEndpoint = matchedMiddlewares.some(
 		middleware => middleware.customParser,
@@ -148,7 +142,7 @@ export function handleRequest(
 	if (hasCustomParserEndpoint) {
 		logger.debug("Executing custom parser endpoint");
 		req.body = {};
-		next();
+		void next();
 		return;
 	}
 
@@ -159,13 +153,13 @@ export function handleRequest(
 	) {
 		logger.debug("Method does not require body. Executing middlewares");
 		req.body = {};
-		next();
+		void next();
 		return;
 	}
 
 	if (reRoute) {
 		logger.debug("Re-route. Executing middlewares");
-		next();
+		void next();
 		return;
 	}
 
@@ -185,7 +179,7 @@ export function handleRequest(
 		} else {
 			logger.debug("No content-type. Executing middlewares");
 		}
-		next();
+		void next();
 		return;
 	}
 
@@ -200,7 +194,7 @@ export function handleRequest(
 			} catch (err: any) {
 				if (!res._ended) req.body = {};
 			}
-			next();
+			void next();
 		})
 		.catch((err: any) => {
 			if (res._ended) return;
@@ -211,6 +205,6 @@ export function handleRequest(
 				return;
 			}
 			req.body = {};
-			next();
+			void next();
 		});
 }

@@ -76,6 +76,28 @@ export function getIP(req: FFRequest, proxy: ProxyMode = "auto") {
 	return resolveRequestInfo(req, proxy).ip;
 }
 
+export function safe500(err: Error, req: FFRequest, res: FFResponse) {
+	res.status(500);
+	const ff = req.FF || res.FF;
+	try {
+		ff._500(err, req, res);
+	} catch (e: any) {
+		ff.logger.error("Error in 500 handler:", e?.stack || e);
+		if (!res.writableEnded && !res._ended) res.end("Internal Server Error");
+	}
+}
+
+export function safe404(req: FFRequest, res: FFResponse) {
+	res.status(404);
+	const ff = req.FF || res.FF;
+	try {
+		ff._404(req, res);
+	} catch (e: any) {
+		ff.logger.error("Error in 404 handler:", e?.stack || e);
+		if (!res.writableEnded && !res._ended) res.end("Not Found");
+	}
+}
+
 export function streamFile(res: FFResponse, filePath: string) {
 	const stream = createReadStream(filePath);
 
@@ -91,13 +113,11 @@ export function streamFile(res: FFResponse, filePath: string) {
 		res.removeHeader("content-encoding");
 
 		if (err.code === "ENOENT") {
-			res.status(404);
-			res.FF._404(res.req as FFRequest, res);
+			safe404(res.req as FFRequest, res);
 			return;
 		}
 
-		res.status(500);
-		res.FF._500(err, res.req as FFRequest, res);
+		safe500(err, res.req as FFRequest, res);
 		if (!res.writableEnded) res.end();
 	});
 

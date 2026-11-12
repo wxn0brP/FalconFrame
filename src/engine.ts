@@ -1,8 +1,10 @@
 import { FalconFrame } from "./index";
 import { getContentType } from "./body-utils";
-import { parseCookies } from "./helpers";
+import { createChain } from "./chain";
+import { parseCookies, safe404, safe500 } from "./helpers";
 import { extractParams, getMiddlewares, matchMiddleware } from "./middleware";
 import { validate } from "./valid";
+import type { FFResponse } from "./res";
 
 export interface OfflineRequest {
 	method?: string;
@@ -154,32 +156,27 @@ export class OfflineEngine {
 		);
 
 		if (matched.length === 0) {
-			res.statusCode = 404;
-			this.ff._404(req as any, res as any);
+			safe404(req as any, res as unknown as FFResponse);
 			return this.buildResponse(res);
 		}
 
-		let i = 0;
-		const next = async () => {
-			if (i >= matched.length) {
-				res.statusCode = 404;
-				this.ff._404(req as any, res as any);
-				return;
-			}
-			const mw = matched[i++];
-			req.params = extractParams(mw.path, path);
-			try {
-				const result = await mw.middleware(req as any, res as any, next);
-				if (result && !res._ended) {
-					typeof result === "string" ? res.send(result) : res.json(result);
-				}
-			} catch (err: any) {
+		const next = createChain(req as any, res as any, matched, {
+			start(middleware) {
+				req.params = extractParams(middleware.path, path);
+			},
+			result(result) {
+				if (typeof result === "string") res.send(result);
+				else res.json(result);
+			},
+			error: err => {
 				if (!res._ended) {
-					res.statusCode = 500;
-					this.ff._500(err, req as any, res as any);
+					safe500(err, req as any, res as unknown as FFResponse);
 				}
-			}
-		};
+			},
+			exhausted: () => {
+				safe404(req as any, res as unknown as FFResponse);
+			},
+		});
 
 		await next();
 		return this.buildResponse(res);

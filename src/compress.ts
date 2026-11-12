@@ -1,12 +1,13 @@
 import { Transform } from "stream";
 import {
-	constants as zlibConstants,
 	createBrotliCompress,
 	createDeflate,
 	createGzip,
+	constants as zlibConstants,
 } from "zlib";
 import { FFResponse } from "./res";
 import { CompressionOptions, FFRequest, RouteHandler } from "./types";
+import { safe500 } from "./helpers";
 
 function isCompressible(contentType: string) {
 	if (!contentType) return true;
@@ -174,8 +175,7 @@ export function compression(
 				return;
 			}
 
-			res.status(500);
-			res.FF._500(err, req, res);
+			safe500(err, req, res);
 			if (!res.writableEnded) res.end();
 		});
 		res.on("close", () => {
@@ -281,11 +281,7 @@ export function compression(
 	};
 }
 
-export const compressionMiddleware: RouteHandler = (
-	req: FFRequest,
-	res: FFResponse,
-	next: () => void,
-) => {
+export const compressionMiddleware: RouteHandler = (req, res, next) => {
 	compression(req, res);
 	next();
 };

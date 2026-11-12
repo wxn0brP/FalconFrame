@@ -1,7 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { join } from "path";
 import { isDebugEnabled } from "./config";
-import { isLoopback, normalizeIp } from "./helpers";
+import { isLoopback, normalizeIp, safe404 } from "./helpers";
 import { Router } from "./router";
 import type { FFResponse } from "./res";
 import type { DebugOptions, FFRequest } from "./types";
@@ -136,11 +136,6 @@ function hostAllowed(hosts: string[], ip: string) {
 	});
 }
 
-function notFound(req: FFRequest, res: FFResponse) {
-	res.status(404);
-	req.FF._404(req, res);
-}
-
 type AuthResult = "disabled" | "denied" | "session" | "token";
 
 function attempt(req: FFRequest, config: EffectiveDebug): AuthResult {
@@ -203,7 +198,7 @@ export function createDebug(
 		const result = attempt(req, settings);
 
 		if (result === "disabled") return next();
-		if (result === "denied") return notFound(req, res);
+		if (result === "denied") return safe404(req, res);
 		if (result === "token") {
 			grantSession(req, res, settings);
 			if (tokenSource(req) === "query") return res.redirect(path);
@@ -220,7 +215,7 @@ export function createDebug(
 			const result = attempt(req, settings);
 
 			if (result === "disabled") return next();
-			if (result === "denied") return notFound(req, res);
+			if (result === "denied") return safe404(req, res);
 			if (result === "token") grantSession(req, res, settings);
 
 			next();

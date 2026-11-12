@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ensureLeadingDot, streamFile } from "./helpers";
+import { ensureLeadingDot, safe404, streamFile } from "./helpers";
 import { getContentType } from "./encoding";
 import { FFResponse } from "./res";
 import {
@@ -65,8 +65,7 @@ export function handleSingleFile(
 		try {
 			stats = fs.statSync(filePath);
 		} catch (e) {
-			res.statusCode = 404;
-			res.FF._404(req, res);
+			safe404(req, res);
 			return;
 		}
 

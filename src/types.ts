@@ -6,7 +6,7 @@ import http from "http";
 export type RouteHandler = (
 	req: FFRequest,
 	res: FFResponse,
-	next: () => void,
+	next: () => Promise<void>,
 ) => void | any;
 
 export type FinalHandler = (req: FFRequest, res: FFResponse) => void | any;
