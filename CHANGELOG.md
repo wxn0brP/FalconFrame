@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.11](https://github.com/wxn0brP/FalconFrame/compare/v0.9.10...v0.9.11) (2026-11-22)
+
+
+### Features
+
+* json error handlers for api routers ([04359a8](https://github.com/wxn0brP/FalconFrame/commit/04359a8b3fce2dd21cd5cfc5c1f8a2276d940cf6))
+* support middleware chain & fix 404/500 ([3c5fcd5](https://github.com/wxn0brP/FalconFrame/commit/3c5fcd5e646ced875d1e6a50e79d557810959744))
+
+
+### Bug Fixes
+
+* ipv6 support ([a45d110](https://github.com/wxn0brP/FalconFrame/commit/a45d1101aaa6188b36d69aaf5b06c075b868ab6b))
+
 ### [0.9.10](https://github.com/wxn0brP/FalconFrame/compare/v0.9.9...v0.9.10) (2026-10-30)
 
 
