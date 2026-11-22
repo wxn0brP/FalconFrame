@@ -220,3 +220,10 @@ export type FFVars = {
 };
 
 export type CombinedVars<ExtraVars> = ExtraVars & FFVars;
+
+export interface ListenTarget {
+	host?: string;
+	port: number;
+}
+
+export type ListenAddress = number | string | ListenTarget;

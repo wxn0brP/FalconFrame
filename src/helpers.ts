@@ -1,6 +1,13 @@
 import { createReadStream } from "fs";
+import { isIP } from "net";
 import type { FFResponse } from "./res";
-import { Cookies, FFRequest, ProxyMode } from "./types";
+import {
+	Cookies,
+	FFRequest,
+	ListenAddress,
+	ListenTarget,
+	ProxyMode,
+} from "./types";
 import { safe404, safe500 } from "./safe";
 export { getContentType } from "./encoding";
 
@@ -17,6 +24,63 @@ export function parseCookies(cookieHeader: string): Cookies {
 export function normalizeIp(ip: string) {
 	const trimmed = ip.trim();
 	return trimmed.startsWith("::ffff:") ? trimmed.slice(7) : trimmed;
+}
+
+export function parseListenTarget(target: ListenAddress): ListenTarget {
+	if (typeof target === "object") {
+		return {
+			host: target.host,
+			port: target.port,
+		};
+	}
+	if (typeof target === "number")
+		return {
+			port: target,
+		};
+
+	const value = target.trim();
+	const bracketed = /^\[([^\]]+)\](?::(\d+))?$/.exec(value);
+	if (bracketed) {
+		return {
+			host: bracketed[1],
+			port: bracketed[2] ? +bracketed[2] : 0,
+		};
+	}
+
+	if (isIP(value))
+		return {
+			host: value,
+			port: 0,
+		};
+
+	const colon = value.lastIndexOf(":");
+	if (colon !== -1) {
+		const portPart = value.slice(colon + 1);
+		if (/^\d+$/.test(portPart)) {
+			return {
+				host: value.slice(0, colon),
+				port: +portPart,
+			};
+		}
+		return {
+			host: value,
+			port: 0,
+		};
+	}
+
+	const port = +value;
+	return Number.isNaN(port)
+		? {
+				host: value,
+				port: 0,
+			}
+		: {
+				port,
+			};
+}
+
+export function formatListenHost(host: string) {
+	return host.includes(":") && !host.startsWith("[") ? `[${host}]` : host;
 }
 
 export function isLoopback(ip: string) {
