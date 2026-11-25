@@ -160,19 +160,24 @@ export function interpolate(template: string, data: Record<string, any>) {
 	);
 }
 
+function isTruthy(value: any) {
+	return Array.isArray(value) ? value.length > 0 : Boolean(value);
+}
+
 export function expandLoops(template: string, data: Record<string, any>) {
 	return template
 		.replace(
 			/<!--\s*each\s+(\w+)\s+as\s+(\w+)\s*-->([\s\S]*?)<!--\s*\/each\s*-->/g,
 			(_, key, itemVar, body) =>
 				((resolvePath(data, key) as any[]) ?? [])
-					.map((value: any, index: number) =>
-						interpolate(body, {
+					.map((value: any, index: number) => {
+						const itemData = {
 							...data,
 							[itemVar]: value,
 							i: index,
-						}),
-					)
+						};
+						return interpolate(expandLoops(body, itemData), itemData);
+					})
 					.join(""),
 		)
 		.replace(
@@ -185,13 +190,22 @@ export function expandLoops(template: string, data: Record<string, any>) {
 					(_, i) => i,
 				);
 				return range
-					.map((i: number) =>
-						interpolate(body, {
+					.map((i: number) => {
+						const itemData = {
 							...data,
 							i,
-						}),
-					)
+						};
+						return interpolate(expandLoops(body, itemData), itemData);
+					})
 					.join("");
 			},
+		)
+		.replace(
+			/<!--\s*if\s+([^\s]+)\s*-->([\s\S]*?)<!--\s*\/if\s*-->/g,
+			(_, key, body) => (isTruthy(resolvePath(data, key)) ? body : ""),
+		)
+		.replace(
+			/<!--\s*unless\s+([^\s]+)\s*-->([\s\S]*?)<!--\s*\/unless\s*-->/g,
+			(_, key, body) => (isTruthy(resolvePath(data, key)) ? "" : body),
 		);
 }
