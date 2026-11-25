@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.12](https://github.com/wxn0brP/FalconFrame/compare/v0.9.11...v0.9.12) (2026-11-25)
+
+
+### Features
+
+* improve loops & add if unless ([363f75f](https://github.com/wxn0brP/FalconFrame/commit/363f75f50e0ac534621a5b181164db402ea2e1ad))
+
 ### [0.9.11](https://github.com/wxn0brP/FalconFrame/compare/v0.9.10...v0.9.11) (2026-11-22)
 
 
