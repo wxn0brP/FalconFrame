@@ -1,111 +1,127 @@
 # `renderHTML` Function
 
-The `renderHTML` function is a template rendering engine that processes HTML templates with data binding, partial inclusion, and optional layout wrapping.
+The `renderHTML` function is a template rendering engine that processes HTML templates with data binding, loops, conditionals, partial inclusion, and optional layout wrapping.
 
-## Behavior
+## Quick Reference
 
-### Data Interpolation
+| Syntax | Description |
+|--------|-------------|
+| `{{ key }}` | Inserts a value, supports dotted paths like `{{ user.name }}` |
+| `<!-- if key -->...<!-- /if -->` | Renders the block when the value is truthy |
+| `<!-- unless key -->...<!-- /unless -->` | Renders the block when the value is falsy |
+| `<!-- each list as item -->...<!-- /each -->` | Repeats the block for every array element |
+| `<!-- range 3 -->...<!-- /range -->` | Repeats the block for `i` from `0` to `2` |
+| `<!-- include name -->` | Renders a partial |
+| `/* include file.css */` | Inserts a raw file |
+| `<!-- data { "key": "value" } -->` | Sets template-local data |
+| `<!-- force-layout -->` | Forces layout application even with HTML structure |
+| `<!-- force-no-layout -->` | Skips the layout even without HTML structure |
 
-Data from the `data` object is inserted using `{{variable}}` syntax. The engine:
-- Looks for all occurrences of `{{key}}` in the template
-- Strips whitespace around keys when matching
-- Replaces variables with corresponding values from the data object
+## Data
 
-### Internal Template Data
+Values from the `data` object are inserted with `{{ key }}`. Whitespace around the key is ignored and dotted paths resolve nested properties.
 
-You can define template-specific data directly within an HTML file using a special comment: `<!-- data { "key": "value" } -->`.
-
-This is particularly useful for setting variables (like a page title) that are used in a parent layout. The data is parsed from the content template and passed up to the layout, allowing content pages to control parts of the surrounding layout without any changes in the rendering code.
-
-The data precedence is as follows:
-1. Data passed directly in the `renderHTML` JavaScript call.
-2. Data defined within the template using `<!-- data {} -->`.
-3. Global data set on the FalconFrame instance (if any).
-
-If the JSON inside the comment is invalid, it will be replaced with `<!-- Invalid template data -->`.
-
-### Partial Inclusion
-
-Partials are loaded using HTML comment syntax `<!-- include partialname -->`. The engine:
-- Constructs the partial path relative to the current template's directory
-- Appends `.html` extension to the partial name
-- Passes the same data object to the included partial
-- Tracks rendered paths to prevent circular dependencies
-- Returns a comment when circular dependencies are detected
-
-### Raw File Inclusion
-
-Raw files (like CSS or JavaScript) are loaded using C-style comment syntax `/* include filename */`. The engine:
-- Reads the content of the file specified by `filename`. The path should be relative to the project's root directory.
-- Inserts the content directly into the template.
-- Does not process the included file content for data interpolation, partial inclusion, or layout handling.
-- Returns a comment when the file is not found.
-
-### Layout Handling
-
-Layouts are applied when a `FalconFrame` instance is provided with a `layout` variable. The engine:
-- Checks if the template has HTML structure (`<html>` or `<body>` tags)
-- Skips layout if the template has HTML structure and no `<!-- force-layout -->` comment
-- Skips layout if the template lacks HTML structure and has `<!-- force-no-layout -->` comment
-- Applies layout by rendering the layout template with the original content as the `body` variable
-- Passes the same data object to the layout with the `body` property added
-
-### Error Handling
-
-- Returns a C-style comment `/* File not found: path */` when a file requested by `/* include */` cannot be read.
-- Returns an HTML comment `<!-- Template not found: path -->` when a template/partial file cannot be read.
-- Prevents circular dependencies by tracking rendered template paths
-
-## Examples
-
-### Data Interpolation Example
-
-**File: `template.html`**
 ```html
 <h1>Hello, {{ name }}!</h1>
-<p>Welcome to our site.</p>
+<p>Signed in as {{ user.name }}.</p>
 ```
 
-**Data:**
 ```javascript
-const data = { name: "Alex" };
+const data = { name: "Alex", user: { name: "alex" } };
 ```
 
-**Result:**
 ```html
 <h1>Hello, Alex!</h1>
-<p>Welcome to our site.</p>
+<p>Signed in as alex.</p>
 ```
 
-### Loop Example
+### Template-local data
 
-**File: `template.html`**
+A template can define its own data with `<!-- data { ... } -->`. This is useful for values consumed by a parent layout, such as the page title. The comment is removed from the output.
+
+Precedence, highest first:
+
+1. Data passed to the `renderHTML` call.
+2. Data from the `<!-- data {} -->` comment.
+3. Global `render data` set on the FalconFrame instance.
+
+Invalid JSON is replaced with `<!-- Invalid template data -->`.
+
+## Conditionals
+
+`if` renders its block when the value is truthy, `unless` renders it when the value is falsy. There are no comparison operators or expressions.
+
+```html
+<!-- if user -->
+  <p>Welcome, {{ user.name }}.</p>
+<!-- /if -->
+<!-- unless user -->
+  <p>Please sign in.</p>
+<!-- /unless -->
+```
+
+```javascript
+const data = { user: { name: "Alex" } };
+```
+
+```html
+  <p>Welcome, Alex.</p>
+```
+
+Truthiness follows JavaScript, with one addition: an array is checked by length, so `[]` is falsy and `[1]` is truthy.
+
+```html
+<!-- if items --><p>{{ items.length }} items.</p><!-- /if -->
+<!-- unless items --><p>No items.</p><!-- /unless -->
+```
+
+```javascript
+const data = { items: [] };
+```
+
+```html
+<p>No items.</p>
+```
+
+Conditionals work inside `each` and `range`, and loops work inside conditionals. Blocks of the same directive do not nest.
+
+## Loops
+
+`<!-- each list as item -->` resolves `list`, iterates over the array and exposes each element as `item`. The zero-based index is available as `i`. The value should be an array.
+
 ```html
 <ul>
 <!-- each items as item -->
   <li>{{ i }}. {{ item.label }}</li>
 <!-- /each -->
 </ul>
-<p><!-- range 3 -->{{ i }} <!-- /range --></p>
 ```
 
-**Data:**
 ```javascript
 const data = { items: [ { label: "One" }, { label: "Two" } ] };
 ```
 
-**Result:**
 ```html
 <ul>
   <li>0. One</li>
   <li>1. Two</li>
 </ul>
+```
+
+`<!-- range n -->` repeats the block for `i` from `0` to `n - 1`. The count is a literal number.
+
+```html
+<p><!-- range 3 -->{{ i }} <!-- /range --></p>
+```
+
+```html
 <p>0 1 2 </p>
 ```
 
-### Partial Inclusion Example
+## Partials
 
-**File: `views/profile.html`**
+`<!-- include name -->` loads `name.html` relative to the directory of the current template and renders it with the same data. Extra data can be passed as JSON in the comment; it overrides the outer data for that partial.
+
 ```html
 <div class="profile">
   <!-- include partials/header -->
@@ -113,198 +129,82 @@ const data = { items: [ { label: "One" }, { label: "Two" } ] };
 </div>
 ```
 
-**File: `views/partials/header.html`**
 ```html
+<!-- views/partials/header.html -->
 <header>
   <h1>Welcome, {{ username }}</h1>
 </header>
 ```
 
-**Data:**
-```javascript
-const data = { username: "JaneDoe" };
-```
+With `{ username: "JaneDoe" }` in the outer data the partial renders `Welcome, JaneDoe`. With `<!-- include partials/header { "username": "Guest" } -->` and no outer value it renders `Welcome, Guest`.
 
-**Result:**
-```html
-<div class="profile">
-  <header>
-    <h1>Welcome, JaneDoe</h1>
-  </header>
-  <p>User profile content.</p>
-</div>
-```
+Rendered paths are tracked, so a partial that includes itself is replaced with `<!-- Circular dependency detected: ... -->` instead of recursing.
 
-**File: `views/dashboard.html` (with inline data)**
-```html
-<!-- include partials/header { "username": "Guest" } -->
-<p>Dashboard content.</p>
-```
+## Raw Files
 
-When `username` is not in the outer data, the JSON default applies:
+`/* include filename */` inserts a file verbatim. The path is relative to the project root. The content is not processed for interpolation, partials or layouts.
 
 ```html
-<header>
-  <h1>Welcome, Guest</h1>
-</header>
-<p>Dashboard content.</p>
+<style>
+  /* include views/assets/style.css */
+</style>
 ```
 
-### Layout Handling Example
-
-```javascript
-app.setVar("layout", "layouts/main.html");
-```
-
-**File: `layouts/main.html` (Layout)**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    {{ body }}
-  </main>
-</body>
-</html>
-```
-
-**File: `pages/about.html` (Template)**
-```html
-<h2>About Us</h2>
-<p>This is the about page content.</p>
-```
-
-**Data:**
-```javascript
-const data = { title: "My Awesome Site" };
-```
-
-**Result:**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>My Awesome Site</title>
-</head>
-<body>
-  <main>
-    <h2>About Us</h2>
-    <p>This is the about page content.</p>
-  </main>
-</body>
-</html>
-```
-
-### Internal Template Data Example
-
-This example demonstrates how a content page can set the `<title>` for its parent layout.
-
-**File: `layouts/main.html` (Layout)**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ title }}</title>
-</head>
-<body>
-  <main>
-    {{ body }}
-  </main>
-</body>
-</html>
-```
-
-**File: `pages/home.html` (Content Template)**
-```html
-<!-- data { "title": "My Awesome Home Page" } -->
-<h2>Welcome!</h2>
-<p>This is the home page content.</p>
-```
-
-**Setup:**
-```javascript
-// Assuming app.setVar("layout", "layouts/main.html") has been called
-app.render("pages/home.html"); 
-// No data needs to be passed via JS for the title
-```
-
-**Result:**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>My Awesome Home Page</title>
-</head>
-<body>
-  <main>
-    <h2>Welcome!</h2>
-    <p>This is the home page content.</p>
-  </main>
-</body>
-</html>
-```
-
-### Raw File Inclusion Example
-
-**File: `views/page.html`**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>My Page</title>
-  <style>
-    /* include views/assets/style.css */
-  </style>
-</head>
-<body>
-  <h1>Welcome!</h1>
-  <script>
-    /* include views/assets/script.js */
-  </script>
-</body>
-</html>
-```
-
-**File: `views/assets/style.css`**
 ```css
+/* views/assets/style.css */
 body {
   font-family: sans-serif;
   color: #333;
 }
 ```
 
-**File: `views/assets/script.js`**
+Missing files become `/* File not found: filename */`.
+
+## Layouts
+
+A layout is applied when the `layout` variable points to a template, either globally or through the render data:
+
 ```javascript
-console.log("Page loaded successfully!");
+app.setVar("layout", "layouts/main.html");
 ```
 
-**Result:**
+The layout is rendered with the page content available as `body` and all other data unchanged.
+
 ```html
+<!-- layouts/main.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Page</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      color: #333;
-    }
-  </style>
+  <title>{{ title }}</title>
 </head>
 <body>
-  <h1>Welcome!</h1>
-  <script>
-    console.log("Page loaded successfully!");
-  </script>
+  <main>{{ body }}</main>
 </body>
 </html>
 ```
+
+```html
+<!-- pages/about.html -->
+<!-- data { "title": "About Us" } -->
+<h2>About Us</h2>
+<p>This is the about page.</p>
+```
+
+The layout receives `title` from the page comment and the rendered page as `body`.
+
+Rules:
+
+- A template containing `<html>` or `<body>` is assumed to be complete and skips the layout unless it has `<!-- force-layout -->`.
+- A template without HTML structure still gets the layout unless it has `<!-- force-no-layout -->`.
+- Both marker comments are removed from the output.
+
+## Errors
+
+| Case | Output |
+|------|--------|
+| Missing partial | `<!-- Template not found: path -->` |
+| Circular partial | `<!-- Circular dependency detected: ... -->` |
+| Missing raw file | `/* File not found: path */` |
+| Invalid `<!-- data -->` JSON | `<!-- Invalid template data -->` |
+| Any other rendering error | `<-- Template path has errors -->` |
